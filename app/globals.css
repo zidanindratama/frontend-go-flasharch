@@ -191,13 +191,3 @@
 ::view-transition-new(root) {
   z-index: 2;
 }
-
-.theme-mobile-transition,
-.theme-mobile-transition *,
-.theme-mobile-transition *::before,
-.theme-mobile-transition *::after {
-  transition-property: background-color, color, border-color, fill, stroke,
-    box-shadow, opacity;
-  transition-duration: 650ms;
-  transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
-}

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { flushSync } from "react-dom";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
@@ -37,15 +38,8 @@ export function Navbar() {
   const isActive = (href: string) =>
     pathname === href || pathname.startsWith(`${href}/`);
 
-  const shouldUseThemeTransition = () => {
-    const prefersReducedMotion = window.matchMedia(
-      "(prefers-reduced-motion: reduce)",
-    ).matches;
-    const coarsePointer = window.matchMedia("(pointer: coarse)").matches;
-    const smallViewport = window.matchMedia("(max-width: 767px)").matches;
-
-    return !prefersReducedMotion && !coarsePointer && !smallViewport;
-  };
+  const prefersReducedMotion = () =>
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   const toggleTheme = () => {
     if (themeChanging) return;
@@ -60,22 +54,17 @@ export function Navbar() {
 
     setThemeChanging(true);
 
-    if (
-      !transitionDocument.startViewTransition ||
-      !shouldUseThemeTransition()
-    ) {
-      document.documentElement.classList.add("theme-mobile-transition");
+    if (!transitionDocument.startViewTransition || prefersReducedMotion()) {
       setTheme(target);
 
-      window.setTimeout(() => {
-        document.documentElement.classList.remove("theme-mobile-transition");
-        setThemeChanging(false);
-      }, 720);
+      window.requestAnimationFrame(() => setThemeChanging(false));
       return;
     }
 
     const transition = transitionDocument.startViewTransition(() => {
-      setTheme(target);
+      flushSync(() => {
+        setTheme(target);
+      });
     });
 
     transition.ready.then(() => {
@@ -95,11 +84,11 @@ export function Navbar() {
         },
         {
           duration: 750,
-          easing: "cubic-bezier(0.42, 0, 0.58, 1)",
+          easing: "cubic-bezier(0.16, 1, 0.3, 1)",
           pseudoElement: "::view-transition-new(root)",
         },
       );
-    });
+    }).catch(() => undefined);
 
     transition.finished.finally(() => setThemeChanging(false));
   };
