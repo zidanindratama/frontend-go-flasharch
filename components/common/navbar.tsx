@@ -12,22 +12,14 @@ import {
   Sun,
   Moon,
   Zap,
-  ShoppingBag,
-  Activity,
-  Cpu,
-  BookOpen,
   ArrowUpRight,
-  Gauge,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const navLinks = [
-  { href: "/about", label: "About", icon: BookOpen },
-  { href: "/architecture", label: "Architecture", icon: Cpu },
-  { href: "/observability", label: "Observability", icon: Activity },
-  { href: "/load-test", label: "Load Test", icon: Gauge },
-  { href: "/products", label: "Products", icon: ShoppingBag },
-  { href: "/flash-sale", label: "Flash Sale", icon: Zap },
+  { href: "/about", label: "About" },
+  { href: "/products", label: "Products" },
+  { href: "/flash-sale", label: "Flash Sale" },
 ];
 
 export function Navbar() {
@@ -38,10 +30,13 @@ export function Navbar() {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    setMounted(true);
+    const frame = window.requestAnimationFrame(() => setMounted(true));
     const onScroll = () => setScrolled(window.scrollY > 40);
     window.addEventListener("scroll", onScroll);
-    return () => window.removeEventListener("scroll", onScroll);
+    return () => {
+      window.cancelAnimationFrame(frame);
+      window.removeEventListener("scroll", onScroll);
+    };
   }, []);
 
   const isActive = (href: string) =>

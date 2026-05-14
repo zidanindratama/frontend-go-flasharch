@@ -79,13 +79,13 @@ export function AboutHero() {
               size="lg"
               className="rounded-full bg-[#FF6600] px-7 text-white hover:bg-[#e65c00]"
             >
-              <Link href="/architecture">
+              <Link href="/about/architecture">
                 View Architecture
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
             </Button>
             <Button asChild size="lg" variant="outline" className="rounded-full px-7">
-              <Link href="/load-test">Load Test Evidence</Link>
+              <Link href="/about/load-test">Load Test Evidence</Link>
             </Button>
           </motion.div>
         </div>

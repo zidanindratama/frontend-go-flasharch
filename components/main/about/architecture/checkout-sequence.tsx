@@ -56,7 +56,7 @@ export function CheckoutSequence() {
                 asChild
                 className="rounded-full bg-[#FF6600] px-7 text-white hover:bg-[#e65c00]"
               >
-                <Link href="/load-test">
+                <Link href="/about/load-test">
                   View Load Test
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>

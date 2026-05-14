@@ -49,7 +49,7 @@ export function ThesisContribution() {
                 </Link>
               </Button>
               <Button asChild variant="outline" className="rounded-full px-7">
-                <Link href="/observability">Open Observability</Link>
+                <Link href="/about/observability">Open Observability</Link>
               </Button>
             </div>
           </motion.div>

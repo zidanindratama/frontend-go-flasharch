@@ -13,9 +13,10 @@ const footerLinks = {
     { label: "Orders", href: "/orders" },
   ],
   System: [
-    { label: "Architecture", href: "/architecture" },
-    { label: "Observability", href: "/observability" },
-    { label: "Load Test", href: "/load-test" },
+    { label: "About", href: "/about" },
+    { label: "Architecture", href: "/about/architecture" },
+    { label: "Observability", href: "/about/observability" },
+    { label: "Load Test", href: "/about/load-test" },
   ],
   Account: [
     { label: "Sign In", href: "/login" },

@@ -66,7 +66,7 @@ export function ArchitectureHero() {
               </Link>
             </Button>
             <Button asChild size="lg" variant="outline" className="rounded-full px-7">
-              <Link href="/observability">Inspect Signals</Link>
+              <Link href="/about/observability">Inspect Signals</Link>
             </Button>
           </div>
         </motion.div>

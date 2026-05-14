@@ -341,7 +341,7 @@ export function ArchitectureProof() {
             variant="ghost"
             className="rounded-full border border-white/20 bg-transparent px-8 text-white hover:bg-white/10 hover:text-white"
           >
-            <Link href="/architecture">
+            <Link href="/about/architecture">
               Explore full architecture
               <ArrowRight className="ml-2 h-4 w-4" />
             </Link>
