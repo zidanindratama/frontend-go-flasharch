@@ -36,7 +36,7 @@ export function BlogDetail({ post }: { post: BlogPost }) {
         </Button>
 
         <header className="grid gap-10 border-y border-border py-12 lg:grid-cols-[16rem_1fr]">
-          <div className="lg:pt-3">
+          <div className="order-2 border-t border-border pt-8 lg:order-1 lg:border-t-0 lg:pt-3">
             <p className="text-xs font-semibold uppercase tracking-widest text-[#FF6600]">
               {category?.name}
             </p>
@@ -65,7 +65,7 @@ export function BlogDetail({ post }: { post: BlogPost }) {
             </dl>
           </div>
 
-          <div>
+          <div className="order-1 lg:order-2">
             <p className="max-w-[56ch] text-sm leading-6 text-muted-foreground">
               {category?.description}
             </p>

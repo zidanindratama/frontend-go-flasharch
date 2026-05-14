@@ -5,12 +5,21 @@ import { MetricsPanel } from "@/components/main/about/observability/metrics-pane
 import { LogStream } from "@/components/main/about/observability/log-stream";
 import { QueueDepth } from "@/components/main/about/observability/queue-depth";
 import { TracePreview } from "@/components/main/about/observability/trace-preview";
+import { createPageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "Observability | Go FlashArch",
+export const metadata: Metadata = createPageMetadata({
+  title: "Flash Sale Observability Dashboard",
   description:
-    "Real-time operational dashboard for Go FlashArch: service health, metrics, logs, queue depth, distributed traces, and API contracts.",
-};
+    "Monitor Go FlashArch service health, queue depth, Prometheus-style metrics, Loki-style logs, and Tempo-style traces for high-pressure checkout flows.",
+  path: "/about/observability",
+  keywords: [
+    "flash sale observability",
+    "Prometheus metrics",
+    "Loki logs",
+    "Tempo traces",
+    "queue monitoring",
+  ],
+});
 
 export default function ObservabilityPage() {
   return (

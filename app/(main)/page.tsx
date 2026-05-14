@@ -7,12 +7,19 @@ import { HowItWorksForYou } from "@/components/main/home/how-it-works-for-you";
 import { ArchitectureProof } from "@/components/main/home/architecture-proof";
 import { DropPrep } from "@/components/main/home/drop-prep";
 import { FinalCTA } from "@/components/common/final-cta";
+import { createPageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "Go FlashArch - Flash Sale Shopping",
+export const metadata: Metadata = createPageMetadata({
+  title: "Flash Sale Shopping With Stock-Safe Checkout",
   description:
-    "Shop limited drops with clearer stock, faster checkout, and order updates you can trust.",
-};
+    "Shop limited drops on Go FlashArch with clearer stock signals, faster checkout, queue-aware order states, and backend reliability built for traffic spikes.",
+  path: "/",
+  keywords: [
+    "flash sale shopping",
+    "limited stock checkout",
+    "stock-safe e-commerce",
+  ],
+});
 
 export default function HomePage() {
   return (

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { BlogDetail } from "@/components/main/blogs/blog-detail";
 import { blogPosts, getBlogCategory, getBlogPostBySlug } from "@/lib/blogs";
+import { createPageMetadata } from "@/lib/seo";
 
 type BlogDetailPageProps = {
   params: Promise<{
@@ -23,16 +24,35 @@ export async function generateMetadata({
 
   if (!post) {
     return {
-      title: "Guide Not Found | Go FlashArch",
+      title: "Guide Not Found",
+      robots: {
+        index: false,
+        follow: false,
+      },
     };
   }
 
   const category = getBlogCategory(post.categoryId);
+  const metadata = createPageMetadata({
+    title: post.title,
+    description: post.excerpt,
+    path: `/blogs/${post.slug}`,
+    keywords: [
+      category?.name ?? "Shopping Guide",
+      "Go FlashArch guide",
+      "flash sale buyer guide",
+    ],
+  });
 
   return {
-    title: `${post.title} | Go FlashArch`,
-    description: post.excerpt,
-    keywords: [category?.name ?? "Shopping Guide", "Go FlashArch"],
+    ...metadata,
+    openGraph: {
+      ...metadata.openGraph,
+      type: "article",
+      publishedTime: post.publishedAt,
+      authors: [post.author],
+      tags: [category?.name ?? "Shopping Guide", "Go FlashArch"],
+    },
   };
 }
 

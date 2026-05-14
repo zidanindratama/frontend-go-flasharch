@@ -1,11 +1,15 @@
 import type { Metadata } from "next";
 import { AuthShell } from "@/components/auth/auth-shell";
 import { ForgotPasswordForm } from "@/components/auth/recovery-forms";
+import { createPageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "Forgot Password | Go FlashArch",
-  description: "Password recovery request UI for Go FlashArch.",
-};
+export const metadata: Metadata = createPageMetadata({
+  title: "Forgot Password",
+  description:
+    "Request a Go FlashArch password reset code and recover account access before checkout or flash sale entry.",
+  path: "/forgot-password",
+  noIndex: true,
+});
 
 export default function ForgotPasswordPage() {
   return (
