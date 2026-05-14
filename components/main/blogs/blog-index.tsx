@@ -10,7 +10,6 @@ import {
   Search,
   SlidersHorizontal,
 } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -111,9 +110,9 @@ export function BlogIndex() {
           className="grid gap-8 lg:grid-cols-[1fr_27rem] lg:items-end"
         >
           <div>
-            <Badge variant="outline" className="rounded-full">
+            <span className="text-xs font-semibold uppercase tracking-widest text-[#FF6600]">
               Guides and stories
-            </Badge>
+            </span>
             <h1 className="mt-5 max-w-4xl text-4xl font-bold tracking-tight md:text-6xl">
               Shop smarter before the next drop.
             </h1>
@@ -232,9 +231,9 @@ function BlogFeature({ post }: { post: BlogPost }) {
     <Link href={`/blogs/${post.slug}`} className="group block">
       <div className="rounded-lg border border-border bg-[#151515] p-5 text-[#f4f1ec] transition-colors group-hover:border-[#FF6600]/45">
         <div className="flex items-center justify-between gap-4">
-          <Badge className="rounded-full bg-[#FF6600]/15 text-[#FF6600]">
-            Featured
-          </Badge>
+          <span className="text-xs font-semibold uppercase tracking-widest text-[#FF6600]">
+            Featured read
+          </span>
           <span className="text-xs text-[#a7a19a]">{post.readMinutes} min read</span>
         </div>
         <h2 className="mt-8 text-2xl font-bold tracking-tight">{post.title}</h2>
@@ -267,10 +266,10 @@ function BlogCard({ post, index }: { post: BlogPost; index: number }) {
       }}
       className="group flex min-h-[21rem] flex-col rounded-lg border border-border bg-card p-5"
     >
-      <div className="flex items-center justify-between gap-3">
-        <Badge variant="outline" className="rounded-full">
+      <div className="flex items-center justify-between gap-3 border-b border-border pb-4">
+        <span className="text-xs font-semibold uppercase tracking-widest text-[#FF6600]">
           {category?.name}
-        </Badge>
+        </span>
         <span className="text-xs text-muted-foreground">
           {post.readMinutes} min read
         </span>
