@@ -206,7 +206,7 @@ export function Navbar() {
                 size="sm"
                 className="hidden md:flex rounded-full text-sm font-medium"
               >
-                <Link href="/login">Sign In</Link>
+                <Link href="/sign-in">Sign In</Link>
               </Button>
 
               {/* Mobile menu toggle */}
@@ -317,7 +317,7 @@ export function Navbar() {
                   variant="outline"
                   className="h-12 w-full rounded-full"
                 >
-                  <Link href="/login" onClick={() => setMobileOpen(false)}>
+                  <Link href="/sign-in" onClick={() => setMobileOpen(false)}>
                     Sign In
                   </Link>
                 </Button>

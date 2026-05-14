@@ -130,7 +130,7 @@ const endpoints = [
   { label: "POST /flash-sale/checkout", value: "checkout" },
   { label: "GET /products", value: "products" },
   { label: "GET /flash-sales/active", value: "flash-sales" },
-  { label: "POST /auth/login", value: "login" },
+  { label: "POST /auth/sign-in", value: "sign-in" },
 ];
 
 function ConfigPanel({ config, onChange }: { config: Config; onChange: (c: Config) => void }) {

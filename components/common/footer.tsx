@@ -19,8 +19,8 @@ const footerLinks = {
     { label: "Load Test", href: "/about/load-test" },
   ],
   Account: [
-    { label: "Sign In", href: "/login" },
-    { label: "Register", href: "/register" },
+    { label: "Sign In", href: "/sign-in" },
+    { label: "Sign Up", href: "/sign-up" },
     { label: "Forgot Password", href: "/forgot-password" },
   ],
 };
