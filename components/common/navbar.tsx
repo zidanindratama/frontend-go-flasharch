@@ -25,6 +25,7 @@ const navLinks = [
 export function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [themeChanging, setThemeChanging] = useState(false);
   const pathname = usePathname();
   const { setTheme, resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
@@ -42,16 +43,40 @@ export function Navbar() {
   const isActive = (href: string) =>
     pathname === href || pathname.startsWith(`${href}/`);
 
+  const shouldUseThemeTransition = () => {
+    const prefersReducedMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
+    const coarsePointer = window.matchMedia("(pointer: coarse)").matches;
+    const smallViewport = window.matchMedia("(max-width: 767px)").matches;
+
+    return !prefersReducedMotion && !coarsePointer && !smallViewport;
+  };
+
   const toggleTheme = () => {
+    if (themeChanging) return;
+
     const target = resolvedTheme === "dark" ? "light" : "dark";
     const transitionDocument = document as Document & {
       startViewTransition?: (callback: () => void) => {
         ready: Promise<void>;
+        finished: Promise<void>;
       };
     };
 
-    if (!transitionDocument.startViewTransition) {
+    setThemeChanging(true);
+
+    if (
+      !transitionDocument.startViewTransition ||
+      !shouldUseThemeTransition()
+    ) {
+      document.documentElement.classList.add("theme-mobile-transition");
       setTheme(target);
+
+      window.setTimeout(() => {
+        document.documentElement.classList.remove("theme-mobile-transition");
+        setThemeChanging(false);
+      }, 720);
       return;
     }
 
@@ -81,6 +106,8 @@ export function Navbar() {
         },
       );
     });
+
+    transition.finished.finally(() => setThemeChanging(false));
   };
 
   return (
@@ -144,6 +171,7 @@ export function Navbar() {
                   variant="ghost"
                   size="icon"
                   onClick={toggleTheme}
+                  disabled={themeChanging}
                   className="h-9 w-9 rounded-full text-muted-foreground hover:text-foreground"
                 >
                   <AnimatePresence mode="wait">
