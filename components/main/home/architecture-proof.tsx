@@ -17,14 +17,16 @@ import {
 const smoothEase: [number, number, number, number] = [0.16, 1, 0.3, 1];
 
 const flowSteps = [
-  { label: "Frontend", icon: Server, desc: "Request" },
-  { label: "API", icon: Layers, desc: "Validate" },
-  { label: "Redis", icon: Database, desc: "Atomic Gate" },
-  { label: "RabbitMQ", icon: Layers, desc: "Buffer" },
-  { label: "Worker", icon: Server, desc: "Process" },
-  { label: "PostgreSQL", icon: HardDrive, desc: "Persist" },
-  { label: "LGTP", icon: Activity, desc: "Observe" },
+  { label: "Browse", icon: Server, desc: "Find a deal" },
+  { label: "Choose", icon: Layers, desc: "Pick item" },
+  { label: "Reserve", icon: Database, desc: "Hold stock" },
+  { label: "Line up", icon: Layers, desc: "Wait fairly" },
+  { label: "Confirm", icon: Server, desc: "Finish order" },
+  { label: "Saved", icon: HardDrive, desc: "Order ready" },
+  { label: "Update", icon: Activity, desc: "Status shown" },
 ];
+
+const highlightedSteps = ["Reserve", "Line up", "Confirm"];
 
 function ArchitectureCanvas() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -97,7 +99,7 @@ function ArchitectureCanvas() {
 
       // Draw nodes
       nodes.forEach((node, i) => {
-        const isCritical = flowSteps[i].label === "Redis" || flowSteps[i].label === "RabbitMQ";
+        const isCritical = highlightedSteps.includes(flowSteps[i].label);
 
         // Glow
         ctx.beginPath();
@@ -165,7 +167,7 @@ export function ArchitectureProof() {
             viewport={{ once: false, amount: 0.5 }}
             className="text-xs font-semibold uppercase tracking-widest text-[#FF6600]"
           >
-            System Architecture
+            Why It Feels Better
           </motion.span>
           <h2 className="mt-4 text-4xl font-bold tracking-tight md:text-5xl lg:text-6xl text-white">
             <SplitText
@@ -181,9 +183,8 @@ export function ArchitectureProof() {
             transition={{ duration: 0.8, ease: smoothEase, delay: 0.6 }}
             className="mt-6 max-w-2xl mx-auto text-muted-foreground"
           >
-            Every checkout follows a validated path. Redis guards stock.
-            RabbitMQ absorbs spikes. Workers persist safely. Observability
-            keeps it all visible.
+            When many people buy at once, the flow keeps stock clear, checkout
+            orderly, and order status easy to understand.
           </motion.p>
         </div>
 
@@ -204,7 +205,7 @@ export function ArchitectureProof() {
               >
                 <step.icon
                   className={`h-5 w-5 ${
-                    step.label === "Redis" || step.label === "RabbitMQ"
+                    highlightedSteps.includes(step.label)
                       ? "text-[#FF6600]"
                       : "text-white/40"
                   }`}
@@ -227,17 +228,17 @@ export function ArchitectureProof() {
         >
           <div className="mb-4 flex items-center justify-between border-y border-white/10 py-3">
             <span className="font-mono text-[10px] uppercase tracking-[0.24em] text-white/35">
-              Checkout route
+              Checkout journey
             </span>
             <span className="font-mono text-[10px] text-[#FF6600]">
-              async_safe=true
+              fair_flow=on
             </span>
           </div>
 
           <div className="relative">
             <div className="absolute left-[21px] top-5 bottom-5 w-px bg-gradient-to-b from-transparent via-white/18 to-transparent" />
             {flowSteps.map((step, index) => {
-              const isGate = step.label === "Redis" || step.label === "RabbitMQ";
+              const isGate = highlightedSteps.includes(step.label);
 
               return (
                 <motion.div
@@ -299,10 +300,10 @@ export function ArchitectureProof() {
           className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4"
         >
           {[
-            { label: "P95 Latency", value: "42ms", color: "#F6B73C" },
-            { label: "Throughput", value: "8,400 rps", color: "#FF6600" },
-            { label: "Oversell Count", value: "0", color: "#39FF14" },
-            { label: "Queue Depth", value: "1,247", color: "#DC143C" },
+            { label: "Checkout Feel", value: "Fast", color: "#F6B73C" },
+            { label: "Busy Drops", value: "Handled", color: "#FF6600" },
+            { label: "Surprise Sellouts", value: "0", color: "#39FF14" },
+            { label: "Order Updates", value: "Clear", color: "#DC143C" },
           ].map((metric, i) => (
             <motion.div
               key={metric.label}
@@ -342,7 +343,7 @@ export function ArchitectureProof() {
             className="rounded-full border border-white/20 bg-transparent px-8 text-white hover:bg-white/10 hover:text-white"
           >
             <Link href="/about/architecture">
-              Explore full architecture
+              See why it works
               <ArrowRight className="ml-2 h-4 w-4" />
             </Link>
           </Button>

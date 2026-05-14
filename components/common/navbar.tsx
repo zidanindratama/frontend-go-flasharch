@@ -6,18 +6,12 @@ import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/button";
-import {
-  Menu,
-  X,
-  Sun,
-  Moon,
-  Zap,
-  ArrowUpRight,
-} from "lucide-react";
+import { Menu, X, Sun, Moon, Zap, ArrowUpRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const navLinks = [
   { href: "/about", label: "About" },
+  { href: "/blogs", label: "Guides" },
   { href: "/products", label: "Products" },
   { href: "/flash-sale", label: "Flash Sale" },
 ];

@@ -28,8 +28,8 @@ export function FinalCTA() {
           <span className="text-[#FF6600]">drop?</span>
         </h2>
         <p className="mt-6 text-lg text-muted-foreground">
-          Experience atomic stock safety under pressure. Join thousands of
-          buyers in the next flash sale event.
+          Join the next drop with clearer stock, faster checkout, and order
+          updates that make busy sale moments easier to trust.
         </p>
         <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
           <Button
@@ -48,7 +48,7 @@ export function FinalCTA() {
             variant="outline"
             className="rounded-full border-border px-8 text-base"
           >
-            <Link href="/about">About Thesis</Link>
+            <Link href="/about">Why It Works</Link>
           </Button>
         </div>
       </motion.div>

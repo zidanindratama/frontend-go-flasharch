@@ -8,20 +8,19 @@ import { SplitText } from "@/components/common/split-text";
 import { AnimatedGridBackground } from "@/components/common/animated-grid-bg";
 import {
   ArrowRight,
-  Zap,
-  Activity,
-  Database,
-  Layers,
-  Shield,
+  BadgeCheck,
+  Clock3,
+  PackageCheck,
+  ShieldCheck,
 } from "lucide-react";
 
 const smoothEase: [number, number, number, number] = [0.16, 1, 0.3, 1];
 
 const floatingBadges = [
-  { icon: Database, label: "Redis", value: "Atomic", x: "10%", y: "20%", delay: 0.2 },
-  { icon: Layers, label: "RabbitMQ", value: "Buffered", x: "85%", y: "25%", delay: 0.4 },
-  { icon: Shield, label: "Stock", value: "Safe", x: "8%", y: "70%", delay: 0.6 },
-  { icon: Activity, label: "Latency", value: "42ms", x: "88%", y: "65%", delay: 0.8 },
+  { icon: ShieldCheck, label: "Stock", value: "Protected", x: "10%", y: "20%", delay: 0.2 },
+  { icon: Clock3, label: "Checkout", value: "Quick", x: "85%", y: "25%", delay: 0.4 },
+  { icon: BadgeCheck, label: "Orders", value: "Clear", x: "8%", y: "70%", delay: 0.6 },
+  { icon: PackageCheck, label: "Updates", value: "Live", x: "88%", y: "65%", delay: 0.8 },
 ];
 
 export function StorefrontHero() {
@@ -62,7 +61,7 @@ export function StorefrontHero() {
           >
             <span className="h-px w-8 bg-[#DC143C]" />
             <span className="text-xs font-semibold uppercase tracking-widest text-[#DC143C]">
-              Flash sale traffic is live
+              Limited deals are live
             </span>
             <span className="h-px w-8 bg-[#DC143C]" />
           </motion.div>
@@ -93,8 +92,8 @@ export function StorefrontHero() {
             transition={{ duration: 0.8, ease: smoothEase, delay: 1.4 }}
             className="mt-8 max-w-xl text-base leading-relaxed text-muted-foreground md:text-lg"
           >
-            High-performance flash sale engine with Redis atomic stock gates,
-            RabbitMQ pressure buffers, and real-time observability.
+            Shop limited drops with clearer stock, faster checkout, and fewer
+            frustrating surprises when demand spikes.
           </motion.p>
 
           {/* CTAs */}
@@ -134,9 +133,9 @@ export function StorefrontHero() {
             className="mt-16 grid grid-cols-3 gap-8 md:gap-16"
           >
             {[
-              { value: "8.4K", label: "Req/sec" },
-              { value: "42ms", label: "P95 Latency" },
-              { value: "0", label: "Oversell" },
+              { value: "Live", label: "Stock updates" },
+              { value: "Fast", label: "Checkout flow" },
+              { value: "0", label: "Surprise sellouts" },
             ].map((stat) => (
               <div key={stat.label} className="text-center">
                 <div className="text-2xl font-bold tabular-nums text-foreground md:text-3xl">

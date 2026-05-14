@@ -91,11 +91,11 @@ export function ActiveFlashSale() {
         <Marquee
           items={[
             "Flash Sale Live",
-            "Redis Atomic Stock",
-            "RabbitMQ Buffered",
-            "Zero Oversell",
-            "Real-time Observability",
-            "High Throughput",
+            "Limited Deals",
+            "Clear Stock",
+            "Fast Checkout",
+            "Order Updates",
+            "No Surprise Sellouts",
           ]}
           speed={40}
         />
@@ -124,8 +124,8 @@ export function ActiveFlashSale() {
               Weekend Tech Drop
             </h2>
             <p className="mt-4 text-muted-foreground max-w-md">
-              Up to 40% off electronics. Stock validated atomically in Redis.
-              Checkout buffered through RabbitMQ.
+              Up to 40% off electronics. See what is still available, move
+              quickly, and know what happens after you place an order.
             </p>
 
             <div className="mt-8">
@@ -165,7 +165,7 @@ export function ActiveFlashSale() {
             <div className="rounded-2xl border border-border bg-card p-6 md:p-8">
               <div className="flex items-center justify-between">
                 <h3 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
-                  Live Metrics
+                  Drop Snapshot
                 </h3>
                 <Badge
                   variant="outline"
@@ -178,10 +178,10 @@ export function ActiveFlashSale() {
 
               <div className="mt-6 grid grid-cols-2 gap-4">
                 {[
-                  { icon: TrendingUp, label: "Throughput", value: "4,200/min" },
-                  { icon: Users, label: "Active Buyers", value: "1,847" },
-                  { icon: Zap, label: "Queue Depth", value: "1,247" },
-                  { icon: Clock, label: "Avg Process", value: "38ms" },
+                  { icon: TrendingUp, label: "Items claimed", value: "4,200" },
+                  { icon: Users, label: "Shopping now", value: "1,847" },
+                  { icon: Zap, label: "Deals left", value: "1,247" },
+                  { icon: Clock, label: "Checkout pace", value: "Fast" },
                 ].map((stat) => (
                   <div
                     key={stat.label}
@@ -220,10 +220,10 @@ export function ActiveFlashSale() {
             <div className="absolute -top-4 -right-4 hidden lg:block">
               <div className="rounded-xl border border-border bg-card px-4 py-3 shadow-lg">
                 <div className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-                  Redis Gate
+                  Stock check
                 </div>
                 <div className="mt-1 text-sm font-bold text-emerald-700 dark:text-[#39FF14]">
-                  Atomic OK
+                  Ready
                 </div>
               </div>
             </div>
@@ -235,12 +235,12 @@ export function ActiveFlashSale() {
       <div className="relative border-t border-border/50 py-3">
         <Marquee
           items={[
-            "No Over-selling",
-            "PostgreSQL Persistence",
-            "Worker Pool Active",
-            "Loki Logging",
-            "Prometheus Metrics",
-            "Tempo Tracing",
+            "Order Status Clear",
+            "Checkout Stays Fair",
+            "Stock Updates Fast",
+            "Busy Drops Handled",
+            "Deals End On Time",
+            "Buy With Confidence",
           ]}
           speed={40}
           direction="right"

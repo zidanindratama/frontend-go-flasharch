@@ -185,7 +185,8 @@ export function FeaturedProducts() {
               Popular right now
             </h2>
             <p className="mt-4 max-w-md text-muted-foreground">
-              Verified stock safety and real-time availability on every item.
+              Clear availability before you commit, so checkout feels direct
+              and predictable.
             </p>
           </div>
           <Button

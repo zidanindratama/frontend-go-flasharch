@@ -11,12 +11,13 @@ const footerLinks = {
     { label: "Products", href: "/products" },
     { label: "Flash Sale", href: "/flash-sale" },
     { label: "Orders", href: "/orders" },
+    { label: "Guides", href: "/blogs" },
   ],
   System: [
     { label: "About", href: "/about" },
-    { label: "Architecture", href: "/about/architecture" },
-    { label: "Observability", href: "/about/observability" },
-    { label: "Load Test", href: "/about/load-test" },
+    { label: "Why It Works", href: "/about/architecture" },
+    { label: "Reliability View", href: "/about/observability" },
+    { label: "Stress Test", href: "/about/load-test" },
   ],
   Account: [
     { label: "Sign In", href: "/sign-in" },
@@ -42,9 +43,8 @@ export function Footer() {
               </span>
             </Link>
             <p className="mt-4 max-w-sm text-sm leading-relaxed text-muted-foreground">
-              High-performance e-commerce with Redis atomic stock gates,
-              RabbitMQ pressure buffers, and observability you can trust.
-              Built for thesis research and real-world flash sale pressure.
+              Flash sale shopping with clearer stock, faster checkout, and
+              order updates that make busy drops easier to trust.
             </p>
             <div className="mt-6 flex items-center gap-3">
               <a
@@ -103,7 +103,7 @@ export function Footer() {
               About Thesis
             </Link>
             <span className="text-xs text-muted-foreground">
-              Redis &middot; RabbitMQ &middot; PostgreSQL &middot; LGTP
+              Built for fair checkout and high-demand sale moments
             </span>
           </div>
         </div>
