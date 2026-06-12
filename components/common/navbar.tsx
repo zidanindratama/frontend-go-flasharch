@@ -15,6 +15,7 @@ const navLinks = [
   { href: "/blogs", label: "Guides" },
   { href: "/products", label: "Products" },
   { href: "/flash-sale", label: "Flash Sale" },
+  { href: "/account", label: "Account" },
 ];
 
 export function Navbar() {
