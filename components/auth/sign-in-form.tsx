@@ -1,39 +1,35 @@
-"use client";
+"use client"
 
-import Link from "next/link";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { motion } from "framer-motion";
-import { ArrowRight, Eye, EyeOff, LockKeyhole, Shield } from "lucide-react";
-import { useState } from "react";
-import { useForm } from "react-hook-form";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
+import Link from "next/link"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { motion } from "framer-motion"
+import { ArrowRight, Eye, EyeOff, Loader2, LockKeyhole } from "lucide-react"
+import { useState } from "react"
+import { useForm } from "react-hook-form"
+import { Button } from "@/components/ui/button"
 import {
   Field,
-  FieldDescription,
   FieldError,
   FieldGroup,
   FieldLabel,
-} from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
-import { signInSchema, type SignInValues } from "@/lib/validations/auth";
+} from "@/components/ui/field"
+import { Input } from "@/components/ui/input"
+import { useSignIn } from "@/hooks/use-auth"
+import { signInSchema, type SignInValues } from "@/lib/validations/auth"
 
 export function SignInForm() {
-  const [showPassword, setShowPassword] = useState(false);
-  const [remember, setRemember] = useState(true);
-  const [submitted, setSubmitted] = useState<SignInValues | null>(null);
+  const [showPassword, setShowPassword] = useState(false)
+  const signIn = useSignIn()
   const form = useForm<SignInValues>({
     resolver: zodResolver(signInSchema),
     defaultValues: {
       email: "",
       password: "",
-      remember: true,
     },
-  });
+  })
 
-  function onSubmit(values: SignInValues) {
-    setSubmitted(values);
+  async function onSubmit(values: SignInValues) {
+    signIn.mutate({ email: values.email, password: values.password })
   }
 
   return (
@@ -48,16 +44,6 @@ export function SignInForm() {
           flash sales.
         </p>
       </div>
-
-      {submitted ? (
-        <Alert className="border-[#39FF14]/30 bg-[#39FF14]/10">
-          <Shield className="size-4 text-[#39FF14]" />
-          <AlertTitle>Your details look ready</AlertTitle>
-          <AlertDescription>
-            This preview has not signed you in yet.
-          </AlertDescription>
-        </Alert>
-      ) : null}
 
       <FieldGroup>
         <Field>
@@ -107,27 +93,19 @@ export function SignInForm() {
           <FieldError errors={[form.formState.errors.password]} />
         </Field>
 
-        <Field orientation="horizontal" className="items-start">
-          <Checkbox
-            id="remember"
-            checked={remember}
-            onCheckedChange={(checked) => {
-              const nextValue = checked === true;
-              setRemember(nextValue);
-              form.setValue("remember", nextValue);
-            }}
-          />
-          <div>
-            <FieldLabel htmlFor="remember">Remember this device</FieldLabel>
-            <FieldDescription>
-              Use this only on a device you trust.
-            </FieldDescription>
-          </div>
-        </Field>
       </FieldGroup>
 
-      <Button type="submit" size="lg" className="h-11 w-full">
-        <LockKeyhole />
+      <Button
+        type="submit"
+        size="lg"
+        className="h-11 w-full"
+        disabled={signIn.isPending}
+      >
+        {signIn.isPending ? (
+          <Loader2 className="animate-spin" />
+        ) : (
+          <LockKeyhole />
+        )}
         Sign in
         <ArrowRight data-icon="inline-end" />
       </Button>
@@ -143,6 +121,19 @@ export function SignInForm() {
           Create account
         </Link>
       </motion.p>
+
+      <motion.p
+        initial={{ opacity: 0, y: 8 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: false, amount: 0.5 }}
+        transition={{ delay: 0.05 }}
+        className="text-center text-xs text-muted-foreground"
+      >
+        Didn&apos;t receive the email?{" "}
+        <Link href="/verify-email" className="font-medium text-primary">
+          Resend verification
+        </Link>
+      </motion.p>
     </form>
-  );
+  )
 }

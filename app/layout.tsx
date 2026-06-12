@@ -1,19 +1,22 @@
-import type { Metadata, Viewport } from "next";
-import { Plus_Jakarta_Sans, Geist_Mono } from "next/font/google";
-import { ThemeProvider } from "@/components/providers/theme-provider";
-import { SITE_URL, siteConfig } from "@/lib/seo";
-import "./globals.css";
+import type { Metadata, Viewport } from "next"
+import { Plus_Jakarta_Sans, Geist_Mono } from "next/font/google"
+import { QueryProvider } from "@/components/providers/query-provider"
+import { ThemeProvider } from "@/components/providers/theme-provider"
+import { AuthStoreHydration } from "@/components/providers/auth-store-hydration"
+import { Toaster } from "@/components/ui/sonner"
+import { SITE_URL, siteConfig } from "@/lib/seo"
+import "./globals.css"
 
 const plusJakarta = Plus_Jakarta_Sans({
   variable: "--font-sans",
   subsets: ["latin"],
   weight: ["300", "400", "500", "600", "700", "800"],
-});
+})
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
-});
+})
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -73,7 +76,7 @@ export const metadata: Metadata = {
   alternates: {
     canonical: SITE_URL,
   },
-};
+}
 
 export const viewport: Viewport = {
   themeColor: [
@@ -83,12 +86,12 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   maximumScale: 5,
-};
+}
 
 export default function RootLayout({
   children,
 }: Readonly<{
-  children: React.ReactNode;
+  children: React.ReactNode
 }>) {
   return (
     <html
@@ -103,9 +106,13 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          {children}
+          <AuthStoreHydration />
+          <QueryProvider>
+            {children}
+            <Toaster position="top-center" />
+          </QueryProvider>
         </ThemeProvider>
       </body>
     </html>
-  );
+  )
 }

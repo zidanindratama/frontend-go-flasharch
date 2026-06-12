@@ -1,27 +1,29 @@
-"use client";
+"use client"
 
-import Link from "next/link";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { ArrowRight, Eye, EyeOff, MailCheck, UserPlus } from "lucide-react";
-import { useState } from "react";
-import { useForm } from "react-hook-form";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
+import Link from "next/link"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { ArrowRight, Eye, EyeOff, Loader2, MailCheck, UserPlus } from "lucide-react"
+import { useState } from "react"
+import { useForm } from "react-hook-form"
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import { Button } from "@/components/ui/button"
+import { Checkbox } from "@/components/ui/checkbox"
 import {
   Field,
   FieldDescription,
   FieldError,
   FieldGroup,
   FieldLabel,
-} from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
-import { signUpSchema, type SignUpValues } from "@/lib/validations/auth";
+} from "@/components/ui/field"
+import { Input } from "@/components/ui/input"
+import { useSignUp } from "@/hooks/use-auth"
+import { signUpSchema, type SignUpValues } from "@/lib/validations/auth"
 
 export function SignUpForm() {
-  const [showPassword, setShowPassword] = useState(false);
-  const [acceptTerms, setAcceptTerms] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
+  const [showPassword, setShowPassword] = useState(false)
+  const [acceptTerms, setAcceptTerms] = useState(false)
+  const [submitted, setSubmitted] = useState(false)
+  const signUp = useSignUp()
   const form = useForm<SignUpValues>({
     resolver: zodResolver(signUpSchema),
     defaultValues: {
@@ -31,10 +33,13 @@ export function SignUpForm() {
       confirmPassword: "",
       acceptTerms: false,
     },
-  });
+  })
 
-  function onSubmit() {
-    setSubmitted(true);
+  async function onSubmit(values: SignUpValues) {
+    signUp.mutate(
+      { email: values.email, password: values.password, full_name: values.fullName },
+      { onSuccess: () => setSubmitted(true) },
+    )
   }
 
   return (
@@ -53,9 +58,9 @@ export function SignUpForm() {
       {submitted ? (
         <Alert className="border-[#39FF14]/30 bg-[#39FF14]/10">
           <MailCheck className="size-4 text-[#39FF14]" />
-          <AlertTitle>Your account details look ready</AlertTitle>
+          <AlertTitle>Account created</AlertTitle>
           <AlertDescription>
-            Email verification will be the next step.
+            Check your email for the verification link.
           </AlertDescription>
         </Alert>
       ) : null}
@@ -115,14 +120,27 @@ export function SignUpForm() {
 
           <Field>
             <FieldLabel htmlFor="confirmPassword">Confirm</FieldLabel>
-            <Input
-              id="confirmPassword"
-              type={showPassword ? "text" : "password"}
-              autoComplete="new-password"
-              placeholder="password123"
-              aria-invalid={!!form.formState.errors.confirmPassword}
-              {...form.register("confirmPassword")}
-            />
+            <div className="relative">
+              <Input
+                id="confirmPassword"
+                type={showPassword ? "text" : "password"}
+                autoComplete="new-password"
+                placeholder="password123"
+                className="pr-10"
+                aria-invalid={!!form.formState.errors.confirmPassword}
+                {...form.register("confirmPassword")}
+              />
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                className="absolute right-0 top-0"
+                onClick={() => setShowPassword((value) => !value)}
+                aria-label={showPassword ? "Hide password" : "Show password"}
+              >
+                {showPassword ? <EyeOff /> : <Eye />}
+              </Button>
+            </div>
             <FieldError errors={[form.formState.errors.confirmPassword]} />
           </Field>
         </div>
@@ -132,11 +150,11 @@ export function SignUpForm() {
             id="acceptTerms"
             checked={acceptTerms}
             onCheckedChange={(checked) => {
-              const nextValue = checked === true;
-              setAcceptTerms(nextValue);
+              const nextValue = checked === true
+              setAcceptTerms(nextValue)
               form.setValue("acceptTerms", nextValue, {
                 shouldValidate: true,
-              });
+              })
             }}
             aria-invalid={!!form.formState.errors.acceptTerms}
           />
@@ -152,8 +170,17 @@ export function SignUpForm() {
         </Field>
       </FieldGroup>
 
-      <Button type="submit" size="lg" className="h-11 w-full">
-        <UserPlus />
+      <Button
+        type="submit"
+        size="lg"
+        className="h-11 w-full"
+        disabled={signUp.isPending}
+      >
+        {signUp.isPending ? (
+          <Loader2 className="animate-spin" />
+        ) : (
+          <UserPlus />
+        )}
         Create account
         <ArrowRight data-icon="inline-end" />
       </Button>
@@ -165,5 +192,5 @@ export function SignUpForm() {
         </Link>
       </p>
     </form>
-  );
+  )
 }

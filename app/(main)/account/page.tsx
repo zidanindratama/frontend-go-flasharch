@@ -3,15 +3,14 @@
 import Link from "next/link"
 import { motion } from "framer-motion"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
-import { DashboardStats } from "@/components/account/dashboard-stats"
-import { LatestOrders } from "@/components/account/latest-orders"
-import { mockAccountDashboard, getInitials } from "@/lib/account-mock"
+import { useUser } from "@/hooks/use-auth"
 import {
   ShoppingBag,
   MapPin,
   Heart,
   Settings,
   ChevronRight,
+  PackageOpen,
 } from "lucide-react"
 
 const ease: [number, number, number, number] = [0.16, 1, 0.3, 1]
@@ -43,15 +42,19 @@ const navCards = [
   },
 ]
 
+function getInitials(name: string): string {
+  return name
+    .split(" ")
+    .map((n) => n[0])
+    .join("")
+    .toUpperCase()
+    .slice(0, 2)
+}
+
 export default function AccountPage() {
-  const {
-    user,
-    total_orders,
-    total_spent_amount,
-    pending_payment_count,
-    active_reservation_count,
-    latest_orders,
-  } = mockAccountDashboard
+  const { data: user } = useUser()
+
+  if (!user) return null
 
   return (
     <div className="space-y-4 lg:space-y-8">
@@ -63,16 +66,16 @@ export default function AccountPage() {
       >
         <Avatar className="h-10 w-10 lg:h-11 lg:w-11">
           <AvatarFallback className="bg-[#FF6600]/10 text-[#FF6600] font-semibold text-sm">
-            {getInitials(user.name)}
+            {getInitials(user.full_name)}
           </AvatarFallback>
         </Avatar>
         <div className="min-w-0">
           <h1 className="text-base font-bold tracking-tight lg:text-lg">
-            {user.name}
+            {user.full_name}
           </h1>
           <p className="text-xs text-muted-foreground lg:text-sm">
             Member since{" "}
-            {new Date(user.member_since).toLocaleDateString("id-ID", {
+            {new Date(user.created_at).toLocaleDateString("id-ID", {
               year: "numeric",
               month: "long",
             })}
@@ -80,14 +83,47 @@ export default function AccountPage() {
         </div>
       </motion.div>
 
-      <DashboardStats
-        totalOrders={total_orders}
-        totalSpent={total_spent_amount}
-        pendingPayments={pending_payment_count}
-        activeReservations={active_reservation_count}
-      />
+      <div className="rounded-xl bg-card p-4 ring-1 ring-foreground/10">
+        <div className="flex items-center gap-2 mb-3">
+          <PackageOpen className="h-4 w-4 text-muted-foreground" />
+          <p className="text-sm font-semibold">Quick Stats</p>
+        </div>
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+          <div className="rounded-lg bg-muted/50 p-3">
+            <p className="text-lg font-bold tabular-nums">0</p>
+            <p className="text-xs text-muted-foreground">Total Orders</p>
+          </div>
+          <div className="rounded-lg bg-muted/50 p-3">
+            <p className="text-lg font-bold tabular-nums">IDR 0</p>
+            <p className="text-xs text-muted-foreground">Total Spent</p>
+          </div>
+          <div className="rounded-lg bg-muted/50 p-3">
+            <p className="text-lg font-bold tabular-nums">0</p>
+            <p className="text-xs text-muted-foreground">Pending Payments</p>
+          </div>
+          <div className="rounded-lg bg-muted/50 p-3">
+            <p className="text-lg font-bold tabular-nums">0</p>
+            <p className="text-xs text-muted-foreground">Active Reservations</p>
+          </div>
+        </div>
+      </div>
 
-      <LatestOrders orders={latest_orders} />
+      <div className="rounded-xl bg-card p-4 ring-1 ring-foreground/10">
+        <div className="mb-3 flex items-center justify-between px-1">
+          <p className="text-sm font-semibold tracking-tight">Latest Orders</p>
+        </div>
+        <div className="flex flex-col items-center justify-center py-14">
+          <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-muted/50">
+            <PackageOpen className="h-6 w-6 text-muted-foreground/50" />
+          </div>
+          <p className="text-sm font-medium text-muted-foreground">
+            No orders yet
+          </p>
+          <p className="mt-1 text-xs text-muted-foreground/70">
+            Your completed orders will appear here.
+          </p>
+        </div>
+      </div>
 
       <div className="lg:hidden">
         <h2 className="mb-3 px-1 text-sm font-semibold tracking-tight">

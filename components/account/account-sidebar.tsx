@@ -13,6 +13,7 @@ import {
   type LucideIcon,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { useSignOut } from "@/hooks/use-auth"
 
 const ease: [number, number, number, number] = [0.16, 1, 0.3, 1]
 
@@ -65,6 +66,7 @@ function SidebarItem({
 
 export function AccountSidebar() {
   const pathname = usePathname()
+  const signOut = useSignOut()
 
   return (
     <>
@@ -98,6 +100,7 @@ export function AccountSidebar() {
             <div className="border-t border-border pt-4">
               <button
                 type="button"
+                onClick={() => signOut.mutate()}
                 className="group flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
               >
                 <LogOut className="h-4 w-4 shrink-0 text-muted-foreground/60 group-hover:text-muted-foreground" />

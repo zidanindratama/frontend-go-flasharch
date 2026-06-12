@@ -1,5 +1,3 @@
-"use client"
-
 import { AccountSidebar } from "@/components/account/account-sidebar"
 
 export default function AccountLayout({

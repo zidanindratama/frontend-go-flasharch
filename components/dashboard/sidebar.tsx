@@ -97,14 +97,14 @@ export function Sidebar({ open, isMobile = false, onClose }: Props) {
               <div className="absolute inset-0 rounded-lg bg-[#FF6600]/15" />
               <Zap className="h-4 w-4 text-[#FF6600]" />
             </div>
-            <div>
+            <Link href="/">
               <div className="text-lg font-bold text-white tracking-tight">
                 Go FlashArch
               </div>
               <div className="text-[10px] font-medium uppercase tracking-[0.18em] text-white/35">
                 Panel
               </div>
-            </div>
+            </Link>
           </motion.div>
         )}
       </AnimatePresence>

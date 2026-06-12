@@ -1,10 +1,12 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ArrowRight, CheckCircle2, KeyRound, Mail, RotateCcw } from "lucide-react";
+import { ArrowRight, CheckCircle2, Eye, EyeOff, KeyRound, Loader2, Mail, RotateCcw } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import {
@@ -28,17 +30,27 @@ import {
   type ResetPasswordValues,
   type VerifyEmailValues,
 } from "@/lib/validations/auth";
+import { usePostData } from "@/hooks/use-post-data";
 
 export function ForgotPasswordForm() {
-  const [submitted, setSubmitted] = useState(false);
+  const router = useRouter();
   const form = useForm<ForgotPasswordValues>({
     resolver: zodResolver(forgotPasswordSchema),
     defaultValues: { email: "" },
   });
 
+  const forgotPassword = usePostData<{ message: string }, { email: string }>({
+    endpoint: "/auth/forgot-password",
+    successMessage: "Password reset OTP sent to your email",
+    errorMessage: "Failed to send reset OTP",
+    onSuccess: () => {
+      router.push("/reset-password");
+    },
+  });
+
   return (
     <form
-      onSubmit={form.handleSubmit(() => setSubmitted(true))}
+      onSubmit={form.handleSubmit((values) => forgotPassword.mutate(values))}
       className="space-y-5"
     >
       <FormHeader
@@ -46,14 +58,6 @@ export function ForgotPasswordForm() {
         title="Send reset OTP"
         description="Enter your account email and we will prepare a reset code."
       />
-
-      {submitted ? (
-        <SuccessAlert
-          icon={Mail}
-          title="Your email looks ready"
-          description="A reset code would be sent to this address."
-        />
-      ) : null}
 
       <FieldGroup>
         <Field>
@@ -73,8 +77,17 @@ export function ForgotPasswordForm() {
         </Field>
       </FieldGroup>
 
-      <Button type="submit" size="lg" className="h-11 w-full">
-        <RotateCcw />
+      <Button
+        type="submit"
+        size="lg"
+        className="h-11 w-full"
+        disabled={forgotPassword.isPending}
+      >
+        {forgotPassword.isPending ? (
+          <Loader2 className="animate-spin" />
+        ) : (
+          <RotateCcw />
+        )}
         Send reset code
         <ArrowRight data-icon="inline-end" />
       </Button>
@@ -85,8 +98,9 @@ export function ForgotPasswordForm() {
 }
 
 export function ResetPasswordForm() {
-  const [submitted, setSubmitted] = useState(false);
+  const router = useRouter();
   const [otp, setOtp] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const form = useForm<ResetPasswordValues>({
     resolver: zodResolver(resetPasswordSchema),
     defaultValues: {
@@ -97,9 +111,27 @@ export function ResetPasswordForm() {
     },
   });
 
+  const resetPassword = usePostData<
+    { message: string },
+    { email: string; otp: string; new_password: string }
+  >({
+    endpoint: "/auth/reset-password",
+    successMessage: "Password reset successful",
+    errorMessage: "Failed to reset password",
+    onSuccess: () => {
+      router.push("/sign-in");
+    },
+  });
+
   return (
     <form
-      onSubmit={form.handleSubmit(() => setSubmitted(true))}
+      onSubmit={form.handleSubmit((values) =>
+        resetPassword.mutate({
+          email: values.email,
+          otp: values.otp,
+          new_password: values.newPassword,
+        }),
+      )}
       className="space-y-5"
     >
       <FormHeader
@@ -107,14 +139,6 @@ export function ResetPasswordForm() {
         title="Confirm OTP and new password"
         description="Use the reset code from your email and choose a new password."
       />
-
-      {submitted ? (
-        <SuccessAlert
-          icon={CheckCircle2}
-          title="Your new password looks ready"
-          description="You can use it after the reset is connected."
-        />
-      ) : null}
 
       <FieldGroup>
         <Field>
@@ -159,34 +183,69 @@ export function ResetPasswordForm() {
         <div className="grid gap-4 sm:grid-cols-2">
           <Field>
             <FieldLabel htmlFor="newPassword">New password</FieldLabel>
-            <Input
-              id="newPassword"
-              type="password"
-              autoComplete="new-password"
-              placeholder="new-password123"
-              aria-invalid={!!form.formState.errors.newPassword}
-              {...form.register("newPassword")}
-            />
+            <div className="relative">
+              <Input
+                id="newPassword"
+                type={showPassword ? "text" : "password"}
+                autoComplete="new-password"
+                placeholder="new-password123"
+                className="pr-10"
+                aria-invalid={!!form.formState.errors.newPassword}
+                {...form.register("newPassword")}
+              />
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                className="absolute right-0 top-0"
+                onClick={() => setShowPassword((value) => !value)}
+                aria-label={showPassword ? "Hide password" : "Show password"}
+              >
+                {showPassword ? <EyeOff /> : <Eye />}
+              </Button>
+            </div>
             <FieldError errors={[form.formState.errors.newPassword]} />
           </Field>
 
           <Field>
             <FieldLabel htmlFor="confirmPassword">Confirm</FieldLabel>
-            <Input
-              id="confirmPassword"
-              type="password"
-              autoComplete="new-password"
-              placeholder="new-password123"
-              aria-invalid={!!form.formState.errors.confirmPassword}
-              {...form.register("confirmPassword")}
-            />
+            <div className="relative">
+              <Input
+                id="confirmPassword"
+                type={showPassword ? "text" : "password"}
+                autoComplete="new-password"
+                placeholder="new-password123"
+                className="pr-10"
+                aria-invalid={!!form.formState.errors.confirmPassword}
+                {...form.register("confirmPassword")}
+              />
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                className="absolute right-0 top-0"
+                onClick={() => setShowPassword((value) => !value)}
+                aria-label={showPassword ? "Hide password" : "Show password"}
+              >
+                {showPassword ? <EyeOff /> : <Eye />}
+              </Button>
+            </div>
             <FieldError errors={[form.formState.errors.confirmPassword]} />
           </Field>
         </div>
       </FieldGroup>
 
-      <Button type="submit" size="lg" className="h-11 w-full">
-        <KeyRound />
+      <Button
+        type="submit"
+        size="lg"
+        className="h-11 w-full"
+        disabled={resetPassword.isPending}
+      >
+        {resetPassword.isPending ? (
+          <Loader2 className="animate-spin" />
+        ) : (
+          <KeyRound />
+        )}
         Reset password
         <ArrowRight data-icon="inline-end" />
       </Button>
@@ -197,15 +256,27 @@ export function ResetPasswordForm() {
 }
 
 export function VerifyEmailForm() {
-  const [submitted, setSubmitted] = useState(false);
+  const router = useRouter();
   const form = useForm<VerifyEmailValues>({
     resolver: zodResolver(verifyEmailSchema),
     defaultValues: { token: "" },
   });
 
+  const verifyEmail = usePostData<
+    { message: string },
+    { token: string }
+  >({
+    endpoint: "/auth/verify-email",
+    successMessage: "Email verified successfully",
+    errorMessage: "Failed to verify email",
+    onSuccess: () => {
+      router.push("/sign-in");
+    },
+  });
+
   return (
     <form
-      onSubmit={form.handleSubmit(() => setSubmitted(true))}
+      onSubmit={form.handleSubmit((values) => verifyEmail.mutate(values))}
       className="space-y-5"
     >
       <FormHeader
@@ -213,14 +284,6 @@ export function VerifyEmailForm() {
         title="Verify your email"
         description="Paste the verification token from your email to finish setup."
       />
-
-      {submitted ? (
-        <SuccessAlert
-          icon={CheckCircle2}
-          title="Your token looks ready"
-          description="Your email would be marked as verified."
-        />
-      ) : null}
 
       <FieldGroup>
         <Field>
@@ -238,8 +301,17 @@ export function VerifyEmailForm() {
         </Field>
       </FieldGroup>
 
-      <Button type="submit" size="lg" className="h-11 w-full">
-        <CheckCircle2 />
+      <Button
+        type="submit"
+        size="lg"
+        className="h-11 w-full"
+        disabled={verifyEmail.isPending}
+      >
+        {verifyEmail.isPending ? (
+          <Loader2 className="animate-spin" />
+        ) : (
+          <CheckCircle2 />
+        )}
         Verify email
         <ArrowRight data-icon="inline-end" />
       </Button>

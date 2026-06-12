@@ -1,80 +1,163 @@
-"use client";
+"use client"
 
-import { useState, useEffect } from "react";
-import { flushSync } from "react-dom";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { motion, AnimatePresence } from "framer-motion";
-import { useTheme } from "next-themes";
-import { Button } from "@/components/ui/button";
-import { Menu, X, Sun, Moon, Zap, ArrowUpRight } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { useState, useEffect, useRef } from "react"
+import { flushSync } from "react-dom"
+import Link from "next/link"
+import { usePathname } from "next/navigation"
+import { motion, AnimatePresence } from "framer-motion"
+import { useTheme } from "next-themes"
+import { Button } from "@/components/ui/button"
+import { useAuthStore } from "@/stores/auth"
+import { useUser, useSignOut } from "@/hooks/use-auth"
+import {
+  Menu,
+  X,
+  Sun,
+  Moon,
+  Zap,
+  ArrowUpRight,
+  ChevronDown,
+  LogOut,
+  Shield,
+  LayoutDashboard,
+  ShoppingBag,
+} from "lucide-react"
+import { cn } from "@/lib/utils"
 
-const navLinks = [
+const guestLinks = [
+  { href: "/about", label: "About" },
+  { href: "/blogs", label: "Guides" },
+  { href: "/products", label: "Products" },
+  { href: "/flash-sale", label: "Flash Sale" },
+]
+
+const buyerLinks = [
   { href: "/about", label: "About" },
   { href: "/blogs", label: "Guides" },
   { href: "/products", label: "Products" },
   { href: "/flash-sale", label: "Flash Sale" },
   { href: "/account", label: "Account" },
-];
+]
+
+const headerEase = [0.16, 1, 0.3, 1] as const
+
+function getInitials(name: string): string {
+  return name
+    .split(" ")
+    .map((n) => n[0])
+    .join("")
+    .toUpperCase()
+    .slice(0, 2)
+}
 
 export function Navbar() {
-  const [scrolled, setScrolled] = useState(false);
-  const [mobileOpen, setMobileOpen] = useState(false);
-  const [themeChanging, setThemeChanging] = useState(false);
-  const pathname = usePathname();
-  const { setTheme, resolvedTheme } = useTheme();
-  const [mounted, setMounted] = useState(false);
+  const [scrolled, setScrolled] = useState(false)
+  const [mobileOpen, setMobileOpen] = useState(false)
+  const [themeChanging, setThemeChanging] = useState(false)
+  const [dropdownOpen, setDropdownOpen] = useState(false)
+  const [cookieAuth, setCookieAuth] = useState(false)
+  const [cookieRole, setCookieRole] = useState<string | null>(null)
+  const pathname = usePathname()
+  const { setTheme, resolvedTheme } = useTheme()
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated)
+  const storedUser = useAuthStore((s) => s.user)
+  const { data: fetchedUser } = useUser()
+  const signOut = useSignOut()
+  const [mounted, setMounted] = useState(false)
+  const dropdownRef = useRef<HTMLDivElement>(null)
+
+  const effectiveAuthenticated = isAuthenticated || cookieAuth
+  const user = fetchedUser ?? storedUser
+  const userName = user?.full_name ?? "Account"
+  const userEmail = user?.email ?? "Profile loading"
+  const userRoleName = user?.role?.name ?? (cookieRole ?? "User")
+  const userRoleCode = user?.role?.code ?? cookieRole ?? "buyer"
+  const userInitials = getInitials(userName)
+  const navLinks = effectiveAuthenticated ? buyerLinks : guestLinks
 
   useEffect(() => {
-    const frame = window.requestAnimationFrame(() => setMounted(true));
-    const onScroll = () => setScrolled(window.scrollY > 40);
-    window.addEventListener("scroll", onScroll);
+    const frame = window.requestAnimationFrame(() => setMounted(true))
+    const onScroll = () => setScrolled(window.scrollY > 40)
+    window.addEventListener("scroll", onScroll)
     return () => {
-      window.cancelAnimationFrame(frame);
-      window.removeEventListener("scroll", onScroll);
-    };
-  }, []);
+      window.cancelAnimationFrame(frame)
+      window.removeEventListener("scroll", onScroll)
+    }
+  }, [])
+
+  useEffect(() => {
+    const frame = window.requestAnimationFrame(() => {
+      const cookies = document.cookie
+        .split(";")
+        .map((cookie) => cookie.trim().split("="))
+        .reduce<Record<string, string>>((acc, [key, value]) => {
+          if (key) {
+            acc[key] = decodeURIComponent(value ?? "")
+          }
+          return acc
+        }, {})
+
+      setCookieAuth(cookies["gfa-auth"] === "true")
+      setCookieRole(cookies["gfa-role"] ?? null)
+    })
+
+    return () => window.cancelAnimationFrame(frame)
+  }, [isAuthenticated])
+
+  useEffect(() => {
+    function handleClick(e: MouseEvent) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(e.target as Node)
+      ) {
+        setDropdownOpen(false)
+      }
+    }
+    if (dropdownOpen) {
+      document.addEventListener("mousedown", handleClick)
+      return () => document.removeEventListener("mousedown", handleClick)
+    }
+  }, [dropdownOpen])
 
   const isActive = (href: string) =>
-    pathname === href || pathname.startsWith(`${href}/`);
+    pathname === href || pathname.startsWith(`${href}/`)
 
   const prefersReducedMotion = () =>
-    window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches
 
   const toggleTheme = () => {
-    if (themeChanging) return;
+    if (themeChanging) return
 
-    const target = resolvedTheme === "dark" ? "light" : "dark";
+    const target = resolvedTheme === "dark" ? "light" : "dark"
     const transitionDocument = document as Document & {
       startViewTransition?: (callback: () => void) => {
-        ready: Promise<void>;
-        finished: Promise<void>;
-      };
-    };
+        ready: Promise<void>
+        finished: Promise<void>
+      }
+    }
 
-    setThemeChanging(true);
+    setThemeChanging(true)
 
     if (!transitionDocument.startViewTransition || prefersReducedMotion()) {
-      setTheme(target);
+      setTheme(target)
 
-      window.requestAnimationFrame(() => setThemeChanging(false));
-      return;
+      window.requestAnimationFrame(() => setThemeChanging(false))
+      return
     }
 
     const transition = transitionDocument.startViewTransition(() => {
       flushSync(() => {
-        setTheme(target);
-      });
-    });
+        setTheme(target)
+      })
+    })
 
     transition.ready.then(() => {
-      const x = window.innerWidth / 2;
-      const y = window.innerHeight / 2;
+      const x = window.innerWidth / 2
+      const y = window.innerHeight / 2
       const endRadius = Math.hypot(
         Math.max(x, window.innerWidth - x),
         Math.max(y, window.innerHeight - y),
-      );
+      )
 
       document.documentElement.animate(
         {
@@ -88,11 +171,16 @@ export function Navbar() {
           easing: "cubic-bezier(0.16, 1, 0.3, 1)",
           pseudoElement: "::view-transition-new(root)",
         },
-      );
-    }).catch(() => undefined);
+      )
+    }).catch(() => undefined)
 
-    transition.finished.finally(() => setThemeChanging(false));
-  };
+    transition.finished.finally(() => setThemeChanging(false))
+  }
+
+  const handleLogout = () => {
+    setDropdownOpen(false)
+    signOut.mutate()
+  }
 
   return (
     <>
@@ -120,7 +208,7 @@ export function Navbar() {
             {/* Desktop Nav */}
             <nav className="hidden items-center gap-1 md:flex">
               {navLinks.map((link) => {
-                const active = isActive(link.href);
+                const active = isActive(link.href)
 
                 return (
                   <Link
@@ -144,7 +232,7 @@ export function Navbar() {
                       <span className="absolute bottom-0 left-1/2 h-px w-0 -translate-x-1/2 bg-[#FF6600] transition-all duration-300 group-hover:w-[calc(100%-2rem)]" />
                     )}
                   </Link>
-                );
+                )
               })}
             </nav>
 
@@ -184,14 +272,115 @@ export function Navbar() {
                 </Button>
               )}
 
-              <Button
-                asChild
-                variant="ghost"
-                size="sm"
-                className="hidden md:flex rounded-full text-sm font-medium"
-              >
-                <Link href="/sign-in">Sign In</Link>
-              </Button>
+              {/* User dropdown or Sign In */}
+              {effectiveAuthenticated ? (
+                <div className="relative" ref={dropdownRef}>
+                  <button
+                    onClick={() => setDropdownOpen(!dropdownOpen)}
+                    className={cn(
+                      "flex items-center gap-2 rounded-lg px-2 py-1.5 text-sm transition-colors",
+                      dropdownOpen
+                        ? "bg-muted text-foreground"
+                        : "text-muted-foreground hover:bg-muted hover:text-foreground",
+                    )}
+                  >
+                    <div className="flex h-7 w-7 items-center justify-center rounded-md bg-[#FF6600]/15 text-[11px] font-semibold text-[#FF6600]">
+                      {userInitials}
+                    </div>
+
+                    <div className="hidden sm:block text-left leading-tight">
+                      <div className="text-[13px] font-medium text-foreground">
+                        {userName}
+                      </div>
+                      <div className="text-[11px] text-muted-foreground capitalize">
+                        {userRoleName}
+                      </div>
+                    </div>
+
+                    <motion.span
+                      animate={{ rotate: dropdownOpen ? 180 : 0 }}
+                      transition={{ duration: 0.25, ease: headerEase }}
+                      className="hidden sm:block"
+                    >
+                      <ChevronDown className="h-3 w-3 text-muted-foreground" />
+                    </motion.span>
+                  </button>
+
+                  <AnimatePresence>
+                    {dropdownOpen && (
+                      <motion.div
+                        initial={{ opacity: 0, y: -4, scale: 0.96 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: -4, scale: 0.96 }}
+                        transition={{ duration: 0.2, ease: headerEase }}
+                        className="absolute right-0 top-full mt-2 w-64 rounded-xl border border-border bg-popover shadow-xl shadow-black/5"
+                      >
+                        <div className="px-4 pt-4 pb-3">
+                          <div className="flex items-center gap-3">
+                            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-[#FF6600]/10 text-sm font-bold text-[#FF6600]">
+                              {userInitials}
+                            </div>
+                            <div className="min-w-0 flex-1">
+                              <div className="truncate text-sm font-semibold text-foreground">
+                                {userName}
+                              </div>
+                              <div className="truncate text-[12px] text-muted-foreground">
+                                {userEmail}
+                              </div>
+                            </div>
+                          </div>
+
+                          <div className="mt-3 inline-flex items-center gap-1.5 rounded-md bg-[#FF6600]/8 px-2 py-1">
+                            <Shield className="h-3 w-3 text-[#FF6600]" />
+                            <span className="text-[11px] font-medium text-[#FF6600] capitalize">
+                              {userRoleName}
+                            </span>
+                          </div>
+                        </div>
+
+                        <div className="h-px bg-border mx-4" />
+
+                        <div className="p-2">
+                          <Link
+                            href={
+                              userRoleCode === "admin"
+                                ? "/dashboard"
+                                : "/account"
+                            }
+                            onClick={() => setDropdownOpen(false)}
+                            className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-[13px] font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+                          >
+                            {userRoleCode === "admin" ? (
+                              <LayoutDashboard className="h-3.5 w-3.5" />
+                            ) : (
+                              <ShoppingBag className="h-3.5 w-3.5" />
+                            )}
+                            {userRoleCode === "admin"
+                              ? "Dashboard"
+                              : "Account"}
+                          </Link>
+                          <button
+                            onClick={handleLogout}
+                            className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-[13px] font-medium text-muted-foreground hover:bg-muted hover:text-destructive transition-colors"
+                          >
+                            <LogOut className="h-3.5 w-3.5" />
+                            Sign Out
+                          </button>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+              ) : (
+                <Button
+                  asChild
+                  variant="ghost"
+                  size="sm"
+                  className="hidden md:flex rounded-full text-sm font-medium"
+                >
+                  <Link href="/sign-in">Sign In</Link>
+                </Button>
+              )}
 
               {/* Mobile menu toggle */}
               <Button
@@ -240,7 +429,7 @@ export function Navbar() {
 
               <nav className="border-y border-border">
                 {navLinks.map((link, i) => {
-                  const active = isActive(link.href);
+                  const active = isActive(link.href)
 
                   return (
                     <motion.div
@@ -282,7 +471,7 @@ export function Navbar() {
                         </span>
                       </Link>
                     </motion.div>
-                  );
+                  )
                 })}
               </nav>
 
@@ -296,15 +485,59 @@ export function Navbar() {
                 }}
                 className="mt-auto pt-8"
               >
-                <Button
-                  asChild
-                  variant="outline"
-                  className="h-12 w-full rounded-full"
-                >
-                  <Link href="/sign-in" onClick={() => setMobileOpen(false)}>
-                    Sign In
-                  </Link>
-                </Button>
+                {effectiveAuthenticated ? (
+                  <>
+                    <div className="flex items-center gap-3 rounded-xl bg-card p-4 ring-1 ring-foreground/10 mb-4">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-[#FF6600]/10 text-sm font-bold text-[#FF6600]">
+                        {userInitials}
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <div className="truncate text-sm font-semibold text-foreground">
+                          {userName}
+                        </div>
+                        <div className="truncate text-xs text-muted-foreground capitalize">
+                          {userRoleName}
+                        </div>
+                      </div>
+                    </div>
+                    <Button
+                      asChild
+                      variant="outline"
+                      className="h-12 w-full rounded-full"
+                    >
+                      <Link
+                        href={
+                          userRoleCode === "admin" ? "/dashboard" : "/account"
+                        }
+                        onClick={() => setMobileOpen(false)}
+                      >
+                        {userRoleCode === "admin"
+                          ? "Go to Dashboard"
+                          : "Go to Account"}
+                      </Link>
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      className="h-12 w-full rounded-full mt-2 text-destructive"
+                      onClick={() => {
+                        setMobileOpen(false)
+                        handleLogout()
+                      }}
+                    >
+                      Sign Out
+                    </Button>
+                  </>
+                ) : (
+                  <Button
+                    asChild
+                    variant="outline"
+                    className="h-12 w-full rounded-full"
+                  >
+                    <Link href="/sign-in" onClick={() => setMobileOpen(false)}>
+                      Sign In
+                    </Link>
+                  </Button>
+                )}
                 <p className="mt-4 text-center text-xs text-muted-foreground">
                   Buyer and admin access use the same authentication entry.
                 </p>
@@ -314,5 +547,5 @@ export function Navbar() {
         )}
       </AnimatePresence>
     </>
-  );
+  )
 }
