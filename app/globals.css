@@ -66,9 +66,11 @@
   --accent-foreground: #1a1a1a;
   --destructive: #DC143C;
   --destructive-foreground: #ffffff;
-  --border: #e5e5e5;
-  --input: #f4f4f5;
+  --border: oklch(0.88 0.021 62);
+  --input: oklch(0.85 0.045 58);
   --ring: #FF6600;
+  --control-bg: oklch(0.985 0.018 65);
+  --control-bg-hover: oklch(0.976 0.024 62);
   --radius: 0.5rem;
 
   --chart-1: #FF6600;
@@ -106,9 +108,11 @@
   --accent-foreground: #f0f0f0;
   --destructive: #DC143C;
   --destructive-foreground: #ffffff;
-  --border: #262626;
-  --input: #1a1a1a;
+  --border: oklch(0.31 0.012 48);
+  --input: oklch(0.39 0.032 50);
   --ring: #FF6600;
+  --control-bg: oklch(0.17 0.006 48);
+  --control-bg-hover: oklch(0.205 0.01 48);
   --radius: 0.5rem;
 
   --chart-1: #FF6600;
@@ -138,6 +142,55 @@
   html {
     @apply font-sans;
     scroll-behavior: smooth;
+  }
+}
+
+@layer components {
+  [data-slot="input"],
+  [data-slot="textarea"],
+  [data-slot="select-trigger"] {
+    background-color: var(--control-bg);
+    border-color: color-mix(in oklch, var(--input) 82%, transparent);
+    box-shadow: inset 0 1px 0 color-mix(in oklch, white 58%, transparent);
+  }
+
+  [data-slot="input"]:hover,
+  [data-slot="textarea"]:hover,
+  [data-slot="select-trigger"]:hover {
+    background-color: var(--control-bg-hover);
+    border-color: color-mix(in oklch, var(--primary) 42%, var(--input));
+  }
+
+  [data-slot="input"]:focus-visible,
+  [data-slot="textarea"]:focus-visible,
+  [data-slot="select-trigger"]:focus-visible {
+    background-color: var(--card);
+    border-color: var(--primary);
+    box-shadow:
+      0 0 0 3px color-mix(in oklch, var(--primary) 18%, transparent),
+      inset 0 1px 0 color-mix(in oklch, white 70%, transparent);
+  }
+
+  .dark [data-slot="input"],
+  .dark [data-slot="textarea"],
+  .dark [data-slot="select-trigger"] {
+    border-color: color-mix(in oklch, var(--input) 62%, white 8%);
+    box-shadow: inset 0 1px 0 color-mix(in oklch, white 6%, transparent);
+  }
+
+  .dark [data-slot="input"]:hover,
+  .dark [data-slot="textarea"]:hover,
+  .dark [data-slot="select-trigger"]:hover {
+    border-color: color-mix(in oklch, var(--primary) 24%, var(--input));
+  }
+
+  .dark [data-slot="input"]:focus-visible,
+  .dark [data-slot="textarea"]:focus-visible,
+  .dark [data-slot="select-trigger"]:focus-visible {
+    background-color: color-mix(in oklch, var(--control-bg-hover) 92%, white 2%);
+    box-shadow:
+      0 0 0 3px color-mix(in oklch, var(--primary) 18%, transparent),
+      inset 0 1px 0 color-mix(in oklch, white 10%, transparent);
   }
 }
 

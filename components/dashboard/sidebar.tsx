@@ -9,6 +9,7 @@ import { cn } from "@/lib/utils";
 import { dashboardNav, type NavItem } from "@/lib/navigation";
 
 const sidebarEase = [0.16, 1, 0.3, 1] as const;
+const dashboardRoot = "/dashboard";
 
 type Props = {
   open: boolean;
@@ -133,8 +134,7 @@ function NavItem({
   pathname: string;
 }) {
   const hasChildren = item.children && item.children.length > 0;
-  const isActive =
-    pathname === item.href || pathname.startsWith(`${item.href}/`);
+  const isActive = isNavItemActive(item, pathname);
   const [expanded, setExpanded] = useState(isActive);
 
   return (
@@ -191,7 +191,7 @@ function NavItem({
               >
                 <div className="ml-4 mt-0.5 border-l border-white/[0.08] pl-2">
                   {item.children!.map((child) => {
-                    const childActive = pathname === child.href;
+                    const childActive = isNavItemActive(child, pathname);
                     return (
                       <Link
                         key={child.href}
@@ -228,8 +228,7 @@ function MobileNavItem({
   onClose?: () => void;
 }) {
   const hasChildren = item.children && item.children.length > 0;
-  const isActive =
-    pathname === item.href || pathname.startsWith(`${item.href}/`);
+  const isActive = isNavItemActive(item, pathname);
   const [expanded, setExpanded] = useState(isActive);
 
   return (
@@ -280,7 +279,7 @@ function MobileNavItem({
           >
             <div className="ml-4 mt-0.5 border-l border-white/[0.08] pl-2">
               {item.children!.map((child) => {
-                const childActive = pathname === child.href;
+                const childActive = isNavItemActive(child, pathname);
                 return (
                   <Link
                     key={child.href}
@@ -304,4 +303,16 @@ function MobileNavItem({
       </AnimatePresence>
     </div>
   );
+}
+
+function isNavItemActive(item: NavItem, pathname: string) {
+  if (item.href === dashboardRoot) {
+    return pathname === dashboardRoot;
+  }
+
+  if (item.children?.some((child) => isNavItemActive(child, pathname))) {
+    return true;
+  }
+
+  return pathname === item.href || pathname.startsWith(`${item.href}/`);
 }

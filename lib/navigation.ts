@@ -6,15 +6,16 @@ import {
   Activity,
   Gauge,
   Cpu,
+  Users,
   type LucideIcon,
-} from "lucide-react"
+} from "lucide-react";
 
 export type NavItem = {
-  label: string
-  href: string
-  icon: LucideIcon
-  children?: NavItem[]
-}
+  label: string;
+  href: string;
+  icon: LucideIcon;
+  children?: NavItem[];
+};
 
 export const dashboardNav: NavItem[] = [
   {
@@ -23,12 +24,21 @@ export const dashboardNav: NavItem[] = [
     icon: LayoutDashboard,
   },
   {
+    label: "Users",
+    href: "/dashboard/users",
+    icon: Users,
+  },
+  {
     label: "Products",
     href: "/dashboard/products",
     icon: Package,
     children: [
       { label: "Catalog", href: "/dashboard/products", icon: Package },
-      { label: "Inventory", href: "/dashboard/products/inventory", icon: Package },
+      {
+        label: "Inventory",
+        href: "/dashboard/products/inventory",
+        icon: Package,
+      },
     ],
   },
   {
@@ -36,6 +46,7 @@ export const dashboardNav: NavItem[] = [
     href: "/dashboard/orders",
     icon: ShoppingCart,
   },
+
   {
     label: "Flash Sales",
     href: "/dashboard/flash-sales",
@@ -56,4 +67,4 @@ export const dashboardNav: NavItem[] = [
     href: "/dashboard/architecture",
     icon: Cpu,
   },
-]
+];

@@ -25,5 +25,6 @@ export const endpoints = {
     summary: "/admin/reports/summary",
     orders: "/admin/orders",
     products: "/admin/reports/products",
+    users: "/admin/users",
   },
 } as const
