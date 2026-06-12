@@ -7,6 +7,7 @@ import { usePathname } from "next/navigation"
 import { motion, AnimatePresence } from "framer-motion"
 import { useTheme } from "next-themes"
 import { Button } from "@/components/ui/button"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { useAuthStore } from "@/stores/auth"
 import { useUser, useSignOut } from "@/hooks/use-auth"
 import {
@@ -73,6 +74,7 @@ export function Navbar() {
   const userRoleName = user?.role?.name ?? (cookieRole ?? "User")
   const userRoleCode = user?.role?.code ?? cookieRole ?? "buyer"
   const userInitials = getInitials(userName)
+  const userAvatarUrl = user?.avatar_url ?? undefined
   const navLinks = effectiveAuthenticated ? buyerLinks : guestLinks
 
   useEffect(() => {
@@ -284,9 +286,12 @@ export function Navbar() {
                         : "text-muted-foreground hover:bg-muted hover:text-foreground",
                     )}
                   >
-                    <div className="flex h-7 w-7 items-center justify-center rounded-md bg-[#FF6600]/15 text-[11px] font-semibold text-[#FF6600]">
-                      {userInitials}
-                    </div>
+                    <Avatar className="h-7 w-7 rounded-md">
+                      <AvatarImage src={userAvatarUrl} alt={userName} />
+                      <AvatarFallback className="rounded-md bg-[#FF6600]/15 text-[11px] font-semibold text-[#FF6600]">
+                        {userInitials}
+                      </AvatarFallback>
+                    </Avatar>
 
                     <div className="hidden sm:block text-left leading-tight">
                       <div className="text-[13px] font-medium text-foreground">
@@ -317,9 +322,12 @@ export function Navbar() {
                       >
                         <div className="px-4 pt-4 pb-3">
                           <div className="flex items-center gap-3">
-                            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-[#FF6600]/10 text-sm font-bold text-[#FF6600]">
-                              {userInitials}
-                            </div>
+                            <Avatar className="h-10 w-10 rounded-lg">
+                              <AvatarImage src={userAvatarUrl} alt={userName} />
+                              <AvatarFallback className="rounded-lg bg-[#FF6600]/10 text-sm font-bold text-[#FF6600]">
+                                {userInitials}
+                              </AvatarFallback>
+                            </Avatar>
                             <div className="min-w-0 flex-1">
                               <div className="truncate text-sm font-semibold text-foreground">
                                 {userName}
@@ -488,9 +496,12 @@ export function Navbar() {
                 {effectiveAuthenticated ? (
                   <>
                     <div className="flex items-center gap-3 rounded-xl bg-card p-4 ring-1 ring-foreground/10 mb-4">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-[#FF6600]/10 text-sm font-bold text-[#FF6600]">
-                        {userInitials}
-                      </div>
+                      <Avatar className="h-10 w-10 rounded-lg">
+                        <AvatarImage src={userAvatarUrl} alt={userName} />
+                        <AvatarFallback className="rounded-lg bg-[#FF6600]/10 text-sm font-bold text-[#FF6600]">
+                          {userInitials}
+                        </AvatarFallback>
+                      </Avatar>
                       <div className="min-w-0 flex-1">
                         <div className="truncate text-sm font-semibold text-foreground">
                           {userName}

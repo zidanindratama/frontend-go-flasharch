@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect, useRef } from "react"
+import Link from "next/link"
 import { motion, AnimatePresence } from "framer-motion"
 import {
   PanelLeftClose,
@@ -10,12 +11,14 @@ import {
   Shield,
   Sun,
   Moon,
+  UserRound,
 } from "lucide-react"
 import { useTheme } from "next-themes"
 import { flushSync } from "react-dom"
 import { cn } from "@/lib/utils"
 import { useUser, useSignOut } from "@/hooks/use-auth"
 import { useAuthStore } from "@/stores/auth"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 
 const headerEase = [0.16, 1, 0.3, 1] as const
 
@@ -38,6 +41,7 @@ export function Header({ sidebarOpen, onToggleSidebar }: Props) {
   const userName = user?.full_name ?? (userLoading ? "Loading..." : "Account")
   const userEmail = user?.email ?? (userLoading ? "Fetching profile" : "No profile loaded")
   const userRole = user?.role?.name ?? (userLoading ? "Loading" : "Unknown")
+  const userAvatarUrl = user?.avatar_url ?? undefined
   const userInitials = userName
     .split(" ")
     .map((n) => n[0])
@@ -197,9 +201,12 @@ export function Header({ sidebarOpen, onToggleSidebar }: Props) {
                 : "text-muted-foreground hover:bg-muted hover:text-foreground",
             )}
           >
-            <div className="flex h-7 w-7 items-center justify-center rounded-md bg-[#FF6600]/15 text-[11px] font-semibold text-[#FF6600]">
-              {userInitials}
-            </div>
+            <Avatar className="h-7 w-7 rounded-md">
+              <AvatarImage src={userAvatarUrl} alt={userName} />
+              <AvatarFallback className="rounded-md bg-[#FF6600]/15 text-[11px] font-semibold text-[#FF6600]">
+                {userInitials}
+              </AvatarFallback>
+            </Avatar>
 
             <div className="hidden sm:block text-left leading-tight">
               <div className="text-[13px] font-medium text-foreground">
@@ -230,9 +237,12 @@ export function Header({ sidebarOpen, onToggleSidebar }: Props) {
               >
                 <div className="px-4 pt-4 pb-3">
                   <div className="flex items-center gap-3">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-[#FF6600]/10 text-sm font-bold text-[#FF6600]">
-                      {userInitials}
-                    </div>
+                    <Avatar className="h-10 w-10 rounded-lg">
+                      <AvatarImage src={userAvatarUrl} alt={userName} />
+                      <AvatarFallback className="rounded-lg bg-[#FF6600]/10 text-sm font-bold text-[#FF6600]">
+                        {userInitials}
+                      </AvatarFallback>
+                    </Avatar>
                     <div className="min-w-0 flex-1">
                       <div className="truncate text-sm font-semibold text-foreground">
                         {userName}
@@ -254,6 +264,14 @@ export function Header({ sidebarOpen, onToggleSidebar }: Props) {
                 <div className="h-px bg-border mx-4" />
 
                 <div className="p-2">
+                  <Link
+                    href="/dashboard/account"
+                    onClick={() => setDropdownOpen(false)}
+                    className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-[13px] font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                  >
+                    <UserRound className="h-3.5 w-3.5" />
+                    Account settings
+                  </Link>
                   <button
                     onClick={handleLogout}
                     className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-[13px] font-medium text-muted-foreground hover:bg-muted hover:text-destructive transition-colors"

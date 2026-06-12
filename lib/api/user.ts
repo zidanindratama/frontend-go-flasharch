@@ -23,13 +23,15 @@ export type UpdateProfileResponse = {
 
 export type UploadAvatarResponse = {
   message: string
-  data: {
-    file_id: string
-    file_name: string
-    content_type: string
-    size_bytes: number
-    url: string
-  }
+  data:
+    | {
+        file_id: string
+        file_name: string
+        content_type: string
+        size_bytes: number
+        url: string
+      }
+    | User
 }
 
 export const getMe = () =>

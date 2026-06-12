@@ -13,5 +13,17 @@ export const endpoints = {
   user: {
     me: "/users/me",
     uploadAvatar: "/users/me/avatar",
+    dashboard: "/users/me/dashboard",
+    addresses: "/users/me/addresses",
+    wishlist: "/users/me/wishlist",
+  },
+  orders: {
+    list: "/orders",
+  },
+  admin: {
+    dashboard: "/admin/reports/dashboard",
+    summary: "/admin/reports/summary",
+    orders: "/admin/orders",
+    products: "/admin/reports/products",
   },
 } as const

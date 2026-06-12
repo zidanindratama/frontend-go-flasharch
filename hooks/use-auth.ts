@@ -208,15 +208,24 @@ export function useUpdateProfile() {
 }
 
 export function useUploadAvatar() {
+  const queryClient = useQueryClient()
+
   return useMutation({
     mutationFn: (formData: FormData) => uploadAvatar(formData),
     onSuccess: (response) => {
       const currentUser = useAuthStore.getState().user
+      const payload = response.data.data
+      const avatarUrl =
+        "avatar_url" in payload ? payload.avatar_url : payload.url
+
       if (currentUser) {
-        useAuthStore.getState().setUser({
-          ...currentUser,
-          avatar_url: response.data.data.url,
-        })
+        const nextUser =
+          "avatar_url" in payload
+            ? { ...currentUser, ...payload }
+            : { ...currentUser, avatar_url: avatarUrl }
+
+        useAuthStore.getState().setUser(nextUser)
+        queryClient.setQueryData(["user"], nextUser)
       }
       toast.success("Avatar uploaded")
     },

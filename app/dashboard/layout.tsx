@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useIsMobile } from "@/hooks/use-mobile"
 import { Sidebar } from "@/components/dashboard/sidebar"
 import { Header } from "@/components/dashboard/header"
@@ -11,8 +11,13 @@ export default function DashboardLayout({
   const isMobile = useIsMobile()
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
+  useEffect(() => {
+    const frame = requestAnimationFrame(() => setSidebarOpen(!isMobile))
+    return () => cancelAnimationFrame(frame)
+  }, [isMobile])
+
   return (
-    <div className="flex h-screen overflow-hidden">
+    <div className="flex h-screen overflow-hidden bg-background">
       <Sidebar
         open={sidebarOpen}
         isMobile={isMobile}
@@ -26,7 +31,9 @@ export default function DashboardLayout({
         />
 
         <main className="flex-1 overflow-y-auto bg-background">
-          <div className="p-6 lg:p-8">{children}</div>
+          <div className="mx-auto w-full max-w-[1540px] p-4 sm:p-5 lg:p-8">
+            {children}
+          </div>
         </main>
       </div>
     </div>
