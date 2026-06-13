@@ -75,7 +75,11 @@ export function Navbar() {
   const userRoleCode = user?.role?.code ?? cookieRole ?? "buyer"
   const userInitials = getInitials(userName)
   const userAvatarUrl = user?.avatar_url ?? undefined
-  const navLinks = effectiveAuthenticated ? buyerLinks : guestLinks
+  const navLinks = effectiveAuthenticated
+    ? userRoleCode === "buyer"
+      ? buyerLinks
+      : buyerLinks.filter((link) => link.href !== "/account")
+    : guestLinks
 
   useEffect(() => {
     const frame = window.requestAnimationFrame(() => setMounted(true))

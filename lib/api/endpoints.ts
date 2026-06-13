@@ -23,6 +23,9 @@ export const endpoints = {
   orders: {
     list: "/orders",
   },
+  products: "/products",
+  categories: "/categories",
+  productReviews: (slug: string) => `/products/${slug}/reviews` as const,
   admin: {
     dashboard: "/admin/reports/dashboard",
     summary: "/admin/reports/summary",

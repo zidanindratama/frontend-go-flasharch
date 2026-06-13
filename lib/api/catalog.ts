@@ -65,6 +65,8 @@ export type ProductListParams = {
   order?: "asc" | "desc"
   status?: ProductStatus
   category?: string
+  min_price?: number
+  max_price?: number
 }
 
 export type CategoryListParams = {
@@ -131,6 +133,22 @@ export type UpdateCategoryInput = {
   status?: CategoryStatus
 }
 
+export type ProductReview = {
+  id: string
+  product_id: string
+  user_id: string
+  rating: number
+  title: string
+  body: string
+  created_at: string
+  updated_at: string
+}
+
+export type ProductReviewListParams = {
+  page?: number
+  per_page?: number
+}
+
 export type AddProductImageInput = {
   file_id: string
   alt_text?: string
@@ -144,6 +162,20 @@ export type UploadFileResponse = {
   size_bytes: number
   url: string
 }
+
+// ─── Public Products ────────────────────────────────────────
+
+export const listProducts = (params: ProductListParams) =>
+  api.get<PaginatedResponse<Product>>(endpoints.products, { params })
+
+export const getProduct = (slug: string) =>
+  api.get<SingleResponse<Product>>(`${endpoints.products}/${slug}`)
+
+export const listProductReviews = (slug: string, params?: ProductReviewListParams) =>
+  api.get<PaginatedResponse<ProductReview>>(endpoints.productReviews(slug), { params })
+
+export const listCategories = (params?: CategoryListParams) =>
+  api.get<PaginatedResponse<Category>>(endpoints.categories, { params })
 
 // ─── Products ───────────────────────────────────────────────
 

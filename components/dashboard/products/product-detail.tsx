@@ -241,7 +241,7 @@ function ProductDetailView({ product }: { product: Product }) {
           </h2>
           {product.description ? (
             <div
-              className="product-rich-text mt-4 max-w-4xl text-sm leading-7 text-muted-foreground"
+              className="product-rich-text mt-5 max-w-none rounded-xl bg-background/60 p-4 ring-1 ring-border sm:p-5"
               dangerouslySetInnerHTML={{
                 __html: DOMPurify.sanitize(product.description),
               }}

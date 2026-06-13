@@ -24,6 +24,7 @@ import {
   FieldLabel,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import { FormattedPriceInput } from "@/components/common/formatted-price-input";
 import {
   Select,
   SelectContent,
@@ -246,14 +247,15 @@ function CreateProductForm() {
               <FieldLabel htmlFor="base_price_amount">
                 Base price (IDR)
               </FieldLabel>
-              <Input
+              <FormattedPriceInput
                 id="base_price_amount"
-                type="number"
-                min={0}
                 placeholder="0"
-                className="tabular-nums"
+                value={values.base_price_amount}
+                onChange={(val) =>
+                  form.setValue("base_price_amount", val, { shouldValidate: true })
+                }
                 aria-invalid={!!form.formState.errors.base_price_amount}
-                {...form.register("base_price_amount", { valueAsNumber: true })}
+                className="w-full"
               />
               <FieldDescription>Integer amount in Rupiah.</FieldDescription>
               <FieldError errors={[form.formState.errors.base_price_amount]} />
@@ -594,13 +596,15 @@ function EditProductForm({ product }: { product: Product }) {
               <FieldLabel htmlFor="base_price_amount">
                 Base price (IDR)
               </FieldLabel>
-              <Input
+              <FormattedPriceInput
                 id="base_price_amount"
-                type="number"
-                min={0}
-                className="tabular-nums"
+                placeholder="0"
+                value={values.base_price_amount}
+                onChange={(val) =>
+                  form.setValue("base_price_amount", val, { shouldValidate: true })
+                }
                 aria-invalid={!!form.formState.errors.base_price_amount}
-                {...form.register("base_price_amount", { valueAsNumber: true })}
+                className="w-full"
               />
               <FieldError errors={[form.formState.errors.base_price_amount]} />
             </Field>
