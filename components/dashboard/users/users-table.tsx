@@ -266,6 +266,7 @@ export function UsersTable() {
         }}
         search={searchValue}
         onSearchChange={setSearchValue}
+        searchPlaceholder="Search users by name or email..."
         filters={filters}
         isLoading={usersQuery.isLoading}
         isError={usersQuery.isError}

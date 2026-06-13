@@ -50,6 +50,7 @@ type DataTableProps<TData> = {
   onSortingChange: (sorting: SortingState) => void
   search: string
   onSearchChange: (value: string) => void
+  searchPlaceholder?: string
   filters?: DataTableFilter[]
   isLoading?: boolean
   isError?: boolean
@@ -70,6 +71,7 @@ export function DataTable<TData>({
   onSortingChange,
   search,
   onSearchChange,
+  searchPlaceholder = "Search...",
   filters = [],
   isLoading,
   isError,
@@ -111,7 +113,7 @@ export function DataTable<TData>({
           <Input
             value={search}
             onChange={(event) => onSearchChange(event.target.value)}
-            placeholder="Search users by name or email"
+            placeholder={searchPlaceholder}
             className="h-10 rounded-xl bg-background pl-9"
           />
         </div>

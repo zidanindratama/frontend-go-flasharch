@@ -31,5 +31,11 @@ export const endpoints = {
     users: "/admin/users",
     products: "/admin/products",
     categories: "/admin/categories",
+    inventory: {
+      stocks: "/admin/inventory/stocks",
+      movements: "/admin/inventory/movements",
+    },
+    stockAdjust: (productId: string) =>
+      `/admin/products/${productId}/stock-adjustments` as const,
   },
 } as const

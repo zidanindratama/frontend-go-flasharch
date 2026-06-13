@@ -231,6 +231,7 @@ export function CategoriesTable() {
         }}
         search={searchValue}
         onSearchChange={setSearchValue}
+        searchPlaceholder="Search categories by name or slug..."
         filters={filters}
         isLoading={categoriesQuery.isLoading}
         isError={categoriesQuery.isError}

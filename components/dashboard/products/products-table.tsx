@@ -252,6 +252,7 @@ export function ProductsTable() {
         }}
         search={searchValue}
         onSearchChange={setSearchValue}
+        searchPlaceholder="Search products by name or SKU..."
         filters={filters}
         isLoading={productsQuery.isLoading}
         isError={productsQuery.isError}
