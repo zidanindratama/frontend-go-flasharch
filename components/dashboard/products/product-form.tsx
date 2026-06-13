@@ -1,10 +1,10 @@
-"use client"
+"use client";
 
-import { useMemo, useState } from "react"
-import { useRouter } from "next/navigation"
-import Link from "next/link"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
+import { useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   ArrowLeft,
   ImagePlus,
@@ -14,27 +14,30 @@ import {
   Trash2,
   Upload,
   X,
-} from "lucide-react"
-import { useForm } from "react-hook-form"
-import { Button } from "@/components/ui/button"
+} from "lucide-react";
+import { useForm } from "react-hook-form";
+import { Button } from "@/components/ui/button";
 import {
   Field,
   FieldDescription,
   FieldError,
   FieldLabel,
-} from "@/components/ui/field"
-import { Input } from "@/components/ui/input"
+} from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
-import { Textarea } from "@/components/ui/textarea"
-import { MultiSelect } from "@/components/common/multi-select"
-import { ProductStatusBadge } from "@/components/dashboard/products/product-badges"
-import { formatPrice, slugify } from "@/components/dashboard/products/product-utils"
+} from "@/components/ui/select";
+import { MinimalTiptapEditor } from "@/components/ui/minimal-tiptap";
+import { MultiSelect } from "@/components/common/multi-select";
+import { ProductStatusBadge } from "@/components/dashboard/products/product-badges";
+import {
+  formatPrice,
+  slugify,
+} from "@/components/dashboard/products/product-utils";
 import {
   addProductImage,
   createProduct,
@@ -45,26 +48,33 @@ import {
   type Product,
   type ProductImage,
   type ProductStatus,
-} from "@/lib/api/catalog"
+} from "@/lib/api/catalog";
 import {
   productCreateSchema,
   productEditSchema,
   type ProductCreateValues,
   type ProductEditValues,
-} from "@/lib/validations/catalog"
+} from "@/lib/validations/catalog";
 
 type ProductFormProps =
   | { mode: "create"; product?: never }
-  | { mode: "edit"; product: Product }
+  | { mode: "edit"; product: Product };
+
+const formPanelClassName =
+  "min-w-0 rounded-2xl border border-border bg-card p-4 shadow-sm sm:p-6";
 
 export function ProductForm(props: ProductFormProps) {
-  return props.mode === "create" ? <CreateProductForm /> : <EditProductForm product={props.product} />
+  return props.mode === "create" ? (
+    <CreateProductForm />
+  ) : (
+    <EditProductForm product={props.product} />
+  );
 }
 
 function CreateProductForm() {
-  const router = useRouter()
-  const queryClient = useQueryClient()
-  const [thumbnailPreview, setThumbnailPreview] = useState<string | null>(null)
+  const router = useRouter();
+  const queryClient = useQueryClient();
+  const [thumbnailPreview, setThumbnailPreview] = useState<string | null>(null);
 
   const form = useForm<ProductCreateValues>({
     resolver: zodResolver(productCreateSchema),
@@ -80,17 +90,17 @@ function CreateProductForm() {
       category_ids: [],
     },
     mode: "onBlur",
-  })
+  });
 
-  const values = form.watch()
+  const values = form.watch();
 
   const categoriesQuery = useQuery({
     queryKey: ["admin-categories-select"],
     queryFn: async () => {
-      const response = await getAllAdminCategories()
-      return response.data.data.items
+      const response = await getAllAdminCategories();
+      return response.data.data.items;
     },
-  })
+  });
 
   const categoryOptions = useMemo(
     () =>
@@ -100,42 +110,44 @@ function CreateProductForm() {
         description: cat.slug,
       })) ?? [],
     [categoriesQuery.data],
-  )
+  );
 
   const createMutation = useMutation({
     mutationFn: (input: ProductCreateValues) => createProduct(input),
     onSuccess: async () => {
-      const { toast } = await import("sonner")
-      toast.success("Product created")
-      await queryClient.invalidateQueries({ queryKey: ["admin-products"] })
-      router.push("/dashboard/products")
+      const { toast } = await import("sonner");
+      toast.success("Product created");
+      await queryClient.invalidateQueries({ queryKey: ["admin-products"] });
+      router.push("/dashboard/products");
     },
     onError: async (error) => {
-      const { toast } = await import("sonner")
-      toast.error(error.message)
+      const { toast } = await import("sonner");
+      toast.error(error.message);
     },
-  })
+  });
 
   const uploadMutation = useMutation({
     mutationFn: (file: File) => uploadFile(file),
     onSuccess: async (response) => {
-      const data = response.data.data
-      form.setValue("thumbnail_file_id", data.file_id, { shouldValidate: true })
-      setThumbnailPreview(data.url)
+      const data = response.data.data;
+      form.setValue("thumbnail_file_id", data.file_id, {
+        shouldValidate: true,
+      });
+      setThumbnailPreview(data.url);
     },
     onError: async (error) => {
-      const { toast } = await import("sonner")
-      toast.error(error.message)
+      const { toast } = await import("sonner");
+      toast.error(error.message);
     },
-  })
+  });
 
   function onSubmit(input: ProductCreateValues) {
-    createMutation.mutate(input)
+    createMutation.mutate(input);
   }
 
   function handleNameChange(name: string) {
     if (!values.slug || values.slug === slugify(values.name)) {
-      form.setValue("slug", slugify(name), { shouldValidate: true })
+      form.setValue("slug", slugify(name), { shouldValidate: true });
     }
   }
 
@@ -153,15 +165,15 @@ function CreateProductForm() {
         />
       }
     >
-      <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-5">
-        <section className="rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="grid min-w-0 gap-5">
+        <section className={formPanelClassName}>
           <h2 className="text-sm font-semibold text-foreground">
             Product identity
           </h2>
           <p className="mt-1 text-xs text-muted-foreground">
             Core product information visible on the storefront.
           </p>
-          <div className="mt-5 grid gap-4">
+          <div className="mt-5 grid min-w-0 gap-4">
             <Field>
               <FieldLabel htmlFor="name">Product name</FieldLabel>
               <Input
@@ -174,7 +186,7 @@ function CreateProductForm() {
               />
               <FieldError errors={[form.formState.errors.name]} />
             </Field>
-            <div className="grid gap-4 sm:grid-cols-2">
+            <div className="grid min-w-0 gap-4 sm:grid-cols-2">
               <Field>
                 <FieldLabel htmlFor="sku">SKU</FieldLabel>
                 <Input
@@ -200,26 +212,36 @@ function CreateProductForm() {
                 <FieldError errors={[form.formState.errors.slug]} />
               </Field>
             </div>
-            <Field>
-              <FieldLabel htmlFor="description">Description</FieldLabel>
-              <Textarea
-                id="description"
-                rows={4}
-                placeholder="Product description..."
-                {...form.register("description")}
+            <Field className="min-w-0">
+              <FieldLabel>Description</FieldLabel>
+              <MinimalTiptapEditor
+                value={form.getValues("description")}
+                onChange={(content) => {
+                  form.setValue("description", content as string, {
+                    shouldValidate: true,
+                    shouldDirty: true,
+                  });
+                }}
+                placeholder="Write a detailed product description..."
+                className="min-h-[280px]"
+                editorContentClassName="min-w-0 max-w-full"
+                uploader={async (file) => {
+                  const response = await uploadFile(file);
+                  return response.data.data.url;
+                }}
               />
             </Field>
           </div>
         </section>
 
-        <section className="rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6">
+        <section className={formPanelClassName}>
           <h2 className="text-sm font-semibold text-foreground">
             Pricing and status
           </h2>
           <p className="mt-1 text-xs text-muted-foreground">
             Set the base price and catalog visibility.
           </p>
-          <div className="mt-5 grid gap-4 sm:grid-cols-2">
+          <div className="mt-5 grid min-w-0 gap-4 sm:grid-cols-2">
             <Field>
               <FieldLabel htmlFor="base_price_amount">
                 Base price (IDR)
@@ -262,7 +284,7 @@ function CreateProductForm() {
           </div>
         </section>
 
-        <section className="rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6">
+        <section className={formPanelClassName}>
           <h2 className="text-sm font-semibold text-foreground">Categories</h2>
           <p className="mt-1 text-xs text-muted-foreground">
             Assign this product to one or more categories.
@@ -288,7 +310,7 @@ function CreateProductForm() {
           </div>
         </section>
 
-        <section className="rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6">
+        <section className={formPanelClassName}>
           <h2 className="text-sm font-semibold text-foreground">Thumbnail</h2>
           <p className="mt-1 text-xs text-muted-foreground">
             Main product image shown in listings.
@@ -304,8 +326,8 @@ function CreateProductForm() {
                 <button
                   type="button"
                   onClick={() => {
-                    form.setValue("thumbnail_file_id", null)
-                    setThumbnailPreview(null)
+                    form.setValue("thumbnail_file_id", null);
+                    setThumbnailPreview(null);
                   }}
                   className="absolute -right-2 -top-2 flex size-6 items-center justify-center rounded-full bg-destructive text-destructive-foreground"
                 >
@@ -321,8 +343,8 @@ function CreateProductForm() {
                   accept="image/*"
                   className="sr-only"
                   onChange={(e) => {
-                    const file = e.target.files?.[0]
-                    if (file) uploadMutation.mutate(file)
+                    const file = e.target.files?.[0];
+                    if (file) uploadMutation.mutate(file);
                   }}
                 />
               </label>
@@ -351,18 +373,18 @@ function CreateProductForm() {
         </Button>
       </form>
     </FormShell>
-  )
+  );
 }
 
 function EditProductForm({ product }: { product: Product }) {
-  const router = useRouter()
-  const queryClient = useQueryClient()
+  const router = useRouter();
+  const queryClient = useQueryClient();
   const [thumbnailPreview, setThumbnailPreview] = useState<string | null>(
     product.thumbnail_url,
-  )
+  );
   const [productImages, setProductImages] = useState<ProductImage[]>(
     [...product.images].sort((a, b) => a.sort_order - b.sort_order),
-  )
+  );
 
   const form = useForm<ProductEditValues>({
     resolver: zodResolver(productEditSchema),
@@ -378,17 +400,17 @@ function EditProductForm({ product }: { product: Product }) {
       category_ids: product.categories.map((c) => c.id),
     },
     mode: "onBlur",
-  })
+  });
 
-  const values = form.watch()
+  const values = form.watch();
 
   const categoriesQuery = useQuery({
     queryKey: ["admin-categories-select"],
     queryFn: async () => {
-      const response = await getAllAdminCategories()
-      return response.data.data.items
+      const response = await getAllAdminCategories();
+      return response.data.data.items;
     },
-  })
+  });
 
   const categoryOptions = useMemo(
     () =>
@@ -398,82 +420,89 @@ function EditProductForm({ product }: { product: Product }) {
         description: cat.slug,
       })) ?? [],
     [categoriesQuery.data],
-  )
+  );
 
   const updateMutation = useMutation({
-    mutationFn: (input: ProductEditValues) =>
-      updateProduct(product.id, input),
+    mutationFn: (input: ProductEditValues) => updateProduct(product.id, input),
     onSuccess: async () => {
-      const { toast } = await import("sonner")
-      toast.success("Product updated")
+      const { toast } = await import("sonner");
+      toast.success("Product updated");
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: ["admin-products"] }),
         queryClient.invalidateQueries({
           queryKey: ["admin-product", product.id],
         }),
-      ])
-      router.push(`/dashboard/products/${product.id}`)
+      ]);
+      router.push(`/dashboard/products/${product.id}`);
     },
     onError: async (error) => {
-      const { toast } = await import("sonner")
-      toast.error(error.message)
+      const { toast } = await import("sonner");
+      toast.error(error.message);
     },
-  })
+  });
 
   const uploadMutation = useMutation({
     mutationFn: (file: File) => uploadFile(file),
     onSuccess: async (response) => {
-      const data = response.data.data
-      form.setValue("thumbnail_file_id", data.file_id, { shouldValidate: true })
-      setThumbnailPreview(data.url)
+      const data = response.data.data;
+      form.setValue("thumbnail_file_id", data.file_id, {
+        shouldValidate: true,
+      });
+      setThumbnailPreview(data.url);
     },
     onError: async (error) => {
-      const { toast } = await import("sonner")
-      toast.error(error.message)
+      const { toast } = await import("sonner");
+      toast.error(error.message);
     },
-  })
+  });
 
   const addImageMutation = useMutation({
     mutationFn: async (file: File) => {
-      const uploadResponse = await uploadFile(file)
-      const uploaded = uploadResponse.data.data
+      const uploadResponse = await uploadFile(file);
+      const uploaded = uploadResponse.data.data;
       const imageResponse = await addProductImage(product.id, {
         file_id: uploaded.file_id,
         alt_text: values.name || product.name,
         sort_order: productImages.length + 1,
-      })
-      return imageResponse.data.data
+      });
+      return imageResponse.data.data;
     },
     onSuccess: async (image) => {
       setProductImages((current) =>
         [...current, image].sort((a, b) => a.sort_order - b.sort_order),
-      )
-      await queryClient.invalidateQueries({ queryKey: ["admin-product", product.id] })
-      const { toast } = await import("sonner")
-      toast.success("Image added")
+      );
+      await queryClient.invalidateQueries({
+        queryKey: ["admin-product", product.id],
+      });
+      const { toast } = await import("sonner");
+      toast.success("Image added");
     },
     onError: async (error) => {
-      const { toast } = await import("sonner")
-      toast.error(error.message)
+      const { toast } = await import("sonner");
+      toast.error(error.message);
     },
-  })
+  });
 
   const deleteImageMutation = useMutation({
     mutationFn: (imageId: string) => deleteProductImage(product.id, imageId),
     onSuccess: async (_, imageId) => {
-      setProductImages((current) => current.filter((image) => image.id !== imageId))
-      await queryClient.invalidateQueries({ queryKey: ["admin-product", product.id] })
-      const { toast } = await import("sonner")
-      toast.success("Image removed")
+      setProductImages((current) =>
+        current.filter((image) => image.id !== imageId),
+      );
+      await queryClient.invalidateQueries({
+        queryKey: ["admin-product", product.id],
+      });
+      const { toast } = await import("sonner");
+      toast.success("Image removed");
     },
     onError: async (error) => {
-      const { toast } = await import("sonner")
-      toast.error(error.message)
+      const { toast } = await import("sonner");
+      toast.error(error.message);
     },
-  })
+  });
 
   function onSubmit(input: ProductEditValues) {
-    updateMutation.mutate(input)
+    updateMutation.mutate(input);
   }
 
   return (
@@ -491,15 +520,15 @@ function EditProductForm({ product }: { product: Product }) {
         />
       }
     >
-      <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-4">
-        <section className="rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="grid min-w-0 gap-4">
+        <section className={formPanelClassName}>
           <h2 className="text-sm font-semibold text-foreground">
             Product identity
           </h2>
           <p className="mt-1 text-xs text-muted-foreground">
             Core product information visible on the storefront.
           </p>
-          <div className="mt-5 grid gap-4">
+          <div className="mt-5 grid min-w-0 gap-4">
             <Field>
               <FieldLabel htmlFor="name">Product name</FieldLabel>
               <Input
@@ -510,7 +539,7 @@ function EditProductForm({ product }: { product: Product }) {
               />
               <FieldError errors={[form.formState.errors.name]} />
             </Field>
-            <div className="grid gap-4 sm:grid-cols-2">
+            <div className="grid min-w-0 gap-4 sm:grid-cols-2">
               <Field>
                 <FieldLabel htmlFor="sku">SKU</FieldLabel>
                 <Input
@@ -534,23 +563,33 @@ function EditProductForm({ product }: { product: Product }) {
                 <FieldError errors={[form.formState.errors.slug]} />
               </Field>
             </div>
-            <Field>
-              <FieldLabel htmlFor="description">Description</FieldLabel>
-              <Textarea
-                id="description"
-                rows={4}
-                placeholder="Product description..."
-                {...form.register("description")}
+            <Field className="min-w-0">
+              <FieldLabel>Description</FieldLabel>
+              <MinimalTiptapEditor
+                value={form.getValues("description")}
+                onChange={(content) => {
+                  form.setValue("description", content as string, {
+                    shouldValidate: true,
+                    shouldDirty: true,
+                  });
+                }}
+                placeholder="Write a detailed product description..."
+                className="min-h-[280px]"
+                editorContentClassName="min-w-0 max-w-full"
+                uploader={async (file) => {
+                  const response = await uploadFile(file);
+                  return response.data.data.url;
+                }}
               />
             </Field>
           </div>
         </section>
 
-        <section className="rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6">
+        <section className={formPanelClassName}>
           <h2 className="text-sm font-semibold text-foreground">
             Pricing and status
           </h2>
-          <div className="mt-5 grid gap-4 sm:grid-cols-2">
+          <div className="mt-5 grid min-w-0 gap-4 sm:grid-cols-2">
             <Field>
               <FieldLabel htmlFor="base_price_amount">
                 Base price (IDR)
@@ -588,7 +627,7 @@ function EditProductForm({ product }: { product: Product }) {
           </div>
         </section>
 
-        <section className="rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6">
+        <section className={formPanelClassName}>
           <h2 className="text-sm font-semibold text-foreground">Categories</h2>
           <div className="mt-5">
             <MultiSelect
@@ -611,7 +650,7 @@ function EditProductForm({ product }: { product: Product }) {
           </div>
         </section>
 
-        <section className="rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6">
+        <section className={formPanelClassName}>
           <h2 className="text-sm font-semibold text-foreground">Thumbnail</h2>
           <div className="mt-5">
             {thumbnailPreview ? (
@@ -624,8 +663,8 @@ function EditProductForm({ product }: { product: Product }) {
                 <button
                   type="button"
                   onClick={() => {
-                    form.setValue("thumbnail_file_id", null)
-                    setThumbnailPreview(null)
+                    form.setValue("thumbnail_file_id", null);
+                    setThumbnailPreview(null);
                   }}
                   className="absolute -right-2 -top-2 flex size-6 items-center justify-center rounded-full bg-destructive text-destructive-foreground"
                 >
@@ -641,8 +680,8 @@ function EditProductForm({ product }: { product: Product }) {
                   accept="image/*"
                   className="sr-only"
                   onChange={(e) => {
-                    const file = e.target.files?.[0]
-                    if (file) uploadMutation.mutate(file)
+                    const file = e.target.files?.[0];
+                    if (file) uploadMutation.mutate(file);
                   }}
                 />
               </label>
@@ -674,7 +713,7 @@ function EditProductForm({ product }: { product: Product }) {
         </Button>
       </form>
     </FormShell>
-  )
+  );
 }
 
 function FormShell({
@@ -683,13 +722,13 @@ function FormShell({
   preview,
   children,
 }: {
-  title: string
-  description: string
-  preview: React.ReactNode
-  children: React.ReactNode
+  title: string;
+  description: string;
+  preview: React.ReactNode;
+  children: React.ReactNode;
 }) {
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex min-w-0 flex-col gap-4">
       <Button
         asChild
         variant="ghost"
@@ -702,12 +741,12 @@ function FormShell({
         </Link>
       </Button>
 
-      <section className="relative overflow-hidden rounded-2xl border border-border bg-[#111111] p-6 text-white shadow-lg sm:p-8">
+      <section className="relative min-w-0 overflow-hidden rounded-2xl border border-border bg-[#111111] p-6 text-white shadow-lg sm:p-8">
         <div className="absolute -top-24 -right-24 size-48 rounded-full bg-[#FF6600]/10 blur-3xl" />
         <div className="absolute -bottom-16 -left-16 size-40 rounded-full bg-[#DC143C]/8 blur-3xl" />
 
-        <div className="relative grid gap-6 lg:grid-cols-[1fr_1fr]">
-          <div>
+        <div className="relative grid min-w-0 gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
+          <div className="min-w-0">
             <div className="inline-flex items-center gap-2 rounded-full bg-[#FF6600]/15 px-3 py-1 text-xs font-semibold text-[#FF6600]">
               <Package className="size-3.5" />
               Catalog entry
@@ -719,15 +758,15 @@ function FormShell({
               {description}
             </p>
           </div>
-          <div>{preview}</div>
+          <div className="min-w-0">{preview}</div>
         </div>
       </section>
 
-      <section className="rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6">
+      <section className="min-w-0 rounded-2xl border border-border bg-card p-3 shadow-sm sm:p-6">
         {children}
       </section>
     </div>
-  )
+  );
 }
 
 function ProductPreview({
@@ -738,15 +777,15 @@ function ProductPreview({
   thumbnailUrl,
   createdAt,
 }: {
-  name: string
-  slug: string
-  price: number
-  status: string
-  thumbnailUrl?: string | null
-  createdAt?: string
+  name: string;
+  slug: string;
+  price: number;
+  status: string;
+  thumbnailUrl?: string | null;
+  createdAt?: string;
 }) {
   return (
-    <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-5">
+    <div className="min-w-0 rounded-2xl border border-white/10 bg-white/[0.04] p-5">
       <div className="flex items-center gap-4">
         {thumbnailUrl ? (
           <img
@@ -789,7 +828,7 @@ function ProductPreview({
         </div>
       )}
     </div>
-  )
+  );
 }
 
 function ProductImagesManager({
@@ -800,15 +839,15 @@ function ProductImagesManager({
   onAdd,
   onDelete,
 }: {
-  images: ProductImage[]
-  productName: string
-  isAdding: boolean
-  isDeleting: boolean
-  onAdd: (file: File) => void
-  onDelete: (imageId: string) => void
+  images: ProductImage[];
+  productName: string;
+  isAdding: boolean;
+  isDeleting: boolean;
+  onAdd: (file: File) => void;
+  onDelete: (imageId: string) => void;
 }) {
   return (
-    <section className="rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6">
+    <section className={formPanelClassName}>
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <h2 className="text-sm font-semibold text-foreground">
@@ -831,15 +870,15 @@ function ProductImagesManager({
             className="sr-only"
             disabled={isAdding}
             onChange={(event) => {
-              const file = event.target.files?.[0]
-              if (file) onAdd(file)
-              event.currentTarget.value = ""
+              const file = event.target.files?.[0];
+              if (file) onAdd(file);
+              event.currentTarget.value = "";
             }}
           />
         </label>
       </div>
 
-      <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="mt-5 grid min-w-0 gap-3 sm:grid-cols-2 lg:grid-cols-4">
         {images.map((image) => (
           <div
             key={image.id}
@@ -886,14 +925,14 @@ function ProductImagesManager({
               className="sr-only"
               disabled={isAdding}
               onChange={(event) => {
-                const file = event.target.files?.[0]
-                if (file) onAdd(file)
-                event.currentTarget.value = ""
+                const file = event.target.files?.[0];
+                if (file) onAdd(file);
+                event.currentTarget.value = "";
               }}
             />
           </label>
         )}
       </div>
     </section>
-  )
+  );
 }

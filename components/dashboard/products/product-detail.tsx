@@ -4,6 +4,7 @@ import { useMemo, useState } from "react"
 import Link from "next/link"
 import { useParams } from "next/navigation"
 import { useQuery } from "@tanstack/react-query"
+import DOMPurify from "dompurify"
 import {
   ArrowLeft,
   Boxes,
@@ -239,9 +240,12 @@ function ProductDetailView({ product }: { product: Product }) {
             Product description
           </h2>
           {product.description ? (
-            <p className="mt-4 max-w-4xl whitespace-pre-wrap text-sm leading-7 text-muted-foreground">
-              {product.description}
-            </p>
+            <div
+              className="product-rich-text mt-4 max-w-4xl text-sm leading-7 text-muted-foreground"
+              dangerouslySetInnerHTML={{
+                __html: DOMPurify.sanitize(product.description),
+              }}
+            />
           ) : (
             <p className="mt-4 text-sm text-muted-foreground">
               No storefront description has been written yet.

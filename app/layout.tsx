@@ -4,6 +4,7 @@ import { QueryProvider } from "@/components/providers/query-provider"
 import { ThemeProvider } from "@/components/providers/theme-provider"
 import { AuthStoreHydration } from "@/components/providers/auth-store-hydration"
 import { Toaster } from "@/components/ui/sonner"
+import { TooltipProvider } from "@/components/ui/tooltip"
 import { SITE_URL, siteConfig } from "@/lib/seo"
 import "./globals.css"
 
@@ -108,8 +109,10 @@ export default function RootLayout({
         >
           <AuthStoreHydration />
           <QueryProvider>
-            {children}
-            <Toaster position="top-center" />
+            <TooltipProvider>
+              {children}
+              <Toaster position="top-center" />
+            </TooltipProvider>
           </QueryProvider>
         </ThemeProvider>
       </body>
