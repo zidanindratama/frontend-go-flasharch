@@ -83,43 +83,45 @@ export function Sidebar({ open, isMobile = false, onClose }: Props) {
     <motion.aside
       animate={{ width: open ? 256 : 0 }}
       transition={{ duration: 0.35, ease: sidebarEase }}
-      className="relative flex-shrink-0 h-full overflow-hidden bg-[#1A1A1A] border-r border-white/[0.06]"
+      className="relative self-stretch flex-shrink-0 overflow-hidden bg-[#1A1A1A] border-r border-white/[0.06]"
     >
-      <AnimatePresence>
-        {open && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.2, ease: sidebarEase }}
-            className="flex items-center gap-3 px-5 pt-6 pb-5"
-          >
-            <div className="relative flex h-8 w-8 items-center justify-center">
-              <div className="absolute inset-0 rounded-lg bg-[#FF6600]/15" />
-              <Zap className="h-4 w-4 text-[#FF6600]" />
-            </div>
-            <Link href="/">
-              <div className="text-lg font-bold text-white tracking-tight">
-                Go FlashArch
+      <div className="sticky top-0 flex h-screen flex-col overflow-hidden">
+        <AnimatePresence>
+          {open && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2, ease: sidebarEase }}
+              className="flex items-center gap-3 px-5 pt-6 pb-5"
+            >
+              <div className="relative flex h-8 w-8 items-center justify-center">
+                <div className="absolute inset-0 rounded-lg bg-[#FF6600]/15" />
+                <Zap className="h-4 w-4 text-[#FF6600]" />
               </div>
-              <div className="text-[10px] font-medium uppercase tracking-[0.18em] text-white/35">
-                Panel
-              </div>
-            </Link>
-          </motion.div>
-        )}
-      </AnimatePresence>
+              <Link href="/">
+                <div className="text-lg font-bold text-white tracking-tight">
+                  Go FlashArch
+                </div>
+                <div className="text-[10px] font-medium uppercase tracking-[0.18em] text-white/35">
+                  Panel
+                </div>
+              </Link>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
-      <nav className="flex flex-col gap-0.5 px-3 pt-1">
-        {dashboardNav.map((item) => (
-          <NavItem
-            key={item.href}
-            item={item}
-            open={open}
-            pathname={pathname}
-          />
-        ))}
-      </nav>
+        <nav className="flex flex-1 flex-col gap-0.5 overflow-y-auto px-3 pt-1">
+          {dashboardNav.map((item) => (
+            <NavItem
+              key={item.href}
+              item={item}
+              open={open}
+              pathname={pathname}
+            />
+          ))}
+        </nav>
+      </div>
     </motion.aside>
   );
 }
@@ -305,6 +307,8 @@ function MobileNavItem({
   );
 }
 
+const allNavHrefs = collectAllHrefs(dashboardNav);
+
 function isNavItemActive(item: NavItem, pathname: string) {
   if (item.href === dashboardRoot) {
     return pathname === dashboardRoot;
@@ -314,5 +318,24 @@ function isNavItemActive(item: NavItem, pathname: string) {
     return true;
   }
 
-  return pathname === item.href || pathname.startsWith(`${item.href}/`);
+  if (pathname === item.href) return true;
+
+  if (!pathname.startsWith(`${item.href}/`)) return false;
+
+  const hasDeeperMatch = allNavHrefs.some((href) => {
+    if (href === item.href) return false;
+    if (!href.startsWith(item.href)) return false;
+    return pathname === href || pathname.startsWith(`${href}/`);
+  });
+
+  return !hasDeeperMatch;
+}
+
+function collectAllHrefs(items: NavItem[]): string[] {
+  const hrefs: string[] = [];
+  for (const item of items) {
+    hrefs.push(item.href);
+    if (item.children) hrefs.push(...collectAllHrefs(item.children));
+  }
+  return hrefs;
 }

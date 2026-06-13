@@ -1,12 +1,14 @@
 import {
   LayoutDashboard,
   Package,
+  Tag,
   ShoppingCart,
   Zap,
   Activity,
   Gauge,
   Cpu,
   Users,
+  Warehouse,
   type LucideIcon,
 } from "lucide-react";
 
@@ -33,12 +35,9 @@ export const dashboardNav: NavItem[] = [
     href: "/dashboard/products",
     icon: Package,
     children: [
-      { label: "Catalog", href: "/dashboard/products", icon: Package },
-      {
-        label: "Inventory",
-        href: "/dashboard/products/inventory",
-        icon: Package,
-      },
+      { label: "All Products", href: "/dashboard/products", icon: Package },
+      { label: "Categories", href: "/dashboard/products/categories", icon: Tag },
+      { label: "Inventory", href: "/dashboard/products/inventory", icon: Warehouse },
     ],
   },
   {
@@ -46,7 +45,6 @@ export const dashboardNav: NavItem[] = [
     href: "/dashboard/orders",
     icon: ShoppingCart,
   },
-
   {
     label: "Flash Sales",
     href: "/dashboard/flash-sales",

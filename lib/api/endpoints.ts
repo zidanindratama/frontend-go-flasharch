@@ -17,6 +17,9 @@ export const endpoints = {
     addresses: "/users/me/addresses",
     wishlist: "/users/me/wishlist",
   },
+  upload: {
+    file: "/files/upload",
+  },
   orders: {
     list: "/orders",
   },
@@ -24,7 +27,9 @@ export const endpoints = {
     dashboard: "/admin/reports/dashboard",
     summary: "/admin/reports/summary",
     orders: "/admin/orders",
-    products: "/admin/reports/products",
+    reportsProducts: "/admin/reports/products",
     users: "/admin/users",
+    products: "/admin/products",
+    categories: "/admin/categories",
   },
 } as const
