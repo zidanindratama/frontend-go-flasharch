@@ -3,11 +3,9 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ArrowRight, CheckCircle2, Eye, EyeOff, KeyRound, Loader2, Mail, RotateCcw } from "lucide-react";
+import { ArrowRight, CheckCircle2, Eye, EyeOff, KeyRound, Loader2, RotateCcw } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { toast } from "sonner";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import {
   Field,
@@ -338,24 +336,6 @@ function FormHeader({
         {description}
       </p>
     </div>
-  );
-}
-
-function SuccessAlert({
-  icon: Icon,
-  title,
-  description,
-}: {
-  icon: typeof CheckCircle2;
-  title: string;
-  description: string;
-}) {
-  return (
-    <Alert className="border-[#39FF14]/30 bg-[#39FF14]/10">
-      <Icon className="size-4 text-[#39FF14]" />
-      <AlertTitle>{title}</AlertTitle>
-      <AlertDescription>{description}</AlertDescription>
-    </Alert>
   );
 }
 

@@ -1,10 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { motion } from "framer-motion";
 import { Zap, ArrowUpRight, Globe, MessageCircle } from "lucide-react";
-
-const smoothEase: [number, number, number, number] = [0.16, 1, 0.3, 1];
 
 const footerLinks = {
   Product: [

@@ -5,14 +5,11 @@ import { useParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import {
   ArrowLeft,
-  Copy,
-  CreditCard,
   Mail,
   Pencil,
   ShieldCheck,
   User,
 } from "lucide-react";
-import { toast } from "sonner";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -23,7 +20,6 @@ import {
 } from "@/components/dashboard/users/user-badges";
 import {
   formatDateTime,
-  shortId,
   userInitials,
 } from "@/components/dashboard/users/user-utils";
 import { getAdminUser } from "@/lib/api/admin-users";
@@ -56,11 +52,6 @@ export function UserDetail() {
   }
 
   const user = userQuery.data;
-
-  async function copyId() {
-    await navigator.clipboard.writeText(user.id);
-    toast.success("User ID copied");
-  }
 
   return (
     <div className="flex flex-col gap-4">

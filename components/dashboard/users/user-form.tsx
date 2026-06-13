@@ -42,7 +42,6 @@ import {
   updateAdminUserStatus,
   type AdminUser,
   type CreateAdminUserInput,
-  type UpdateAdminUserInput,
 } from "@/lib/api/admin-users"
 import {
   adminUserCreateSchema,
@@ -109,6 +108,7 @@ function CreateUserForm() {
   })
 
   function onSubmit(input: AdminUserCreateValues) {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { confirmPassword: _, ...payload } = input
     createUser.mutate(payload)
   }
