@@ -21,6 +21,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import { SingleSelect } from "@/components/common/single-select"
 import { Textarea } from "@/components/ui/textarea"
 import { CategoryStatusBadge } from "@/components/dashboard/products/product-badges"
 import { slugify } from "@/components/dashboard/products/product-utils"
@@ -146,26 +147,23 @@ function CreateCategoryForm() {
             </Field>
             <Field>
               <FieldLabel htmlFor="parent_id">Parent category</FieldLabel>
-              <Select
-                value={values.parent_id || "none"}
-                onValueChange={(v) =>
-                  form.setValue("parent_id", v === "none" ? null : v, {
+              <SingleSelect
+                value={values.parent_id || ""}
+                onChange={(v) =>
+                  form.setValue("parent_id", v === "_none" ? null : v, {
                     shouldValidate: true,
                   })
                 }
-              >
-                <SelectTrigger className="h-10 w-full rounded-xl">
-                  <SelectValue placeholder="None (top-level)" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="none">None (top-level)</SelectItem>
-                  {categoriesQuery.data?.map((cat) => (
-                    <SelectItem key={cat.id} value={cat.id}>
-                      {cat.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+                placeholder="None (top-level)"
+                searchPlaceholder="Search categories..."
+                options={[
+                  { value: "_none", label: "None (top-level)" },
+                  ...(categoriesQuery.data?.map((cat) => ({
+                    value: cat.id,
+                    label: cat.name,
+                  })) ?? []),
+                ]}
+              />
               <FieldDescription>
                 Optional parent for hierarchical categories.
               </FieldDescription>
@@ -308,28 +306,25 @@ function EditCategoryForm({ category }: { category: Category }) {
             </Field>
             <Field>
               <FieldLabel htmlFor="parent_id">Parent category</FieldLabel>
-              <Select
-                value={values.parent_id || "none"}
-                onValueChange={(v) =>
-                  form.setValue("parent_id", v === "none" ? null : v, {
+              <SingleSelect
+                value={values.parent_id || ""}
+                onChange={(v) =>
+                  form.setValue("parent_id", v === "_none" ? null : v, {
                     shouldValidate: true,
                   })
                 }
-              >
-                <SelectTrigger className="h-10 w-full rounded-xl">
-                  <SelectValue placeholder="None (top-level)" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="none">None (top-level)</SelectItem>
-                  {categoriesQuery.data
+                placeholder="None (top-level)"
+                searchPlaceholder="Search categories..."
+                options={[
+                  { value: "_none", label: "None (top-level)" },
+                  ...(categoriesQuery.data
                     ?.filter((c) => c.id !== category.id)
-                    .map((cat) => (
-                      <SelectItem key={cat.id} value={cat.id}>
-                        {cat.name}
-                      </SelectItem>
-                    ))}
-                </SelectContent>
-              </Select>
+                    .map((cat) => ({
+                      value: cat.id,
+                      label: cat.name,
+                    })) ?? []),
+                ]}
+              />
             </Field>
             <Field>
               <FieldLabel htmlFor="description">Description</FieldLabel>

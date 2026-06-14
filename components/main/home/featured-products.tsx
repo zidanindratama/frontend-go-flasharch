@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -11,56 +12,14 @@ import {
   HardDrive,
   Watch,
   Cable,
+  Package,
+  Loader2,
 } from "lucide-react";
+import { listProducts } from "@/lib/api/catalog";
 
 const smoothEase: [number, number, number, number] = [0.16, 1, 0.3, 1];
 
-const products = [
-  {
-    id: 1,
-    name: "Mechanical Keyboard RGB",
-    category: "Peripherals",
-    price: 149,
-    originalPrice: 219,
-    stock: "available" as const,
-    stockCount: 42,
-    icon: HardDrive,
-    size: "large" as const,
-  },
-  {
-    id: 2,
-    name: "Portable SSD 1TB",
-    category: "Storage",
-    price: 79,
-    originalPrice: 129,
-    stock: "limited" as const,
-    stockCount: 5,
-    icon: Cable,
-    size: "small" as const,
-  },
-  {
-    id: 3,
-    name: "Wireless Earbuds Elite",
-    category: "Audio",
-    price: 99,
-    originalPrice: 159,
-    stock: "available" as const,
-    stockCount: 128,
-    icon: Headphones,
-    size: "small" as const,
-  },
-  {
-    id: 4,
-    name: "Smart Watch Series X",
-    category: "Wearables",
-    price: 249,
-    originalPrice: 349,
-    stock: "available" as const,
-    stockCount: 67,
-    icon: Watch,
-    size: "wide" as const,
-  },
-];
+const iconMap = [HardDrive, Cable, Headphones, Watch];
 
 function StockBadge({ stock, count }: { stock: string; count: number }) {
   if (stock === "sold_out") {
@@ -87,13 +46,22 @@ function StockBadge({ stock, count }: { stock: string; count: number }) {
   );
 }
 
-function ProductCard({
+function HomeProductCard({
   product,
   index,
+  size,
 }: {
-  product: (typeof products)[0];
+  product: any;
   index: number;
+  size: "large" | "small" | "wide";
 }) {
+  const Icon = iconMap[index % iconMap.length];
+  const stockCount = product.stock_quantity ?? 0;
+  const stockStatus =
+    stockCount === 0 ? "sold_out" : stockCount <= 10 ? "limited" : "available";
+  const categoryNames =
+    product.categories?.map((c: any) => c.name).join(", ") || "";
+
   const sizeClasses: Record<string, string> = {
     large: "md:col-span-2 md:row-span-2",
     small: "md:col-span-1 md:row-span-1",
@@ -106,48 +74,56 @@ function ProductCard({
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: false, amount: 0.2 }}
       transition={{ duration: 0.65, ease: smoothEase, delay: index * 0.06 }}
-      className={`group relative min-h-[260px] ${sizeClasses[product.size] || ""}`}
+      className={`group relative min-h-[260px] ${sizeClasses[size] || ""}`}
     >
-      <Link href={`/products/${product.id}`} className="block h-full">
+      <Link href={`/products/${product.slug}`} className="block h-full">
         <div
           className={`relative overflow-hidden rounded-2xl border border-border bg-card transition-all duration-500 hover:border-[#FF6600]/30 ${
-            product.size === "large"
+            size === "large"
               ? "aspect-[4/3] md:aspect-auto md:min-h-full"
-              : product.size === "wide"
+              : size === "wide"
               ? "aspect-[4/3] md:aspect-auto md:min-h-full"
               : "aspect-[4/3] md:aspect-auto md:min-h-full"
           }`}
         >
-          {/* Icon placeholder with animated bg */}
+          {/* Image or icon placeholder */}
           <div className="absolute inset-0 flex items-center justify-center">
-            <div className="relative">
-              <div className="absolute inset-0 rounded-full bg-[#FF6600]/5 blur-3xl scale-150 group-hover:scale-200 transition-transform duration-700" />
-              <product.icon className="relative h-14 w-14 text-muted-foreground/30 transition-colors duration-500 group-hover:text-[#FF6600]/40 md:h-24 md:w-24" />
-            </div>
+            {product.thumbnail_url ? (
+              <img
+                src={product.thumbnail_url}
+                alt={product.name}
+                className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+              />
+            ) : (
+              <div className="relative">
+                <div className="absolute inset-0 rounded-full bg-[#FF6600]/5 blur-3xl scale-150 group-hover:scale-200 transition-transform duration-700" />
+                <Icon className="relative h-14 w-14 text-muted-foreground/30 transition-colors duration-500 group-hover:text-[#FF6600]/40 md:h-24 md:w-24" />
+              </div>
+            )}
           </div>
 
-          {/* Overlay info on hover */}
-          <div className="absolute inset-0 bg-gradient-to-t from-background/95 via-background/30 to-transparent opacity-100 transition-opacity duration-500 md:opacity-0 md:group-hover:opacity-100" />
+          {/* Gradient overlay for text readability */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent transition-opacity duration-500 md:opacity-0 md:group-hover:opacity-100" />
 
           {/* Top right badge */}
           <div className="absolute top-4 right-4">
-            <StockBadge stock={product.stock} count={product.stockCount} />
+            <StockBadge stock={stockStatus} count={stockCount} />
           </div>
 
           {/* Bottom info */}
-          <div className="absolute bottom-0 left-0 right-0 translate-y-0 p-5 opacity-100 transition-all duration-500 md:translate-y-4 md:opacity-0 md:group-hover:translate-y-0 md:group-hover:opacity-100">
-            <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-              {product.category}
+          <div className="absolute bottom-0 left-0 right-0 p-5 transition-all duration-500 translate-y-0 opacity-100 md:translate-y-4 md:opacity-0 md:group-hover:translate-y-0 md:group-hover:opacity-100">
+            <p className="text-xs font-medium uppercase tracking-wider text-white/70 drop-shadow-sm">
+              {categoryNames || "Product"}
             </p>
-            <h3 className="mt-1 text-lg font-semibold text-foreground">
+            <h3 className="mt-1 text-lg font-semibold text-white drop-shadow-md">
               {product.name}
             </h3>
             <div className="mt-2 flex items-baseline gap-2">
-              <span className="text-xl font-bold text-[#FF6600]">
-                ${product.price}
+              <span className="text-xl font-bold text-[#FF6600] drop-shadow-sm">
+                {product.base_price_amount?.toLocaleString()}
               </span>
-              <span className="text-sm text-muted-foreground line-through">
-                ${product.originalPrice}
+              <span className="text-xs text-white/60 drop-shadow-sm">
+                {product.currency}
               </span>
             </div>
           </div>
@@ -160,12 +136,32 @@ function ProductCard({
           </div>
         </div>
       </Link>
-
     </motion.div>
   );
 }
 
 export function FeaturedProducts() {
+  const { data, isLoading, isError } = useQuery({
+    queryKey: ["public-products", "popular"],
+    queryFn: async () => {
+      const res = await listProducts({
+        sort: "popularity",
+        order: "desc",
+        per_page: 4,
+        status: "active",
+      });
+      return res.data.data.items;
+    },
+    staleTime: 60_000,
+  });
+
+  const sizes: Array<"large" | "small" | "small" | "wide"> = [
+    "large",
+    "small",
+    "small",
+    "wide",
+  ];
+
   return (
     <section className="relative w-full py-24 md:py-32">
       <div className="mx-auto max-w-7xl px-6">
@@ -185,8 +181,8 @@ export function FeaturedProducts() {
               Popular right now
             </h2>
             <p className="mt-4 max-w-md text-muted-foreground">
-              Clear availability before you commit, so checkout feels direct
-              and predictable.
+              Products with the most completed purchases, sorted by real buyer
+              activity.
             </p>
           </div>
           <Button
@@ -194,7 +190,7 @@ export function FeaturedProducts() {
             variant="ghost"
             className="group w-fit rounded-full text-[#FF6600] hover:text-[#FF6600] hover:bg-[#FF6600]/5"
           >
-            <Link href="/products">
+            <Link href="/products?sort=popularity">
               View all products
               <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
             </Link>
@@ -202,11 +198,39 @@ export function FeaturedProducts() {
         </motion.div>
 
         {/* Asymmetric grid */}
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-4 md:grid-rows-[220px_220px] lg:grid-rows-[260px_260px]">
-          {products.map((product, i) => (
-            <ProductCard key={product.id} product={product} index={i} />
-          ))}
-        </div>
+        {isLoading ? (
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-4 md:grid-rows-[220px_220px] lg:grid-rows-[260px_260px]">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div
+                key={i}
+                className={`animate-pulse rounded-2xl border border-border bg-card ${
+                  sizes[i] === "large"
+                    ? "md:col-span-2 md:row-span-2"
+                    : sizes[i] === "wide"
+                    ? "md:col-span-2 md:row-span-1"
+                    : ""
+                }`}
+              />
+            ))}
+          </div>
+        ) : isError || !data?.length ? (
+          <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-border py-20">
+            <p className="text-sm text-muted-foreground">
+              No products found yet.
+            </p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-4 md:grid-rows-[220px_220px] lg:grid-rows-[260px_260px]">
+            {data.map((product: any, i: number) => (
+              <HomeProductCard
+                key={product.id}
+                product={product}
+                index={i}
+                size={sizes[i] || "small"}
+              />
+            ))}
+          </div>
+        )}
       </div>
     </section>
   );

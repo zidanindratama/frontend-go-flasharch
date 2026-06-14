@@ -191,9 +191,10 @@ export function ProductsCatalog() {
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, ease: smoothEase, delay: 0.05 }}
-              className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"
+              className="mb-6 flex flex-col gap-3"
             >
-              <div className="flex items-center gap-2">
+              {/* Filter button - mobile only, full width */}
+              <div className="flex items-center gap-2 lg:hidden">
                 <FilterDrawer
                   categories={categories}
                   selectedCategory={category || null}
@@ -204,23 +205,24 @@ export function ProductsCatalog() {
                   activeFilterCount={activeFilterCount}
                   isLoading={categoriesQuery.isLoading}
                 />
-                <span className="text-sm text-muted-foreground lg:hidden">
+                <span className="text-sm text-muted-foreground">
                   {activeFilterCount > 0 ? `${activeFilterCount} active` : "Filters"}
                 </span>
               </div>
 
-              <div className="flex flex-1 items-center gap-3 sm:justify-end">
+              {/* Search + Sort - always full width row */}
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
                 <SearchInput
                   key={search}
                   value={search}
                   onChange={handleSearchChange}
                   placeholder="Search products..."
-                  className="w-full sm:max-w-sm"
+                  className="w-full"
                 />
                 <SortSelect
                   value={sortOption}
                   onChange={handleSortChange}
-                  className="w-[180px] shrink-0"
+                  className="w-full sm:w-[180px] shrink-0"
                 />
               </div>
             </motion.div>

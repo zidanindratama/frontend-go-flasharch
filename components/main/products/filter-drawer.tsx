@@ -55,8 +55,8 @@ export function FilterDrawer({
         </Button>
       </SheetTrigger>
       <SheetContent
-        side="left"
-        className="w-full max-w-sm overflow-y-auto border-r border-border bg-card p-0"
+        side="bottom"
+        className="max-h-[85dvh] overflow-y-auto rounded-t-2xl border-t border-border bg-card p-0"
       >
         <SheetHeader className="sticky top-0 z-10 border-b border-border bg-card px-5 py-4">
           <div className="flex items-center justify-between">
