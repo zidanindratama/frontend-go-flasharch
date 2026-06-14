@@ -1,17 +1,18 @@
-"use client";
+"use client"
 
-import { useMemo, useState } from "react";
-import Link from "next/link";
-import { motion } from "framer-motion";
+import { useEffect, useMemo, useState } from "react"
+import Link from "next/link"
+import { useQuery } from "@tanstack/react-query"
+import { motion } from "framer-motion"
 import {
   ArrowRight,
   BookOpen,
   CalendarDays,
   Search,
   SlidersHorizontal,
-} from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+} from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
 import {
   Pagination,
   PaginationContent,
@@ -19,81 +20,93 @@ import {
   PaginationLink,
   PaginationNext,
   PaginationPrevious,
-} from "@/components/ui/pagination";
+} from "@/components/ui/pagination"
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from "@/components/ui/select"
+import { Skeleton } from "@/components/ui/skeleton"
 import {
-  blogCategories,
-  blogPosts,
-  getBlogCategory,
+  listBlogs,
+  listBlogCategories,
   type BlogPost,
-} from "@/lib/blogs";
-import { cn } from "@/lib/utils";
+  type BlogCategory,
+} from "@/lib/api/blogs"
+import { cn } from "@/lib/utils"
 
-const smoothEase: [number, number, number, number] = [0.16, 1, 0.3, 1];
-const postsPerPage = 6;
+const smoothEase: [number, number, number, number] = [0.16, 1, 0.3, 1]
+const postsPerPage = 6
 
-type SortValue = "newest" | "oldest" | "shortest" | "longest";
+type SortValue = "newest" | "oldest" | "shortest" | "longest"
+
+const sortMap: Record<SortValue, { sort: string; order: "asc" | "desc" }> = {
+  newest: { sort: "published_at", order: "desc" },
+  oldest: { sort: "published_at", order: "asc" },
+  shortest: { sort: "read_minutes", order: "asc" },
+  longest: { sort: "read_minutes", order: "desc" },
+}
 
 export function BlogIndex() {
-  const [query, setQuery] = useState("");
-  const [categoryId, setCategoryId] = useState("all");
-  const [sort, setSort] = useState<SortValue>("newest");
-  const [page, setPage] = useState(1);
+  const [query, setQueryState] = useState("")
+  const [debouncedSearch, setDebouncedSearch] = useState("")
+  const [categoryId, setCategoryIdState] = useState("all")
+  const [sort, setSortState] = useState<SortValue>("newest")
+  const [page, setPage] = useState(1)
 
-  const filteredPosts = useMemo(() => {
-    const normalizedQuery = query.trim().toLowerCase();
+  useEffect(() => {
+    const handle = window.setTimeout(() => setDebouncedSearch(query), 350)
+    return () => window.clearTimeout(handle)
+  }, [query])
 
-    return blogPosts
-      .filter((post) => {
-        const category = getBlogCategory(post.categoryId);
-        const matchesCategory =
-          categoryId === "all" || post.categoryId === categoryId;
-        const matchesQuery =
-          !normalizedQuery ||
-          post.title.toLowerCase().includes(normalizedQuery) ||
-          post.excerpt.toLowerCase().includes(normalizedQuery) ||
-          category?.name.toLowerCase().includes(normalizedQuery);
+  const { sort: sortField, order } = sortMap[sort]
 
-        return matchesCategory && matchesQuery;
+  const blogsQuery = useQuery({
+    queryKey: ["public-blogs", debouncedSearch, categoryId, sortField, order, page],
+    queryFn: async () => {
+      const response = await listBlogs({
+        page,
+        per_page: postsPerPage,
+        search: debouncedSearch || undefined,
+        category: categoryId !== "all" ? categoryId : undefined,
+        sort: sortField,
+        order,
       })
-      .sort((a, b) => {
-        if (sort === "oldest") {
-          return (
-            new Date(a.publishedAt).getTime() -
-            new Date(b.publishedAt).getTime()
-          );
-        }
-        if (sort === "shortest") {
-          return a.readMinutes - b.readMinutes;
-        }
-        if (sort === "longest") {
-          return b.readMinutes - a.readMinutes;
-        }
+      return response.data.data
+    },
+  })
 
-        return (
-          new Date(b.publishedAt).getTime() -
-          new Date(a.publishedAt).getTime()
-        );
-      });
-  }, [categoryId, query, sort]);
+  const categoriesQuery = useQuery({
+    queryKey: ["public-blog-categories"],
+    queryFn: async () => {
+      const response = await listBlogCategories({ per_page: 100, status: "active" })
+      return response.data.data.items
+    },
+  })
 
-  const totalPages = Math.max(1, Math.ceil(filteredPosts.length / postsPerPage));
-  const safePage = Math.min(page, totalPages);
-  const visiblePosts = filteredPosts.slice(
-    (safePage - 1) * postsPerPage,
-    safePage * postsPerPage,
-  );
-  const featuredPost = blogPosts.find((post) => post.featured) ?? blogPosts[0];
+  const posts = blogsQuery.data?.items ?? []
+  const total = blogsQuery.data?.total ?? 0
+  const totalPages = Math.max(1, Math.ceil(total / postsPerPage))
+  const safePage = Math.min(page, totalPages)
+  const categories = categoriesQuery.data ?? []
 
-  function resetPage(nextAction: () => void) {
-    setPage(1);
-    nextAction();
+  const featuredPost = useMemo(() => posts.find((p) => p.featured) ?? posts[0], [posts])
+
+  function handleQueryChange(value: string) {
+    setQueryState(value)
+    setPage(1)
+  }
+
+  function handleCategoryChange(value: string) {
+    setCategoryIdState(value)
+    setPage(1)
+  }
+
+  function handleSortChange(value: SortValue) {
+    setSortState(value)
+    setPage(1)
   }
 
   return (
@@ -111,7 +124,7 @@ export function BlogIndex() {
         >
           <div>
             <span className="text-xs font-semibold uppercase tracking-widest text-[#FF6600]">
-              Guides and stories
+              Blogs and stories
             </span>
             <h1 className="mt-5 max-w-4xl text-4xl font-bold tracking-tight md:text-6xl">
               Shop smarter before the next drop.
@@ -122,7 +135,9 @@ export function BlogIndex() {
             </p>
           </div>
 
-          <BlogFeature post={featuredPost} />
+          {featuredPost ? (
+            <BlogFeature post={featuredPost} />
+          ) : null}
         </motion.div>
 
         <div className="mt-12 rounded-lg border border-border bg-card p-4">
@@ -131,25 +146,23 @@ export function BlogIndex() {
               <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
               <Input
                 value={query}
-                onChange={(event) =>
-                  resetPage(() => setQuery(event.target.value))
-                }
-                placeholder="Search guides, products, or shopping tips"
+                onChange={(event) => handleQueryChange(event.target.value)}
+                placeholder="Search blogs, products, or shopping tips"
                 className="h-10 pl-9"
               />
             </div>
 
             <Select
               value={categoryId}
-              onValueChange={(value) => resetPage(() => setCategoryId(value))}
+              onValueChange={handleCategoryChange}
             >
               <SelectTrigger className="h-10 w-full">
                 <SelectValue placeholder="Category" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All categories</SelectItem>
-                {blogCategories.map((category) => (
-                  <SelectItem key={category.id} value={category.id}>
+                {categories.map((category) => (
+                  <SelectItem key={category.id} value={category.slug}>
                     {category.name}
                   </SelectItem>
                 ))}
@@ -158,9 +171,7 @@ export function BlogIndex() {
 
             <Select
               value={sort}
-              onValueChange={(value) =>
-                resetPage(() => setSort(value as SortValue))
-              }
+              onValueChange={(value) => handleSortChange(value as SortValue)}
             >
               <SelectTrigger className="h-10 w-full">
                 <SelectValue placeholder="Sort" />
@@ -177,18 +188,18 @@ export function BlogIndex() {
           <div className="mt-4 flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
             <SlidersHorizontal className="size-4" />
             <span>
-              {filteredPosts.length} result{filteredPosts.length === 1 ? "" : "s"}
+              {total} result{total === 1 ? "" : "s"}
             </span>
-            {query || categoryId !== "all" ? (
+            {debouncedSearch || categoryId !== "all" ? (
               <Button
                 type="button"
                 variant="ghost"
                 size="sm"
                 onClick={() => {
-                  setQuery("");
-                  setCategoryId("all");
-                  setSort("newest");
-                  setPage(1);
+                  setQueryState("")
+                  setCategoryIdState("all")
+                  setSortState("newest")
+                  setPage(1)
                 }}
                 className="h-7 rounded-full text-[#FF6600]"
               >
@@ -198,16 +209,24 @@ export function BlogIndex() {
           </div>
         </div>
 
-        <div id="blog-list" className="mt-8 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-          {visiblePosts.map((post, index) => (
-            <BlogCard key={post.id} post={post} index={index} />
-          ))}
-        </div>
+        {blogsQuery.isLoading ? (
+          <div id="blog-list" className="mt-8 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+            {Array.from({ length: postsPerPage }).map((_, i) => (
+              <Skeleton key={i} className="min-h-[21rem] rounded-lg" />
+            ))}
+          </div>
+        ) : (
+          <div id="blog-list" className="mt-8 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+            {posts.map((post, index) => (
+              <BlogCard key={post.id} post={post} index={index} />
+            ))}
+          </div>
+        )}
 
-        {visiblePosts.length === 0 ? (
+        {posts.length === 0 && !blogsQuery.isLoading ? (
           <div className="mt-8 rounded-lg border border-border bg-card p-10 text-center">
             <BookOpen className="mx-auto size-8 text-muted-foreground" />
-            <h2 className="mt-4 text-xl font-semibold">No guides found</h2>
+            <h2 className="mt-4 text-xl font-semibold">No blogs found</h2>
             <p className="mt-2 text-sm text-muted-foreground">
               Try another keyword or reset the category filter.
             </p>
@@ -221,12 +240,10 @@ export function BlogIndex() {
         />
       </div>
     </section>
-  );
+  )
 }
 
 function BlogFeature({ post }: { post: BlogPost }) {
-  const category = getBlogCategory(post.categoryId);
-
   return (
     <Link href={`/blogs/${post.slug}`} className="group block">
       <div className="rounded-lg border border-border bg-[#151515] p-5 text-[#f4f1ec] transition-colors group-hover:border-[#FF6600]/45">
@@ -234,25 +251,23 @@ function BlogFeature({ post }: { post: BlogPost }) {
           <span className="text-xs font-semibold uppercase tracking-widest text-[#FF6600]">
             Featured read
           </span>
-          <span className="text-xs text-[#a7a19a]">{post.readMinutes} min read</span>
+          <span className="text-xs text-[#a7a19a]">{post.read_minutes} min read</span>
         </div>
         <h2 className="mt-8 text-2xl font-bold tracking-tight">{post.title}</h2>
         <p className="mt-3 text-sm leading-6 text-[#c9c2ba]">{post.excerpt}</p>
         <div className="mt-8 flex items-center justify-between gap-4">
-          <span className="text-xs text-[#a7a19a]">{category?.name}</span>
+          <span className="text-xs text-[#a7a19a]">{post.category?.name}</span>
           <span className="inline-flex items-center text-sm font-semibold text-[#FF6600]">
-            Read guide
+            Read blog
             <ArrowRight className="ml-1 size-4 transition-transform group-hover:translate-x-1" />
           </span>
         </div>
       </div>
     </Link>
-  );
+  )
 }
 
 function BlogCard({ post, index }: { post: BlogPost; index: number }) {
-  const category = getBlogCategory(post.categoryId);
-
   return (
     <motion.article
       initial={{ opacity: 0, y: 24 }}
@@ -268,10 +283,10 @@ function BlogCard({ post, index }: { post: BlogPost; index: number }) {
     >
       <div className="flex items-center justify-between gap-3 border-b border-border pb-4">
         <span className="text-xs font-semibold uppercase tracking-widest text-[#FF6600]">
-          {category?.name}
+          {post.category?.name}
         </span>
         <span className="text-xs text-muted-foreground">
-          {post.readMinutes} min read
+          {post.read_minutes} min read
         </span>
       </div>
       <h2 className="mt-8 text-2xl font-bold tracking-tight">{post.title}</h2>
@@ -285,7 +300,7 @@ function BlogCard({ post, index }: { post: BlogPost; index: number }) {
             month: "short",
             day: "numeric",
             year: "numeric",
-          }).format(new Date(post.publishedAt))}
+          }).format(new Date(post.published_at ?? post.created_at))}
         </span>
         <Button
           asChild
@@ -300,7 +315,7 @@ function BlogCard({ post, index }: { post: BlogPost; index: number }) {
         </Button>
       </div>
     </motion.article>
-  );
+  )
 }
 
 function BlogPagination({
@@ -308,11 +323,11 @@ function BlogPagination({
   totalPages,
   onPageChange,
 }: {
-  currentPage: number;
-  totalPages: number;
-  onPageChange: (page: number) => void;
+  currentPage: number
+  totalPages: number
+  onPageChange: (page: number) => void
 }) {
-  if (totalPages <= 1) return null;
+  if (totalPages <= 1) return null
 
   return (
     <Pagination className="mt-10">
@@ -321,14 +336,14 @@ function BlogPagination({
           <PaginationPrevious
             href="#blog-list"
             onClick={(event) => {
-              event.preventDefault();
-              onPageChange(Math.max(1, currentPage - 1));
+              event.preventDefault()
+              onPageChange(Math.max(1, currentPage - 1))
             }}
             className={cn(currentPage === 1 && "pointer-events-none opacity-50")}
           />
         </PaginationItem>
         {Array.from({ length: totalPages }).map((_, index) => {
-          const page = index + 1;
+          const page = index + 1
 
           return (
             <PaginationItem key={page}>
@@ -336,21 +351,21 @@ function BlogPagination({
                 href="#blog-list"
                 isActive={page === currentPage}
                 onClick={(event) => {
-                  event.preventDefault();
-                  onPageChange(page);
+                  event.preventDefault()
+                  onPageChange(page)
                 }}
               >
                 {page}
               </PaginationLink>
             </PaginationItem>
-          );
+          )
         })}
         <PaginationItem>
           <PaginationNext
             href="#blog-list"
             onClick={(event) => {
-              event.preventDefault();
-              onPageChange(Math.min(totalPages, currentPage + 1));
+              event.preventDefault()
+              onPageChange(Math.min(totalPages, currentPage + 1))
             }}
             className={cn(
               currentPage === totalPages && "pointer-events-none opacity-50",
@@ -359,5 +374,5 @@ function BlogPagination({
         </PaginationItem>
       </PaginationContent>
     </Pagination>
-  );
+  )
 }

@@ -27,14 +27,14 @@ import { cn } from "@/lib/utils"
 
 const guestLinks = [
   { href: "/about", label: "About" },
-  { href: "/blogs", label: "Guides" },
+  { href: "/blogs", label: "Blogs" },
   { href: "/products", label: "Products" },
   { href: "/flash-sale", label: "Flash Sale" },
 ]
 
 const buyerLinks = [
   { href: "/about", label: "About" },
-  { href: "/blogs", label: "Guides" },
+  { href: "/blogs", label: "Blogs" },
   { href: "/products", label: "Products" },
   { href: "/flash-sale", label: "Flash Sale" },
   { href: "/account", label: "Account" },

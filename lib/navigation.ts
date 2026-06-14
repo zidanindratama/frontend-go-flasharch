@@ -9,6 +9,7 @@ import {
   Cpu,
   Users,
   Warehouse,
+  Newspaper,
   type LucideIcon,
 } from "lucide-react";
 
@@ -31,13 +32,30 @@ export const dashboardNav: NavItem[] = [
     icon: Users,
   },
   {
+    label: "Blogs",
+    href: "/dashboard/blogs",
+    icon: Newspaper,
+    children: [
+      { label: "All Blogs", href: "/dashboard/blogs", icon: Newspaper },
+      { label: "Categories", href: "/dashboard/blogs/categories", icon: Tag },
+    ],
+  },
+  {
     label: "Products",
     href: "/dashboard/products",
     icon: Package,
     children: [
       { label: "All Products", href: "/dashboard/products", icon: Package },
-      { label: "Categories", href: "/dashboard/products/categories", icon: Tag },
-      { label: "Inventory", href: "/dashboard/products/inventory", icon: Warehouse },
+      {
+        label: "Categories",
+        href: "/dashboard/products/categories",
+        icon: Tag,
+      },
+      {
+        label: "Inventory",
+        href: "/dashboard/products/inventory",
+        icon: Warehouse,
+      },
     ],
   },
   {

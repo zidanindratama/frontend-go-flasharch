@@ -25,6 +25,8 @@ export const endpoints = {
   },
   products: "/products",
   categories: "/categories",
+  blogs: "/blogs",
+  blogCategories: "/blog-categories",
   productReviews: (slug: string) => `/products/${slug}/reviews` as const,
   admin: {
     dashboard: "/admin/reports/dashboard",
@@ -40,5 +42,7 @@ export const endpoints = {
     },
     stockAdjust: (productId: string) =>
       `/admin/products/${productId}/stock-adjustments` as const,
+    blogs: "/admin/blogs",
+    blogCategories: "/admin/blog-categories",
   },
 } as const

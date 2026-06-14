@@ -241,7 +241,7 @@ function ProductDetailView({ product }: { product: Product }) {
           </h2>
           {product.description ? (
             <div
-              className="product-rich-text mt-5 max-w-none rounded-xl bg-background/60 p-4 ring-1 ring-border sm:p-5"
+              className="mt-5 rounded-xl bg-background/60 p-4 ring-1 ring-border text-base leading-8 text-foreground/88 sm:p-5 [&_blockquote]:my-8 [&_blockquote]:rounded-lg [&_blockquote]:border [&_blockquote]:border-[#FF6600]/25 [&_blockquote]:bg-[#FF6600]/8 [&_blockquote]:p-5 [&_blockquote]:font-medium [&_h1]:mb-3 [&_h1]:mt-12 [&_h1]:text-3xl [&_h1]:font-bold [&_h2]:mb-3 [&_h2]:mt-12 [&_h2]:text-2xl [&_h2]:font-bold [&_h3]:mb-3 [&_h3]:mt-8 [&_h3]:text-xl [&_h3]:font-bold [&_h4]:mb-2 [&_h4]:mt-6 [&_h4]:text-lg [&_h4]:font-bold [&_h5]:mb-2 [&_h5]:mt-6 [&_h5]:text-base [&_h5]:font-bold [&_h6]:mb-2 [&_h6]:mt-6 [&_h6]:text-sm [&_h6]:font-bold [&_li]:mb-2 [&_ol]:my-5 [&_ol]:list-decimal [&_ol]:pl-6 [&_p]:my-5 [&_table]:my-8 [&_table]:block [&_table]:w-full [&_table]:min-w-full [&_table]:overflow-x-auto [&_table]:rounded-lg [&_table]:border [&_table]:border-border [&_td]:border-t [&_td]:border-border [&_td]:p-3 [&_th]:bg-muted [&_th]:p-3 [&_th]:text-left [&_ul]:my-5 [&_ul]:list-disc [&_ul]:pl-6"
               dangerouslySetInnerHTML={{
                 __html: DOMPurify.sanitize(product.description),
               }}

@@ -8,7 +8,7 @@ const footerLinks = {
     { label: "Products", href: "/products" },
     { label: "Flash Sale", href: "/flash-sale" },
     { label: "Orders", href: "/orders" },
-    { label: "Guides", href: "/blogs" },
+    { label: "Blogs", href: "/blogs" },
   ],
   System: [
     { label: "About", href: "/about" },

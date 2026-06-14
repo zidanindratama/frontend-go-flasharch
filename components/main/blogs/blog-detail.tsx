@@ -1,22 +1,36 @@
-import Link from "next/link";
+"use client"
+
+import Link from "next/link"
+import { useQuery } from "@tanstack/react-query"
 import {
   ArrowLeft,
   ArrowRight,
   CalendarDays,
   Clock3,
   UserRound,
-} from "lucide-react";
-import { Button } from "@/components/ui/button";
-import {
-  getBlogCategory,
-  getRelatedPosts,
-  type BlogPost,
-} from "@/lib/blogs";
+} from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { Skeleton } from "@/components/ui/skeleton"
+import { listBlogs, type BlogPost } from "@/lib/api/blogs"
 
 export function BlogDetail({ post }: { post: BlogPost }) {
-  const category = getBlogCategory(post.categoryId);
-  const relatedPosts = getRelatedPosts(post, 3);
-  const headings = extractHeadings(post.html);
+  const headings = extractHeadings(post.html)
+
+  const relatedQuery = useQuery({
+    queryKey: ["public-blogs-related", post.category_id, post.id],
+    queryFn: async () => {
+      const response = await listBlogs({
+        per_page: 10,
+        sort: "published_at",
+        order: "desc",
+      })
+      return response.data.data.items
+        .filter((p) => p.id !== post.id)
+        .slice(0, 3)
+    },
+  })
+
+  const relatedPosts = relatedQuery.data ?? []
 
   return (
     <article className="relative min-h-screen overflow-hidden bg-background pt-24">
@@ -31,14 +45,14 @@ export function BlogDetail({ post }: { post: BlogPost }) {
         >
           <Link href="/blogs">
             <ArrowLeft className="mr-2 size-4" />
-            Back to guides
+            Back to blogs
           </Link>
         </Button>
 
         <header className="grid gap-10 border-y border-border py-12 lg:grid-cols-[16rem_1fr]">
           <div className="order-2 border-t border-border pt-8 lg:order-1 lg:border-t-0 lg:pt-3">
             <p className="text-xs font-semibold uppercase tracking-widest text-[#FF6600]">
-              {category?.name}
+              {post.category?.name}
             </p>
             <dl className="mt-10 grid gap-5 text-sm">
               <div className="border-t border-border pt-4">
@@ -46,14 +60,16 @@ export function BlogDetail({ post }: { post: BlogPost }) {
                   <CalendarDays className="size-4" />
                   Published
                 </dt>
-                <dd className="font-medium">{formatDate(post.publishedAt)}</dd>
+                <dd className="font-medium">
+                  {formatDate(post.published_at ?? post.created_at)}
+                </dd>
               </div>
               <div className="border-t border-border pt-4">
                 <dt className="mb-1 inline-flex items-center gap-2 text-muted-foreground">
                   <Clock3 className="size-4" />
                   Read time
                 </dt>
-                <dd className="font-medium">{post.readMinutes} minutes</dd>
+                <dd className="font-medium">{post.read_minutes} minutes</dd>
               </div>
               <div className="border-t border-border pt-4">
                 <dt className="mb-1 inline-flex items-center gap-2 text-muted-foreground">
@@ -67,7 +83,7 @@ export function BlogDetail({ post }: { post: BlogPost }) {
 
           <div className="order-1 lg:order-2">
             <p className="max-w-[56ch] text-sm leading-6 text-muted-foreground">
-              {category?.description}
+              {post.category?.description}
             </p>
             <h1 className="mt-8 max-w-5xl text-5xl font-black tracking-tight md:text-7xl">
               {post.title}
@@ -82,7 +98,7 @@ export function BlogDetail({ post }: { post: BlogPost }) {
           <aside className="lg:sticky lg:top-28 lg:self-start">
             <div className="border-y border-border py-5">
               <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
-                In this guide
+                In this blog
               </p>
               <nav className="mt-5 grid gap-1">
                 {headings.map((heading, index) => (
@@ -95,15 +111,6 @@ export function BlogDetail({ post }: { post: BlogPost }) {
                   </a>
                 ))}
               </nav>
-            </div>
-            <div className="mt-6 border-b border-border pb-6">
-              <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
-                Best for
-              </p>
-              <p className="mt-3 text-sm leading-6 text-muted-foreground">
-                Shoppers who want practical steps before buying during busy
-                sale moments.
-              </p>
             </div>
           </aside>
 
@@ -123,7 +130,7 @@ export function BlogDetail({ post }: { post: BlogPost }) {
               <span className="text-xs font-semibold uppercase tracking-widest text-[#FF6600]">
                 Keep reading
               </span>
-              <h2 className="mt-2 text-2xl font-bold">Related guides</h2>
+              <h2 className="mt-2 text-2xl font-bold">Related blogs</h2>
             </div>
             <Button asChild variant="ghost" className="rounded-full">
               <Link href="/blogs">
@@ -133,11 +140,19 @@ export function BlogDetail({ post }: { post: BlogPost }) {
             </Button>
           </div>
 
-          <div className="grid gap-0 border-y border-border md:grid-cols-3">
-            {relatedPosts.map((item, index) => {
-              const relatedCategory = getBlogCategory(item.categoryId);
-
-              return (
+          {relatedQuery.isLoading ? (
+            <div className="grid gap-0 border-y border-border md:grid-cols-3">
+              {Array.from({ length: 3 }).map((_, i) => (
+                <div key={i} className="min-h-[17rem] border-b border-border p-5 md:border-b-0 md:border-r md:last:border-r-0">
+                  <Skeleton className="mb-8 h-4 w-24" />
+                  <Skeleton className="mb-3 h-6 w-full" />
+                  <Skeleton className="h-4 w-3/4" />
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="grid gap-0 border-y border-border md:grid-cols-3">
+              {relatedPosts.map((item, index) => (
                 <Link
                   key={item.id}
                   href={`/blogs/${item.slug}`}
@@ -145,7 +160,7 @@ export function BlogDetail({ post }: { post: BlogPost }) {
                 >
                   <div className="flex items-center justify-between gap-4">
                     <span className="text-xs font-semibold uppercase tracking-widest text-[#FF6600]">
-                      {relatedCategory?.name}
+                      {item.category?.name}
                     </span>
                     <span className="font-mono text-xs text-muted-foreground">
                       0{index + 1}
@@ -162,13 +177,13 @@ export function BlogDetail({ post }: { post: BlogPost }) {
                     <ArrowRight className="ml-1 size-4 transition-transform group-hover:translate-x-1" />
                   </span>
                 </Link>
-              );
-            })}
-          </div>
+              ))}
+            </div>
+          )}
         </section>
       </div>
     </article>
-  );
+  )
 }
 
 function formatDate(value: string) {
@@ -176,24 +191,24 @@ function formatDate(value: string) {
     month: "long",
     day: "numeric",
     year: "numeric",
-  }).format(new Date(value));
+  }).format(new Date(value))
 }
 
 function extractHeadings(html: string) {
-  return [...html.matchAll(/<h2>(.*?)<\/h2>/g)].map((match) =>
-    stripTags(match[1]),
-  );
+  return [...html.matchAll(/<h([2-6])[^>]*>(.*?)<\/h\1>/g)].map((match) =>
+    stripTags(match[2]),
+  )
 }
 
 function addHeadingIds(html: string) {
-  let index = 0;
+  let index = 0
 
-  return html.replace(/<h2>(.*?)<\/h2>/g, (_match, content) => {
-    index += 1;
-    return `<h2 id="section-${index}">${content}</h2>`;
-  });
+  return html.replace(/<h([2-6])[^>]*>(.*?)<\/h\1>/g, (_match, level, content) => {
+    index += 1
+    return `<h${level} id="section-${index}">${content}</h${level}>`
+  })
 }
 
 function stripTags(value: string) {
-  return value.replace(/<[^>]*>/g, "");
+  return value.replace(/<[^>]*>/g, "")
 }
