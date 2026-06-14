@@ -44,5 +44,6 @@ export const endpoints = {
       `/admin/products/${productId}/stock-adjustments` as const,
     blogs: "/admin/blogs",
     blogCategories: "/admin/blog-categories",
+    flashSales: "/admin/flash-sales",
   },
 } as const

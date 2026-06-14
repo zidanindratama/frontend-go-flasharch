@@ -327,7 +327,7 @@ export function StockAdjustForm({ stock }: StockAdjustFormProps) {
               </div>
 
               <div className="rounded-xl bg-card p-4 ring-1 ring-border">
-                <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-3">
+                <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-5">
                   <PreviewNumber
                     label="Current"
                     value={stock.available_quantity}
@@ -338,7 +338,8 @@ export function StockAdjustForm({ stock }: StockAdjustFormProps) {
                   <PreviewNumber
                     label="After"
                     value={previewAvailable}
-                    className={previewTone}
+                    className={cn("text-right", previewTone)}
+                    labelClassName="text-right"
                   />
                 </div>
                 <div className="mt-4 rounded-lg bg-muted/60 px-3 py-2 text-sm">
@@ -439,14 +440,16 @@ function PreviewNumber({
   label,
   value,
   className,
+  labelClassName,
 }: {
   label: string
   value: number
   className?: string
+  labelClassName?: string
 }) {
   return (
     <div>
-      <p className="text-xs font-medium text-muted-foreground">{label}</p>
+      <p className={cn("text-xs font-medium text-muted-foreground", labelClassName)}>{label}</p>
       <p
         className={cn(
           "mt-1 font-mono text-2xl font-semibold tabular-nums text-foreground",

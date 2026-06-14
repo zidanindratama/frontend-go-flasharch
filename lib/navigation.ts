@@ -67,6 +67,10 @@ export const dashboardNav: NavItem[] = [
     label: "Flash Sales",
     href: "/dashboard/flash-sales",
     icon: Zap,
+    children: [
+      { label: "All Sales", href: "/dashboard/flash-sales", icon: Zap },
+      { label: "Create Sale", href: "/dashboard/flash-sales/new", icon: Tag },
+    ],
   },
   {
     label: "Observability",
