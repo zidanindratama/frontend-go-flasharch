@@ -7,15 +7,12 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import {
   ArrowLeft,
-  Calendar,
   Clock,
   FileText,
   Loader2,
   Newspaper,
   Save,
   Sparkles,
-  Tag,
-  Type,
   User,
 } from "lucide-react"
 import { useForm } from "react-hook-form"
@@ -73,6 +70,11 @@ type BlogPostFormProps =
 
 const panelClass =
   "min-w-0 rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6"
+
+async function showFormValidationError() {
+  const { toast } = await import("sonner")
+  toast.error("Please fix the highlighted fields")
+}
 
 export function BlogPostForm(props: BlogPostFormProps) {
   return props.mode === "create" ? (
@@ -173,7 +175,10 @@ function CreateBlogPostForm() {
         />
       }
     >
-      <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-5">
+      <form
+        onSubmit={form.handleSubmit(onSubmit, showFormValidationError)}
+        className="grid gap-5"
+      >
         <section className={panelClass}>
           <SectionHeader
             title="Post identity"
@@ -414,7 +419,7 @@ function EditBlogPostForm({ blog }: { blog: BlogPost }) {
   const form = useForm<BlogPostEditValues>({
     resolver: zodResolver(blogPostEditSchema),
     defaultValues: {
-      category_id: blog.category_id,
+      category_id: blog.category_id ?? blog.category?.id ?? "",
       slug: blog.slug,
       title: blog.title,
       excerpt: blog.excerpt,
@@ -496,7 +501,10 @@ function EditBlogPostForm({ blog }: { blog: BlogPost }) {
         />
       }
     >
-      <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-5">
+      <form
+        onSubmit={form.handleSubmit(onSubmit, showFormValidationError)}
+        className="grid gap-5"
+      >
         <section className={panelClass}>
           <SectionHeader
             title="Post identity"
@@ -606,6 +614,7 @@ function EditBlogPostForm({ blog }: { blog: BlogPost }) {
                 emptyText="No categories found."
                 disabled={categoriesQuery.isLoading}
               />
+              <FieldError errors={[form.formState.errors.category_id]} />
             </Field>
 
             <Field>
@@ -644,6 +653,7 @@ function EditBlogPostForm({ blog }: { blog: BlogPost }) {
                 />
               </div>
               <FieldDescription>Minutes.</FieldDescription>
+              <FieldError errors={[form.formState.errors.read_minutes]} />
             </Field>
 
             <Field>

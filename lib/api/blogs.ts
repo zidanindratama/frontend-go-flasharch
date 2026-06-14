@@ -16,7 +16,7 @@ export type BlogCategory = {
 
 export type BlogPost = {
   id: string
-  category_id: string
+  category_id?: string
   category: BlogCategory
   slug: string
   title: string

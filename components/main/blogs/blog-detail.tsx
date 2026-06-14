@@ -17,7 +17,7 @@ export function BlogDetail({ post }: { post: BlogPost }) {
   const headings = extractHeadings(post.html)
 
   const relatedQuery = useQuery({
-    queryKey: ["public-blogs-related", post.category_id, post.id],
+    queryKey: ["public-blogs-related", post.category?.id, post.id],
     queryFn: async () => {
       const response = await listBlogs({
         per_page: 10,
