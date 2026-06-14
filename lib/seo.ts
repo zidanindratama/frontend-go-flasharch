@@ -11,7 +11,8 @@ export const siteConfig = {
   author: "Muhamad Zidan Indratama",
   creator: "Muhamad Zidan Indratama",
   category: "E-Commerce Technology",
-  ogImage: "/og-image.png",
+  openGraphImage: "/opengraph-image",
+  twitterImage: "/twitter-image",
   keywords: [
     "Go FlashArch",
     "flash sale platform",
@@ -49,7 +50,7 @@ export function createPageMetadata({
   description,
   path = "/",
   keywords = [],
-  image = siteConfig.ogImage,
+  image = siteConfig.openGraphImage,
   noIndex = false,
 }: PageMetadataInput): Metadata {
   const url = absoluteUrl(path);
@@ -81,7 +82,7 @@ export function createPageMetadata({
       card: "summary_large_image",
       title,
       description,
-      images: [image],
+      images: [image === siteConfig.openGraphImage ? siteConfig.twitterImage : image],
     },
     robots: noIndex
       ? {

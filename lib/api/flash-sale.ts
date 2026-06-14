@@ -1,6 +1,14 @@
 import { api } from "@/lib/api/axios"
 import { endpoints } from "@/lib/api/endpoints"
 
+export type PublicFlashSaleItemListParams = {
+  page?: number
+  per_page?: number
+  search?: string
+  sort?: string
+  order?: "asc" | "desc"
+}
+
 export type FlashSaleStatus = "draft" | "scheduled" | "running" | "ended" | "cancelled"
 export type FlashSaleItemStatus = "active" | "hidden" | "sold_out"
 
@@ -134,6 +142,24 @@ export type FlashSaleReport = {
   confirmed_checkouts: number
   conversion_rate: number
   generated_at: string
+}
+
+// Public: get active flash sale
+export function getActiveFlashSale() {
+  return api.get<{ message: string; data: FlashSale }>(`${endpoints.flashSales}/active`)
+}
+
+// Public: list paginated flash sale items by slug
+export function getPublicFlashSaleItems(slug: string, params: PublicFlashSaleItemListParams) {
+  return api.get<{
+    message: string
+    data: {
+      items: FlashSaleItem[]
+      page: number
+      per_page: number
+      total: number
+    }
+  }>(`${endpoints.flashSales}/${slug}/items`, { params })
 }
 
 // Admin: list flash sales

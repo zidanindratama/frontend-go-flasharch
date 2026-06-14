@@ -28,6 +28,7 @@ export const endpoints = {
   blogs: "/blogs",
   blogCategories: "/blog-categories",
   productReviews: (slug: string) => `/products/${slug}/reviews` as const,
+  flashSales: "/flash-sales",
   admin: {
     dashboard: "/admin/reports/dashboard",
     summary: "/admin/reports/summary",

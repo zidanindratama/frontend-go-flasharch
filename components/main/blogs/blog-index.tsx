@@ -111,7 +111,6 @@ export function BlogIndex() {
 
   return (
     <section className="relative min-h-screen overflow-hidden bg-background pt-28">
-      <div className="absolute inset-x-0 top-20 h-px bg-border" />
       <div className="absolute left-0 top-20 size-[32rem] rounded-full bg-[#FF6600]/8 blur-3xl" />
       <div className="absolute bottom-40 right-0 size-[28rem] rounded-full bg-[#DC143C]/8 blur-3xl" />
 

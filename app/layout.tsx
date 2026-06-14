@@ -50,10 +50,10 @@ export const metadata: Metadata = {
     siteName: siteConfig.name,
     images: [
       {
-        url: siteConfig.ogImage,
+        url: siteConfig.openGraphImage,
         width: 1200,
         height: 630,
-        alt: "Go FlashArch flash sale commerce cover",
+        alt: "Go FlashArch flash sale shopping with clear stock and checkout updates",
       },
     ],
   },
@@ -61,7 +61,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: siteConfig.title,
     description: siteConfig.description,
-    images: [siteConfig.ogImage],
+    images: [siteConfig.twitterImage],
   },
   robots: {
     index: true,

@@ -34,7 +34,6 @@ export function BlogDetail({ post }: { post: BlogPost }) {
 
   return (
     <article className="relative min-h-screen overflow-hidden bg-background pt-24">
-      <div className="absolute inset-x-0 top-20 h-px bg-border" />
       <div className="absolute right-0 top-28 size-[26rem] rounded-full bg-[#FF6600]/8 blur-3xl" />
 
       <div className="relative mx-auto max-w-7xl px-6 pb-24">

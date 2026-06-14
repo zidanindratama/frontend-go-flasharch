@@ -118,9 +118,9 @@ export function StockAdjustLoader() {
                     {product.sku}
                   </span>
                 )}
-                {product?.category && (
+                {product?.categories?.[0] && (
                   <span className="rounded-full border border-border bg-muted/40 px-3 py-1 text-muted-foreground">
-                    {product.category.name}
+                    {product.categories[0].name}
                   </span>
                 )}
                 <span className="inline-flex items-center gap-1.5 rounded-full border border-[#FF6600]/20 bg-[#FF6600]/10 px-3 py-1 font-medium text-[#FF6600]">
