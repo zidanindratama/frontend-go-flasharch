@@ -20,7 +20,7 @@ function formatCurrency(amount: number) {
     style: "currency",
     currency: "IDR",
     maximumFractionDigits: 0,
-  }).format(amount / 100)
+  }).format(amount)
 }
 
 function statusStyle(status: string) {

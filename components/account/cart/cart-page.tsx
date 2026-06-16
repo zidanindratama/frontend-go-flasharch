@@ -3,8 +3,8 @@
 import Link from "next/link"
 import { useCallback, useMemo, useState } from "react"
 import { AnimatePresence, motion } from "framer-motion"
-import { useQueries } from "@tanstack/react-query"
 import {
+  AlertTriangle,
   Loader2,
   Minus,
   Package,
@@ -23,14 +23,8 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
-import {
-  useCart,
-  useUpdateCartItem,
-  useRemoveCartItem,
-  useClearCart,
-  useSaveForLater,
-} from "@/lib/hooks/use-cart"
-import { getProduct } from "@/lib/api/catalog"
+import { useCart, useUpdateCartItem, useRemoveCartItem, useClearCart, useSaveForLater } from "@/lib/hooks/use-cart"
+import { useCheckoutFlow } from "@/lib/hooks/use-checkout"
 import { formatPrice } from "@/components/dashboard/products/product-utils"
 import type { CartItem as CartItemType } from "@/lib/api/cart"
 import { cn } from "@/lib/utils"
@@ -57,6 +51,7 @@ function CartItemRow({
   isRemoving: boolean
 }) {
   const [confirmRemove, setConfirmRemove] = useState(false)
+  const isInactive = item.product.status !== "active"
 
   const handleRemove = useCallback(() => {
     if (confirmRemove) {
@@ -77,7 +72,12 @@ function CartItemRow({
       transition={{ duration: 0.4, ease: smoothEase }}
       className="group"
     >
-      <div className="flex gap-4 rounded-xl bg-card p-4 ring-1 ring-foreground/10 transition-shadow duration-300 hover:shadow-lg hover:shadow-foreground/5 hover:ring-foreground/15">
+      <div className={cn(
+        "flex gap-4 rounded-xl bg-card p-4 ring-1 ring-foreground/10 transition-shadow duration-300",
+        isInactive
+          ? "opacity-60 ring-destructive/30"
+          : "hover:shadow-lg hover:shadow-foreground/5 hover:ring-foreground/15",
+      )}>
         <Link
           href={`/products/${item.product.slug}`}
           className="relative h-20 w-20 shrink-0 overflow-hidden rounded-lg bg-muted sm:h-24 sm:w-24"
@@ -104,6 +104,16 @@ function CartItemRow({
             <p className="mt-0.5 font-mono text-[11px] text-muted-foreground">
               {item.product.sku}
             </p>
+            {isInactive && (
+              <motion.p
+                initial={{ opacity: 0, y: -4 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="mt-1 flex items-center gap-1 text-[11px] font-medium text-destructive"
+              >
+                <AlertTriangle className="h-3 w-3" />
+                No longer available
+              </motion.p>
+            )}
           </div>
 
           <div className="mt-2 flex flex-wrap items-center justify-between gap-2">
@@ -116,7 +126,7 @@ function CartItemRow({
                 type="button"
                 whileTap={{ scale: 0.85 }}
                 onClick={() => onUpdate(item.id, Math.max(1, item.quantity - 1))}
-                disabled={isUpdating || item.quantity <= 1}
+                disabled={isUpdating || item.quantity <= 1 || isInactive}
                 className="flex h-7 w-7 items-center justify-center rounded-md border border-border text-muted-foreground transition-colors hover:bg-muted hover:text-foreground disabled:opacity-40"
               >
                 <Minus className="h-3 w-3" />
@@ -136,7 +146,7 @@ function CartItemRow({
                 type="button"
                 whileTap={{ scale: 0.85 }}
                 onClick={() => onUpdate(item.id, item.quantity + 1)}
-                disabled={isUpdating}
+                disabled={isUpdating || isInactive}
                 className="flex h-7 w-7 items-center justify-center rounded-md border border-border text-muted-foreground transition-colors hover:bg-muted hover:text-foreground disabled:opacity-40"
               >
                 <Plus className="h-3 w-3" />
@@ -158,7 +168,7 @@ function CartItemRow({
                     type="button"
                     whileTap={{ scale: 0.85 }}
                     onClick={() => onSaveForLater(item.id)}
-                    disabled={isUpdating}
+                    disabled={isUpdating || isInactive}
                     className="flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-[#FF6600]/10 hover:text-[#FF6600]"
                   >
                     <Save className="h-3.5 w-3.5" />
@@ -277,32 +287,12 @@ export function CartPage() {
   const saveForLaterMutation = useSaveForLater()
   const deleteSavedMutation = useDeleteSavedItem()
   const moveToCartMutation = useMoveToCart()
+  const { phase, startCheckout, isStarting } = useCheckoutFlow(cart?.id ?? null)
 
-  const productSlugs = useMemo(
-    () => (cart?.items ?? []).map((item) => item.product.slug),
+  const hasInactiveItems = useMemo(
+    () => (cart?.items ?? []).some((item) => item.product.status !== "active"),
     [cart?.items],
   )
-
-  const productQueries = useQueries({
-    queries: productSlugs.map((slug) => ({
-      queryKey: ["product-thumb", slug],
-      queryFn: async () => {
-        const res = await getProduct(slug)
-        return res.data.data
-      },
-      staleTime: 5 * 60_000,
-    })),
-  })
-
-  const thumbnailMap = useMemo(() => {
-    const map: Record<string, string | null> = {}
-    productQueries.forEach((q, i) => {
-      if (q.data) {
-        map[productSlugs[i]] = q.data.thumbnail_url ?? null
-      }
-    })
-    return map
-  }, [productQueries, productSlugs])
 
   const [confirmClear, setConfirmClear] = useState(false)
 
@@ -403,7 +393,7 @@ export function CartPage() {
               <CartItemRow
                 key={item.id}
                 item={item}
-                thumbnailUrl={thumbnailMap[item.product.slug]}
+                thumbnailUrl={item.product.thumbnail_url}
                 onUpdate={handleUpdate}
                 onRemove={handleRemove}
                 onSaveForLater={handleSaveForLater}
@@ -427,6 +417,40 @@ export function CartPage() {
                 {formatPrice(subtotal)}
               </span>
             </div>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3, duration: 0.4, ease: smoothEase }}
+          >
+            {hasInactiveItems && (
+              <motion.p
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: "auto" }}
+                className="mb-3 flex items-center gap-2 rounded-lg bg-destructive/5 px-3 py-2 text-xs text-destructive"
+              >
+                <AlertTriangle className="h-3.5 w-3.5 shrink-0" />
+                Remove unavailable items before checkout
+              </motion.p>
+            )}
+            <Button
+              onClick={startCheckout}
+              disabled={isStarting || phase !== "idle" || hasInactiveItems}
+              className="h-11 w-full rounded-full text-sm font-semibold"
+            >
+              {isStarting || phase === "checkout" ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Processing...
+                </>
+              ) : (
+                <>
+                  <ShoppingCart className="mr-2 h-4 w-4" />
+                  Checkout
+                </>
+              )}
+            </Button>
           </motion.div>
         </div>
       ) : (

@@ -63,6 +63,16 @@ export const endpoints = {
   },
   productReviews: (slug: string) => `/products/${slug}/reviews` as const,
   flashSales: "/flash-sales",
+  checkouts: {
+    cart: "/checkouts/cart",
+    directFlashSale: "/checkouts/direct-flash-sale",
+    get: (id: string) => `/checkouts/${id}` as const,
+  },
+  payments: {
+    get: (id: string) => `/payments/${id}` as const,
+    checkoutSession: (id: string) =>
+      `/payments/${id}/checkout-session` as const,
+  },
   admin: {
     dashboard: "/admin/reports/dashboard",
     summary: "/admin/reports/summary",

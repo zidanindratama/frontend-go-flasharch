@@ -9,6 +9,7 @@ export type CartProduct = {
   base_price_amount: number
   currency: string
   status: string
+  thumbnail_url: string | null
 }
 
 export type CartItem = {
