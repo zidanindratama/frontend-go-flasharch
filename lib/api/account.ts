@@ -119,5 +119,22 @@ export const getBuyerOrders = (params?: BuyerOrdersParams) =>
 export const getBuyerAddresses = () =>
   api.get<AddressesResponse>(endpoints.user.addresses)
 
+export type AddWishlistInput = {
+  product_id: string
+}
+
+export type WishlistSingleResponse = {
+  message: string
+  data: WishlistItem
+}
+
 export const getBuyerWishlist = () =>
   api.get<WishlistResponse>(endpoints.user.wishlist)
+
+export const addToWishlist = (data: AddWishlistInput) =>
+  api.post<WishlistSingleResponse>(endpoints.user.wishlist + "/items", data)
+
+export const removeFromWishlist = (productId: string) =>
+  api.delete<{ message: string }>(
+    `${endpoints.user.wishlist}/items/${productId}`,
+  )

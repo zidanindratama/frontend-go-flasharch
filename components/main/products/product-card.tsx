@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge"
 import { cn } from "@/lib/utils"
 import { formatPrice } from "@/components/dashboard/products/product-utils"
 import type { Product } from "@/lib/api/catalog"
+import { WishlistToggle } from "./wishlist-button"
 
 const smoothEase: [number, number, number, number] = [0.16, 1, 0.3, 1]
 
@@ -49,14 +50,19 @@ export function ProductCard({ product, index = 0, className }: ProductCardProps)
             {/* Hover overlay gradient */}
             <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/20 to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
 
-            {/* Top-right category badge */}
-            <div className="absolute top-3 right-3 z-10">
+            {/* Top-right: category badge + wishlist */}
+            <div className="absolute top-3 right-3 z-10 flex items-center gap-1.5">
               <Badge
                 variant="secondary"
                 className="rounded-full border border-border/50 bg-background/90 px-2.5 py-0.5 text-[10px] font-medium text-muted-foreground backdrop-blur-sm"
               >
                 {categoryNames || "Uncategorized"}
               </Badge>
+              <WishlistToggle
+                productId={product.id}
+                size="sm"
+                variant="overlay"
+              />
             </div>
 
             {/* Top-left arrow */}

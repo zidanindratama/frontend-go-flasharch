@@ -42,6 +42,7 @@ import { formatPrice } from "@/components/dashboard/products/product-utils"
 import type { Product } from "@/lib/api/catalog"
 import { ProductReviews } from "./product-reviews"
 import { RelatedProducts } from "./related-products"
+import { WishlistToggle } from "./wishlist-button"
 
 const smoothEase: [number, number, number, number] = [0.16, 1, 0.3, 1]
 
@@ -134,8 +135,15 @@ function ProductGallery({ product }: { product: Product }) {
     )
   }
 
+  const hasThumbnailRail = images.length > 1
+
   return (
-    <div className="grid gap-3 md:gap-4 lg:grid-cols-[5.5rem_minmax(0,1fr)]">
+    <div
+      className={cn(
+        "grid gap-3 md:gap-4",
+        hasThumbnailRail && "lg:grid-cols-[5.5rem_minmax(0,1fr)]",
+      )}
+    >
       {images.length > 1 && (
         <div className="order-2 flex gap-2 overflow-x-auto pb-1 lg:order-1 lg:flex-col lg:overflow-visible lg:pb-0">
           {images.map((img, i) => (
@@ -161,7 +169,7 @@ function ProductGallery({ product }: { product: Product }) {
         </div>
       )}
 
-      <div className="order-1 lg:order-2">
+      <div className={cn("order-1", hasThumbnailRail && "lg:order-2")}>
         <div className="relative aspect-[4/3] min-h-[260px] overflow-hidden rounded-xl bg-muted ring-1 ring-foreground/10 sm:min-h-[360px] lg:aspect-[5/4]">
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_10%,color-mix(in_oklch,var(--primary)_28%,transparent),transparent_34%),linear-gradient(135deg,color-mix(in_oklch,var(--ops-grid)_55%,transparent)_1px,transparent_1px)] bg-[length:auto,28px_28px]" />
           <AnimatePresence mode="wait">
@@ -322,13 +330,21 @@ function ProductCommandPanel({ product }: { product: Product }) {
         </div>
 
         <div className="flex flex-col gap-2">
-          <Button disabled={!active} className="h-11 w-full justify-between">
-            <span className="inline-flex items-center gap-2">
-              <ShoppingCart data-icon="inline-start" />
-              Add to cart
-            </span>
-            <ArrowUpRight data-icon="inline-end" />
-          </Button>
+          <div className="flex gap-2">
+            <Button disabled={!active} className="h-11 flex-1 justify-between">
+              <span className="inline-flex items-center gap-2">
+                <ShoppingCart data-icon="inline-start" />
+                Add to cart
+              </span>
+              <ArrowUpRight data-icon="inline-end" />
+            </Button>
+            <WishlistToggle
+              productId={product.id}
+              size="lg"
+              variant="command"
+              className="h-11 w-11 shrink-0"
+            />
+          </div>
           <Button asChild variant="outline" className="h-11 w-full justify-between">
             <Link href="/flash-sale">
               <span className="inline-flex items-center gap-2">

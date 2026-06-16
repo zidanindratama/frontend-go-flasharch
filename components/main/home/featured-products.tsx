@@ -15,7 +15,8 @@ import {
   Package,
   Loader2,
 } from "lucide-react";
-import { listProducts } from "@/lib/api/catalog";
+import { listProducts } from "@/lib/api/catalog"
+import { WishlistToggle } from "@/components/main/products/wishlist-button";
 
 const smoothEase: [number, number, number, number] = [0.16, 1, 0.3, 1];
 
@@ -105,9 +106,14 @@ function HomeProductCard({
           {/* Gradient overlay for text readability */}
           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent transition-opacity duration-500 md:opacity-0 md:group-hover:opacity-100" />
 
-          {/* Top right badge */}
-          <div className="absolute top-4 right-4">
+          {/* Top right badge + wishlist */}
+          <div className="absolute top-4 right-4 z-10 flex items-center gap-2">
             <StockBadge stock={stockStatus} count={stockCount} />
+            <WishlistToggle
+              productId={product.id}
+              size="sm"
+              variant="overlay"
+            />
           </div>
 
           {/* Bottom info */}

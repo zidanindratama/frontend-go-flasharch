@@ -1,8 +1,10 @@
 "use client"
 
+import Link from "next/link"
 import { motion } from "framer-motion"
 import { useQuery } from "@tanstack/react-query"
-import { CreditCard, PackageOpen } from "lucide-react"
+import { CreditCard, PackageOpen, ShoppingBag } from "lucide-react"
+import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
 import {
   getBuyerOrders,
@@ -124,32 +126,43 @@ export function AccountOrders() {
           ))}
         </div>
       ) : (
-        <EmptyState
-          icon={PackageOpen}
-          title="No orders yet"
-          copy="Your checkout and payment history will appear here."
-        />
+        <EmptyState />
       )}
     </div>
   )
 }
 
-function EmptyState({
-  icon: Icon,
-  title,
-  copy,
-}: {
-  icon: typeof PackageOpen
-  title: string
-  copy: string
-}) {
+function EmptyState() {
   return (
-    <div className="flex flex-col items-center justify-center rounded-xl bg-card px-4 py-20 text-center ring-1 ring-foreground/10">
-      <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-muted/60">
-        <Icon className="h-6 w-6 text-muted-foreground/60" />
-      </div>
-      <h2 className="text-base font-semibold tracking-tight">{title}</h2>
-      <p className="mt-1.5 max-w-sm text-sm text-muted-foreground">{copy}</p>
-    </div>
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, ease }}
+      className="flex flex-col items-center justify-center rounded-xl bg-card px-4 py-20 text-center ring-1 ring-foreground/10"
+    >
+      <motion.div
+        initial={{ scale: 0.8, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        transition={{ delay: 0.15, duration: 0.5, ease }}
+        className="mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-[#FF6600]/8"
+      >
+        <motion.div
+          animate={{ scale: [1, 1.12, 1] }}
+          transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+        >
+          <PackageOpen className="h-7 w-7 text-[#FF6600]/60" />
+        </motion.div>
+      </motion.div>
+      <h2 className="text-base font-semibold tracking-tight">No orders yet</h2>
+      <p className="mt-1.5 max-w-xs text-sm leading-relaxed text-muted-foreground">
+        Your checkout and payment history will appear here.
+      </p>
+      <Button asChild className="mt-6 gap-2 rounded-full">
+        <Link href="/products">
+          <ShoppingBag className="h-4 w-4" />
+          Browse products
+        </Link>
+      </Button>
+    </motion.div>
   )
 }
