@@ -116,8 +116,41 @@ export const getBuyerDashboard = () =>
 export const getBuyerOrders = (params?: BuyerOrdersParams) =>
   api.get<BuyerOrdersResponse>(endpoints.orders.list, { params })
 
+export type AddressResponse = {
+  message: string
+  data: UserAddress
+}
+
+export type CreateAddressInput = {
+  label: string
+  recipient_name: string
+  phone: string
+  province: string
+  city: string
+  district: string
+  postal_code: string
+  address_line: string
+  notes?: string
+  is_default?: boolean
+}
+
 export const getBuyerAddresses = () =>
   api.get<AddressesResponse>(endpoints.user.addresses)
+
+export const getAddress = (id: string) =>
+  api.get<AddressResponse>(`${endpoints.user.addresses}/${id}`)
+
+export const createAddress = (data: CreateAddressInput) =>
+  api.post<AddressResponse>(endpoints.user.addresses, data)
+
+export const updateAddress = (id: string, data: Partial<CreateAddressInput>) =>
+  api.patch<AddressResponse>(`${endpoints.user.addresses}/${id}`, data)
+
+export const deleteAddress = (id: string) =>
+  api.delete<{ message: string }>(`${endpoints.user.addresses}/${id}`)
+
+export const setDefaultAddress = (id: string) =>
+  api.patch<{ message: string }>(`${endpoints.user.addresses}/${id}/default`)
 
 export type AddWishlistInput = {
   product_id: string

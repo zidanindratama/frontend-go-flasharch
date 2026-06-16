@@ -1,5 +1,9 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
+The frontend calls the FlashArch backend API only. For Indonesian regional lookups and shipping-cost checks, use the backend proxy endpoints in `lib/api/endpoints.ts` and `lib/api/shipping-region.ts`.
+
+Never call Api.co.id directly from browser code and never expose the `x-api-co-id` key in frontend config, `NEXT_PUBLIC_*` variables, or client-side headers. The backend owns Api.co.id credentials and injects them server-side.
+
 ## Getting Started
 
 First, run the development server:

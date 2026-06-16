@@ -27,6 +27,29 @@ export const endpoints = {
   categories: "/categories",
   blogs: "/blogs",
   blogCategories: "/blog-categories",
+  regional: {
+    provinces: "/regional/provinces",
+    province: (code: string) => `/regional/provinces/${code}` as const,
+    provinceRegencies: (code: string) =>
+      `/regional/provinces/${code}/regencies` as const,
+    regencies: "/regional/regencies",
+    regency: (code: string) => `/regional/regencies/${code}` as const,
+    regencyDistricts: (code: string) =>
+      `/regional/regencies/${code}/districts` as const,
+    districts: "/regional/districts",
+    district: (code: string) => `/regional/districts/${code}` as const,
+    districtVillages: (code: string) =>
+      `/regional/districts/${code}/villages` as const,
+    villages: "/regional/villages",
+    village: (code: string) => `/regional/villages/${code}` as const,
+    postalCodes: "/regional/postal-codes",
+    postalCode: (postalCode: string) =>
+      `/regional/postal-codes/${postalCode}` as const,
+    search: "/regional/search",
+  },
+  shipping: {
+    cost: "/shipping/cost",
+  },
   productReviews: (slug: string) => `/products/${slug}/reviews` as const,
   flashSales: "/flash-sales",
   admin: {
