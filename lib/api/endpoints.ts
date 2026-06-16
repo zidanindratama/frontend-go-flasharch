@@ -50,6 +50,17 @@ export const endpoints = {
   shipping: {
     cost: "/shipping/cost",
   },
+  cart: {
+    root: "/cart",
+    items: "/cart/items",
+    item: (id: string) => `/cart/items/${id}` as const,
+    savedItems: "/cart/saved-items",
+    savedItem: (id: string) => `/cart/saved-items/${id}` as const,
+    saveForLater: (itemId: string) =>
+      `/cart/items/${itemId}/save-for-later` as const,
+    moveToCart: (savedItemId: string) =>
+      `/cart/saved-items/${savedItemId}/move-to-cart` as const,
+  },
   productReviews: (slug: string) => `/products/${slug}/reviews` as const,
   flashSales: "/flash-sales",
   admin: {

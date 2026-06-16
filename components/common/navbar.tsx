@@ -22,8 +22,10 @@ import {
   Shield,
   LayoutDashboard,
   ShoppingBag,
+  ShoppingCart,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { useCart } from "@/lib/hooks/use-cart"
 
 const guestLinks = [
   { href: "/about", label: "About" },
@@ -37,7 +39,6 @@ const buyerLinks = [
   { href: "/blogs", label: "Blogs" },
   { href: "/products", label: "Products" },
   { href: "/flash-sale", label: "Flash Sale" },
-  { href: "/account", label: "Account" },
 ]
 
 const headerEase = [0.16, 1, 0.3, 1] as const
@@ -66,6 +67,7 @@ export function Navbar() {
   const signOut = useSignOut()
   const [mounted, setMounted] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
+  const { itemCount } = useCart()
 
   const effectiveAuthenticated = isAuthenticated || cookieAuth
   const user = fetchedUser ?? storedUser
@@ -276,6 +278,33 @@ export function Navbar() {
                     )}
                   </AnimatePresence>
                 </Button>
+              )}
+
+              {/* Cart icon */}
+              {effectiveAuthenticated && userRoleCode === "buyer" && (
+                <Link href="/account/cart">
+                  <motion.button
+                    type="button"
+                    whileTap={{ scale: 0.9 }}
+                    className="relative flex h-9 items-center gap-1.5 rounded-full px-2.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                  >
+                    <ShoppingCart className="h-4 w-4" />
+                    <AnimatePresence>
+                      {itemCount > 0 && (
+                        <motion.span
+                          key={itemCount}
+                          initial={{ width: 0, opacity: 0 }}
+                          animate={{ width: "auto", opacity: 1 }}
+                          exit={{ width: 0, opacity: 0 }}
+                          transition={{ duration: 0.25, ease: headerEase }}
+                          className="inline-flex h-4 min-w-[1rem] items-center justify-center overflow-hidden rounded-full bg-[#FF6600] px-1 text-[10px] font-bold text-white"
+                        >
+                          {itemCount > 99 ? "99+" : itemCount}
+                        </motion.span>
+                      )}
+                    </AnimatePresence>
+                  </motion.button>
+                </Link>
               )}
 
               {/* User dropdown or Sign In */}
@@ -499,6 +528,22 @@ export function Navbar() {
               >
                 {effectiveAuthenticated ? (
                   <>
+                    {userRoleCode === "buyer" && (
+                      <Button
+                        asChild
+                        variant="outline"
+                        className="h-12 w-full rounded-full mb-3"
+                      >
+                        <Link
+                          href="/account/cart"
+                          onClick={() => setMobileOpen(false)}
+                          className="gap-2"
+                        >
+                          <ShoppingCart className="h-4 w-4" />
+                          Cart {itemCount > 0 && `(${itemCount})`}
+                        </Link>
+                      </Button>
+                    )}
                     <div className="flex items-center gap-3 rounded-xl bg-card p-4 ring-1 ring-foreground/10 mb-4">
                       <Avatar className="h-10 w-10 rounded-lg">
                         <AvatarImage src={userAvatarUrl} alt={userName} />

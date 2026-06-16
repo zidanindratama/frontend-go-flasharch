@@ -6,6 +6,7 @@ import { motion } from "framer-motion"
 import {
   LayoutDashboard,
   ShoppingBag,
+  ShoppingCart,
   MapPin,
   Heart,
   Settings,
@@ -19,6 +20,7 @@ const ease: [number, number, number, number] = [0.16, 1, 0.3, 1]
 
 const accountNavItems: { label: string; href: string; icon: LucideIcon }[] = [
   { label: "Dashboard", href: "/account", icon: LayoutDashboard },
+  { label: "Cart", href: "/account/cart", icon: ShoppingCart },
   { label: "Orders", href: "/account/orders", icon: ShoppingBag },
   { label: "Addresses", href: "/account/addresses", icon: MapPin },
   { label: "Wishlist", href: "/account/wishlist", icon: Heart },

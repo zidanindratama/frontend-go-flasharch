@@ -13,6 +13,7 @@ import {
   ChevronLeft,
   ChevronRight,
   HeartPulse,
+  Loader2,
   Package,
   ListChecks,
   ReceiptText,
@@ -43,6 +44,7 @@ import type { Product } from "@/lib/api/catalog"
 import { ProductReviews } from "./product-reviews"
 import { RelatedProducts } from "./related-products"
 import { WishlistToggle } from "./wishlist-button"
+import { useAddCartItem } from "@/lib/hooks/use-cart"
 
 const smoothEase: [number, number, number, number] = [0.16, 1, 0.3, 1]
 
@@ -268,6 +270,7 @@ function StatusBadge({ status }: { status: string }) {
 function ProductCommandPanel({ product }: { product: Product }) {
   const active = product.status === "active"
   const category = product.categories?.[0]
+  const addCartItem = useAddCartItem()
 
   return (
     <Card className="border-border/80 bg-card/96 shadow-2xl shadow-primary/5 lg:sticky lg:top-28">
@@ -331,10 +334,18 @@ function ProductCommandPanel({ product }: { product: Product }) {
 
         <div className="flex flex-col gap-2">
           <div className="flex gap-2">
-            <Button disabled={!active} className="h-11 flex-1 justify-between">
+            <Button
+              disabled={!active || addCartItem.isPending}
+              onClick={() => addCartItem.mutate({ product_id: product.id, quantity: 1 })}
+              className="h-11 flex-1 justify-between"
+            >
               <span className="inline-flex items-center gap-2">
-                <ShoppingCart data-icon="inline-start" />
-                Add to cart
+                {addCartItem.isPending ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <ShoppingCart data-icon="inline-start" />
+                )}
+                {addCartItem.isPending ? "Adding..." : "Add to cart"}
               </span>
               <ArrowUpRight data-icon="inline-end" />
             </Button>
