@@ -1,26 +1,30 @@
-"use client"
+"use client";
 
-import Link from "next/link"
-import { motion } from "framer-motion"
-import { ArrowUpRight, Package, Plus, Star } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { cn } from "@/lib/utils"
-import { formatPrice } from "@/components/dashboard/products/product-utils"
-import type { Product } from "@/lib/api/catalog"
-import { WishlistToggle } from "./wishlist-button"
+import Link from "next/link";
+import { motion } from "framer-motion";
+import { ArrowUpRight, Package, Plus, Star } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { cn } from "@/lib/utils";
+import { formatPrice } from "@/components/dashboard/products/product-utils";
+import type { Product } from "@/lib/api/catalog";
+import { WishlistToggle } from "./wishlist-button";
 
-const smoothEase: [number, number, number, number] = [0.16, 1, 0.3, 1]
+const smoothEase: [number, number, number, number] = [0.16, 1, 0.3, 1];
 
 interface ProductCardProps {
-  product: Product
-  index?: number
-  className?: string
+  product: Product;
+  index?: number;
+  className?: string;
 }
 
-export function ProductCard({ product, index = 0, className }: ProductCardProps) {
-  const primaryImage = product.thumbnail_url
-  const categoryNames = product.categories.map((c) => c.name).join(", ")
+export function ProductCard({
+  product,
+  index = 0,
+  className,
+}: ProductCardProps) {
+  const primaryImage = product.thumbnail_url;
+  const categoryNames = product.categories.map((c) => c.name).join(", ");
 
   return (
     <motion.div
@@ -105,7 +109,9 @@ export function ProductCard({ product, index = 0, className }: ProductCardProps)
                   </span>
                 </>
               ) : (
-                <span className="text-sm text-muted-foreground">No ratings yet</span>
+                <span className="text-sm text-muted-foreground">
+                  No ratings yet
+                </span>
               )}
             </div>
 
@@ -121,5 +127,5 @@ export function ProductCard({ product, index = 0, className }: ProductCardProps)
         </div>
       </Link>
     </motion.div>
-  )
+  );
 }

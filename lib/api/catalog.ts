@@ -34,6 +34,7 @@ export type Product = {
   base_price_amount: number
   currency: string
   status: ProductStatus
+  weight: number
   thumbnail_file_id: string | null
   thumbnail_url: string | null
   rating_average: number
@@ -101,6 +102,7 @@ export type CreateProductInput = {
   base_price_amount: number
   currency?: string
   status?: ProductStatus
+  weight: number
   thumbnail_file_id?: string | null
   category_ids?: string[]
 }
@@ -113,6 +115,7 @@ export type UpdateProductInput = {
   base_price_amount?: number
   currency?: string
   status?: ProductStatus
+  weight?: number
   thumbnail_file_id?: string | null
   category_ids?: string[]
 }

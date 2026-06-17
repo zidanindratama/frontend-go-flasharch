@@ -88,6 +88,7 @@ function CreateProductForm() {
       base_price_amount: 0,
       currency: "IDR",
       status: "draft",
+      weight: 0,
       thumbnail_file_id: null,
       category_ids: [],
     },
@@ -243,7 +244,7 @@ function CreateProductForm() {
           <p className="mt-1 text-xs text-muted-foreground">
             Set the base price and catalog visibility.
           </p>
-          <div className="mt-5 grid min-w-0 gap-4 sm:grid-cols-2">
+          <div className="mt-5 grid min-w-0 gap-4 sm:grid-cols-3">
             <Field>
               <FieldLabel htmlFor="base_price_amount">
                 Base price (IDR)
@@ -260,6 +261,26 @@ function CreateProductForm() {
               />
               <FieldDescription>Integer amount in Rupiah.</FieldDescription>
               <FieldError errors={[form.formState.errors.base_price_amount]} />
+            </Field>
+            <Field>
+              <FieldLabel htmlFor="weight">
+                Weight (kg)
+              </FieldLabel>
+              <Input
+                id="weight"
+                type="number"
+                step="0.01"
+                min="0.01"
+                placeholder="0.00"
+                className="h-10 w-full rounded-xl"
+                value={values.weight || ""}
+                onChange={(e) =>
+                  form.setValue("weight", parseFloat(e.target.value) || 0, { shouldValidate: true })
+                }
+                aria-invalid={!!form.formState.errors.weight}
+              />
+              <FieldDescription>Product weight in kilograms.</FieldDescription>
+              <FieldError errors={[form.formState.errors.weight]} />
             </Field>
             <Field>
               <FieldLabel>Status</FieldLabel>
@@ -399,6 +420,7 @@ function EditProductForm({ product }: { product: Product }) {
       base_price_amount: product.base_price_amount,
       currency: product.currency,
       status: product.status,
+      weight: product.weight,
       thumbnail_file_id: product.thumbnail_file_id,
       category_ids: product.categories.map((c) => c.id),
     },
@@ -592,7 +614,7 @@ function EditProductForm({ product }: { product: Product }) {
           <h2 className="text-sm font-semibold text-foreground">
             Pricing and status
           </h2>
-          <div className="mt-5 grid min-w-0 gap-4 sm:grid-cols-2">
+          <div className="mt-5 grid min-w-0 gap-4 sm:grid-cols-3">
             <Field>
               <FieldLabel htmlFor="base_price_amount">
                 Base price (IDR)
@@ -608,6 +630,25 @@ function EditProductForm({ product }: { product: Product }) {
                 className="w-full"
               />
               <FieldError errors={[form.formState.errors.base_price_amount]} />
+            </Field>
+            <Field>
+              <FieldLabel htmlFor="weight">
+                Weight (kg)
+              </FieldLabel>
+              <Input
+                id="weight"
+                type="number"
+                step="0.01"
+                min="0.01"
+                placeholder="0.00"
+                className="h-10 w-full rounded-xl"
+                value={values.weight || ""}
+                onChange={(e) =>
+                  form.setValue("weight", parseFloat(e.target.value) || 0, { shouldValidate: true })
+                }
+                aria-invalid={!!form.formState.errors.weight}
+              />
+              <FieldError errors={[form.formState.errors.weight]} />
             </Field>
             <Field>
               <FieldLabel>Status</FieldLabel>

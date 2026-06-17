@@ -21,6 +21,7 @@ export type FlashSaleItem = {
     sku: string
     slug: string
     name: string
+    weight: number
   }
   sale_price_amount: number
   currency: string

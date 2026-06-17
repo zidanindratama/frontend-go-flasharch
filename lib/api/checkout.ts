@@ -12,6 +12,7 @@ export type CheckoutOrderItem = {
   unit_price_amount: number
   line_total_amount: number
   currency: string
+  weight: number
   thumbnail_url: string | null
 }
 

@@ -104,6 +104,9 @@ function CartItemRow({
             <p className="mt-0.5 font-mono text-[11px] text-muted-foreground">
               {item.product.sku}
             </p>
+            <p className="mt-0.5 text-[11px] text-muted-foreground">
+              {item.product.weight} kg
+            </p>
             {isInactive && (
               <motion.p
                 initial={{ opacity: 0, y: -4 }}

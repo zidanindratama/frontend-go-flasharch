@@ -95,6 +95,9 @@ function WishlistCard({
             <p className="mt-0.5 font-mono text-[11px] text-muted-foreground">
               {item.product.sku}
             </p>
+            <p className="mt-0.5 text-[11px] text-muted-foreground">
+              {item.product.weight} kg
+            </p>
           </div>
           <div className="mt-2 flex items-center justify-between gap-3">
             <span className="text-sm font-bold tabular-nums text-foreground">

@@ -79,6 +79,9 @@ export function SavedCartItem({
             <p className="mt-0.5 font-mono text-[11px] text-muted-foreground">
               {item.product.sku}
             </p>
+            <p className="mt-0.5 text-[11px] text-muted-foreground">
+              {item.product.weight} kg
+            </p>
           </div>
           <span className="mt-1 text-sm font-bold tabular-nums text-foreground">
             {formatPrice(item.unit_price_amount)}

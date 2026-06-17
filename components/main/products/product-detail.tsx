@@ -1,9 +1,9 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import Link from "next/link"
-import { AnimatePresence, motion } from "framer-motion"
-import { useQuery } from "@tanstack/react-query"
+import { useState } from "react";
+import Link from "next/link";
+import { AnimatePresence, motion } from "framer-motion";
+import { useQuery } from "@tanstack/react-query";
 import {
   AlertCircle,
   ArrowLeft,
@@ -22,10 +22,10 @@ import {
   Sparkles,
   Star,
   Zap,
-} from "lucide-react"
+} from "lucide-react";
 
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -33,20 +33,24 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
-import { Progress } from "@/components/ui/progress"
-import { Separator } from "@/components/ui/separator"
-import { Skeleton } from "@/components/ui/skeleton"
-import { getProduct, listProductReviews, listProducts } from "@/lib/api/catalog"
-import { cn } from "@/lib/utils"
-import { formatPrice } from "@/components/dashboard/products/product-utils"
-import type { Product } from "@/lib/api/catalog"
-import { ProductReviews } from "./product-reviews"
-import { RelatedProducts } from "./related-products"
-import { WishlistToggle } from "./wishlist-button"
-import { useAddCartItem } from "@/lib/hooks/use-cart"
+} from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
+import { Separator } from "@/components/ui/separator";
+import { Skeleton } from "@/components/ui/skeleton";
+import {
+  getProduct,
+  listProductReviews,
+  listProducts,
+} from "@/lib/api/catalog";
+import { cn } from "@/lib/utils";
+import { formatPrice } from "@/components/dashboard/products/product-utils";
+import type { Product } from "@/lib/api/catalog";
+import { ProductReviews } from "./product-reviews";
+import { RelatedProducts } from "./related-products";
+import { WishlistToggle } from "./wishlist-button";
+import { useAddCartItem } from "@/lib/hooks/use-cart";
 
-const smoothEase: [number, number, number, number] = [0.16, 1, 0.3, 1]
+const smoothEase: [number, number, number, number] = [0.16, 1, 0.3, 1];
 
 const sectionReveal = {
   hidden: { opacity: 0, y: 28 },
@@ -55,7 +59,7 @@ const sectionReveal = {
     y: 0,
     transition: { duration: 0.7, ease: smoothEase },
   },
-}
+};
 
 const flowSteps = [
   {
@@ -82,7 +86,7 @@ const flowSteps = [
     icon: CheckCircle2,
     tone: "text-emerald-700",
   },
-]
+];
 
 function StarRating({ rating, count }: { rating: number; count: number }) {
   return (
@@ -107,7 +111,7 @@ function StarRating({ rating, count }: { rating: number; count: number }) {
         {count} {count === 1 ? "review" : "reviews"}
       </span>
     </div>
-  )
+  );
 }
 
 function ProductGallery({ product }: { product: Product }) {
@@ -125,8 +129,8 @@ function ProductGallery({ product }: { product: Product }) {
             created_at: "",
           },
         ]
-      : []
-  const [activeIndex, setActiveIndex] = useState(0)
+      : [];
+  const [activeIndex, setActiveIndex] = useState(0);
 
   if (images.length === 0) {
     return (
@@ -134,10 +138,10 @@ function ProductGallery({ product }: { product: Product }) {
         <div className="absolute inset-6 rounded-xl border border-dashed border-border" />
         <Package className="size-14 text-muted-foreground" />
       </div>
-    )
+    );
   }
 
-  const hasThumbnailRail = images.length > 1
+  const hasThumbnailRail = images.length > 1;
 
   return (
     <div
@@ -248,7 +252,7 @@ function ProductGallery({ product }: { product: Product }) {
         </div>
       </div>
     </div>
-  )
+  );
 }
 
 function StatusBadge({ status }: { status: string }) {
@@ -257,20 +261,20 @@ function StatusBadge({ status }: { status: string }) {
       <Badge className="bg-[var(--health)]/12 text-[var(--health)] hover:bg-[var(--health)]/12">
         Available
       </Badge>
-    )
+    );
   }
 
   if (status === "draft") {
-    return <Badge variant="secondary">Draft</Badge>
+    return <Badge variant="secondary">Draft</Badge>;
   }
 
-  return <Badge variant="destructive">Archived</Badge>
+  return <Badge variant="destructive">Archived</Badge>;
 }
 
 function ProductCommandPanel({ product }: { product: Product }) {
-  const active = product.status === "active"
-  const category = product.categories?.[0]
-  const addCartItem = useAddCartItem()
+  const active = product.status === "active";
+  const category = product.categories?.[0];
+  const addCartItem = useAddCartItem();
 
   return (
     <Card className="border-border/80 bg-card/96 shadow-2xl shadow-primary/5 lg:sticky lg:top-28">
@@ -317,6 +321,14 @@ function ProductCommandPanel({ product }: { product: Product }) {
           </div>
         </div>
 
+        <div className="rounded-xl border border-border p-4">
+          <p className="text-xs font-medium text-muted-foreground">Weight</p>
+          <p className="mt-1 text-lg font-semibold text-foreground">
+            {product.weight}{" "}
+            <span className="text-sm text-muted-foreground">kg</span>
+          </p>
+        </div>
+
         <div className="grid grid-cols-3 gap-2">
           {[
             ["Stock", "Checked"],
@@ -336,7 +348,9 @@ function ProductCommandPanel({ product }: { product: Product }) {
           <div className="flex gap-2">
             <Button
               disabled={!active || addCartItem.isPending}
-              onClick={() => addCartItem.mutate({ product_id: product.id, quantity: 1 })}
+              onClick={() =>
+                addCartItem.mutate({ product_id: product.id, quantity: 1 })
+              }
               className="h-11 flex-1 justify-between"
             >
               <span className="inline-flex items-center gap-2">
@@ -356,7 +370,11 @@ function ProductCommandPanel({ product }: { product: Product }) {
               className="h-11 w-11 shrink-0"
             />
           </div>
-          <Button asChild variant="outline" className="h-11 w-full justify-between">
+          <Button
+            asChild
+            variant="outline"
+            className="h-11 w-full justify-between"
+          >
             <Link href="/flash-sale">
               <span className="inline-flex items-center gap-2">
                 <Zap data-icon="inline-start" />
@@ -383,7 +401,7 @@ function ProductCommandPanel({ product }: { product: Product }) {
         <Progress value={100} className="bg-white/10" />
       </CardFooter>
     </Card>
-  )
+  );
 }
 
 function ProductDescription({ description }: { description: string }) {
@@ -392,10 +410,12 @@ function ProductDescription({ description }: { description: string }) {
       <Card>
         <CardHeader>
           <CardTitle>Product description</CardTitle>
-          <CardDescription>No product description available yet.</CardDescription>
+          <CardDescription>
+            No product description available yet.
+          </CardDescription>
         </CardHeader>
       </Card>
-    )
+    );
   }
 
   return (
@@ -430,7 +450,7 @@ function ProductDescription({ description }: { description: string }) {
         </CardContent>
       </Card>
     </motion.section>
-  )
+  );
 }
 
 function SystemProofBand() {
@@ -443,13 +463,13 @@ function SystemProofBand() {
       className="overflow-hidden rounded-xl bg-[var(--ops-background)] text-[var(--ops-foreground)]"
     >
       <div className="relative p-5 md:p-8">
-          <div className="absolute inset-0 bg-[linear-gradient(135deg,var(--ops-grid)_1px,transparent_1px)] bg-[length:26px_26px] opacity-70" />
-          <div className="relative grid gap-8 lg:grid-cols-[0.8fr_1.2fr] lg:items-end">
-            <div>
-              <span className="text-xs font-semibold uppercase tracking-widest text-primary">
-                Checkout assurance
-              </span>
-              <h2 className="mt-4 text-2xl font-black tracking-tight md:text-4xl">
+        <div className="absolute inset-0 bg-[linear-gradient(135deg,var(--ops-grid)_1px,transparent_1px)] bg-[length:26px_26px] opacity-70" />
+        <div className="relative grid gap-8 lg:grid-cols-[0.8fr_1.2fr] lg:items-end">
+          <div>
+            <span className="text-xs font-semibold uppercase tracking-widest text-primary">
+              Checkout assurance
+            </span>
+            <h2 className="mt-4 text-2xl font-black tracking-tight md:text-4xl">
               Built to keep sale checkout fair.
             </h2>
             <p className="mt-4 max-w-xl text-sm leading-7 text-[var(--ops-muted)]">
@@ -488,7 +508,7 @@ function SystemProofBand() {
         </div>
       </div>
     </motion.section>
-  )
+  );
 }
 
 function ProductLoading() {
@@ -516,7 +536,7 @@ function ProductLoading() {
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }
 
 function ProductNotFound() {
@@ -533,7 +553,7 @@ function ProductNotFound() {
         <Link href="/products">Browse products</Link>
       </Button>
     </div>
-  )
+  );
 }
 
 export function ProductDetail({ slug }: { slug: string }) {
@@ -541,10 +561,10 @@ export function ProductDetail({ slug }: { slug: string }) {
     queryKey: ["public.products", slug],
     queryFn: () => getProduct(slug),
     select: (res) => res.data.data,
-  })
+  });
 
-  const product = productQuery.data
-  const categorySlug = product?.categories?.[0]?.slug
+  const product = productQuery.data;
+  const categorySlug = product?.categories?.[0]?.slug;
 
   const relatedQuery = useQuery({
     queryKey: ["public.products", slug, "related"],
@@ -559,18 +579,18 @@ export function ProductDetail({ slug }: { slug: string }) {
     enabled: !!categorySlug,
     select: (res) =>
       res?.data?.data?.items?.filter((p) => p.slug !== slug).slice(0, 6) ?? [],
-  })
+  });
 
   const reviewsQuery = useQuery({
     queryKey: ["public.products", slug, "reviews"],
     queryFn: () => listProductReviews(slug, { per_page: 5 }),
     select: (res) => res.data.data,
     enabled: !!product,
-  })
+  });
 
   const categoryLabel = product?.categories?.length
     ? product.categories.map((category) => category.name).join(" / ")
-    : "Storefront"
+    : "Storefront";
 
   return (
     <div className="w-full bg-background">
@@ -703,5 +723,5 @@ export function ProductDetail({ slug }: { slug: string }) {
         </div>
       )}
     </div>
-  )
+  );
 }

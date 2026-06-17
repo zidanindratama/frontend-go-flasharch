@@ -9,6 +9,7 @@ export type CartProduct = {
   base_price_amount: number
   currency: string
   status: string
+  weight: number
   thumbnail_url: string | null
 }
 
@@ -59,6 +60,7 @@ export type SavedItemProduct = {
   base_price_amount: number
   currency: string
   status: string
+  weight: number
   thumbnail_url: string | null
 }
 

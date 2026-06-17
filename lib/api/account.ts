@@ -96,6 +96,7 @@ export type ProductSummary = {
   base_price_amount: number
   currency: string
   status: string
+  weight: number
   thumbnail_url: string | null
 }
 

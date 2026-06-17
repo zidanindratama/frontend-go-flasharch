@@ -208,6 +208,15 @@ function ProductDetailView({ product }: { product: Product }) {
             </p>
           </div>
 
+          <div className="mt-4 rounded-2xl border border-border bg-muted/30 p-4">
+            <p className="text-xs font-semibold uppercase text-muted-foreground">
+              Weight
+            </p>
+            <p className="mt-1 text-3xl font-semibold tabular-nums text-foreground">
+              {product.weight} <span className="text-lg text-muted-foreground">kg</span>
+            </p>
+          </div>
+
           <div className="mt-5 grid gap-3 sm:grid-cols-3">
             <Metric label="Images" value={String(gallery.length)} icon={<ImagePlus />} />
             <Metric label="Rating" value={product.rating_count ? product.rating_average.toFixed(1) : "0.0"} icon={<Star />} />

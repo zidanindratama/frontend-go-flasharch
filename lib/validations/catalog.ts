@@ -26,6 +26,9 @@ export const productCreateSchema = z.object({
     .min(0, "Price must be at least 0"),
   currency: z.string(),
   status: z.enum(["draft", "active", "archived"]),
+  weight: z
+    .number()
+    .min(0.01, "Weight must be greater than zero"),
   thumbnail_file_id: z.string().nullable(),
   category_ids: z.array(z.string()),
 })
@@ -54,6 +57,9 @@ export const productEditSchema = z.object({
     .min(0, "Price must be at least 0"),
   currency: z.string(),
   status: z.enum(["draft", "active", "archived"]),
+  weight: z
+    .number()
+    .min(0.01, "Weight must be greater than zero"),
   thumbnail_file_id: z.string().nullable(),
   category_ids: z.array(z.string()),
 })
