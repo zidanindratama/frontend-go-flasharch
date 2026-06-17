@@ -78,8 +78,8 @@ export function StockAdjustForm({ stock }: StockAdjustFormProps) {
       })
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["admin-inventory-stocks"] })
-      queryClient.invalidateQueries({ queryKey: ["admin-inventory-movements"] })
+      queryClient.invalidateQueries({ queryKey: ["admin.inventory.stocks"] })
+      queryClient.invalidateQueries({ queryKey: ["admin.inventory.movements"] })
       router.push("/dashboard/products/inventory")
     },
     onError: (error: Error) => {

@@ -205,7 +205,7 @@ export function AccountWishlist() {
   const queryClient = useQueryClient()
 
   const { data: items = [], isLoading } = useQuery<WishlistItem[]>({
-    queryKey: ["buyer-wishlist"],
+    queryKey: ["account.wishlist"],
     queryFn: async () => {
       const response = await getBuyerWishlist()
       return response.data.data.items
@@ -216,9 +216,9 @@ export function AccountWishlist() {
   const removeMutation = useMutation({
     mutationFn: (productId: string) => removeFromWishlist(productId),
     onMutate: async (productId) => {
-      await queryClient.cancelQueries({ queryKey: ["buyer-wishlist"] })
-      const previous = queryClient.getQueryData<WishlistItem[]>(["buyer-wishlist"])
-      queryClient.setQueryData<WishlistItem[]>(["buyer-wishlist"], (old) => {
+      await queryClient.cancelQueries({ queryKey: ["account.wishlist"] })
+      const previous = queryClient.getQueryData<WishlistItem[]>(["account.wishlist"])
+      queryClient.setQueryData<WishlistItem[]>(["account.wishlist"], (old) => {
         if (!old) return old
         return old.filter((item) => item.product.id !== productId)
       })
@@ -228,13 +228,13 @@ export function AccountWishlist() {
     },
     onError: async (_err, _productId, context) => {
       if (context?.previous) {
-        queryClient.setQueryData(["buyer-wishlist"], context.previous)
+        queryClient.setQueryData(["account.wishlist"], context.previous)
       }
       const { toast } = await import("sonner")
       toast.error("Failed to remove item")
     },
     onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ["buyer-wishlist"] })
+      queryClient.invalidateQueries({ queryKey: ["account.wishlist"] })
     },
   })
 

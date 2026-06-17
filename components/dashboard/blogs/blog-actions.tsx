@@ -1,9 +1,8 @@
 "use client"
 
 import Link from "next/link"
-import { useMutation, useQueryClient } from "@tanstack/react-query"
+import { useState } from "react"
 import { Eye, Loader2, Pencil, Trash2 } from "lucide-react"
-import { toast } from "sonner"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -22,25 +21,16 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
-import { deleteBlogPost, type BlogPost } from "@/lib/api/blogs"
+import { useDeleteBlogPost } from "@/lib/hooks/use-blogs"
+import type { BlogPost } from "@/lib/api/blogs"
 
 type BlogActionsProps = {
   blog: BlogPost
 }
 
 export function BlogActions({ blog }: BlogActionsProps) {
-  const queryClient = useQueryClient()
-  const deleteMutation = useMutation({
-    mutationFn: () => deleteBlogPost(blog.id),
-    onSuccess: async () => {
-      toast.success("Blog post deleted")
-      await Promise.all([
-        queryClient.invalidateQueries({ queryKey: ["admin-blogs"] }),
-        queryClient.invalidateQueries({ queryKey: ["admin-blog", blog.id] }),
-      ])
-    },
-    onError: (error) => toast.error(error.message),
-  })
+  const deleteMutation = useDeleteBlogPost()
+  const [open, setOpen] = useState(false)
 
   return (
     <TooltipProvider>
@@ -71,7 +61,7 @@ export function BlogActions({ blog }: BlogActionsProps) {
             </Link>
           </Button>
         </ActionTooltip>
-        <AlertDialog>
+        <AlertDialog open={open} onOpenChange={setOpen}>
           <ActionTooltip label="Delete">
             <AlertDialogTrigger asChild>
               <Button
@@ -106,7 +96,7 @@ export function BlogActions({ blog }: BlogActionsProps) {
                 disabled={deleteMutation.isPending}
                 onClick={(event) => {
                   event.preventDefault()
-                  deleteMutation.mutate()
+                  deleteMutation.mutate(blog.id)
                 }}
               >
                 Delete

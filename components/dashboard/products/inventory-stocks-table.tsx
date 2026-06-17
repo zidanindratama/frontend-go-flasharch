@@ -90,7 +90,7 @@ export function InventoryStocksTable() {
   )
 
   const stocksQuery = useQuery({
-    queryKey: ["admin-inventory-stocks", params],
+    queryKey: ["admin.inventory.stocks", params],
     queryFn: async () => {
       const response = await listInventoryStocks(params)
       return response.data

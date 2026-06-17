@@ -1,9 +1,8 @@
 "use client"
 
 import Link from "next/link"
-import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { Eye, Loader2, Pencil, Trash2 } from "lucide-react"
-import { toast } from "sonner"
+import { useState } from "react"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -22,25 +21,16 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
-import { deleteProduct, type Product } from "@/lib/api/catalog"
+import { useDeleteProduct } from "@/lib/hooks/use-products"
+import type { Product } from "@/lib/api/catalog"
 
 type ProductActionsProps = {
   product: Product
 }
 
 export function ProductActions({ product }: ProductActionsProps) {
-  const queryClient = useQueryClient()
-  const deleteProductMutation = useMutation({
-    mutationFn: () => deleteProduct(product.id),
-    onSuccess: async () => {
-      toast.success("Product deleted")
-      await Promise.all([
-        queryClient.invalidateQueries({ queryKey: ["admin-products"] }),
-        queryClient.invalidateQueries({ queryKey: ["admin-product", product.id] }),
-      ])
-    },
-    onError: (error) => toast.error(error.message),
-  })
+  const deleteMutation = useDeleteProduct()
+  const [open, setOpen] = useState(false)
 
   return (
     <TooltipProvider>
@@ -71,16 +61,16 @@ export function ProductActions({ product }: ProductActionsProps) {
             </Link>
           </Button>
         </ActionTooltip>
-        <AlertDialog>
+        <AlertDialog open={open} onOpenChange={setOpen}>
           <ActionTooltip label="Delete">
             <AlertDialogTrigger asChild>
               <Button
                 variant="ghost"
                 size="icon-sm"
                 className="rounded-lg text-destructive hover:text-destructive"
-                disabled={deleteProductMutation.isPending}
+                disabled={deleteMutation.isPending}
               >
-                {deleteProductMutation.isPending ? (
+                {deleteMutation.isPending ? (
                   <Loader2 className="size-4 animate-spin" />
                 ) : (
                   <Trash2 className="size-4" />
@@ -97,15 +87,15 @@ export function ProductActions({ product }: ProductActionsProps) {
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-              <AlertDialogCancel disabled={deleteProductMutation.isPending}>
+              <AlertDialogCancel disabled={deleteMutation.isPending}>
                 Cancel
               </AlertDialogCancel>
               <AlertDialogAction
                 variant="destructive"
-                disabled={deleteProductMutation.isPending}
+                disabled={deleteMutation.isPending}
                 onClick={(event) => {
                   event.preventDefault()
-                  deleteProductMutation.mutate()
+                  deleteMutation.mutate(product.id)
                 }}
               >
                 Delete

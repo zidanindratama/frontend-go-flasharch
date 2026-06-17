@@ -16,7 +16,7 @@ import {
 import { useTheme } from "next-themes"
 import { flushSync } from "react-dom"
 import { cn } from "@/lib/utils"
-import { useUser, useSignOut } from "@/hooks/use-auth"
+import { useUser, useSignOut } from "@/lib/hooks/use-auth"
 import { useAuthStore } from "@/stores/auth"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 

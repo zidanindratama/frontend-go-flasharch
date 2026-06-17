@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react"
 import { useRouter, usePathname } from "next/navigation"
 import { useAuthStore } from "@/stores/auth"
-import { useUser } from "@/hooks/use-auth"
+import { useUser } from "@/lib/hooks/use-auth"
 import { Loader2 } from "lucide-react"
 
 export function RequireAuth({ children }: { children: React.ReactNode }) {

@@ -49,6 +49,7 @@ import {
   type AdminUserCreateValues,
   type AdminUserEditValues,
 } from "@/lib/validations/admin-users"
+import { getErrorMessage } from "@/lib/api/errors"
 
 type UserFormProps =
   | {
@@ -98,12 +99,12 @@ function CreateUserForm() {
     onSuccess: async () => {
       const { toast } = await import("sonner")
       toast.success("User created")
-      await queryClient.invalidateQueries({ queryKey: ["admin-users"] })
+      await queryClient.invalidateQueries({ queryKey: ["admin.users"] })
       router.push("/dashboard/users")
     },
     onError: async (error) => {
       const { toast } = await import("sonner")
-      toast.error(error.message)
+      toast.error(getErrorMessage(error, "Failed to create user"))
     },
   })
 
@@ -257,14 +258,14 @@ function EditUserForm({ user }: { user: AdminUser }) {
       const { toast } = await import("sonner")
       toast.success("User updated")
       await Promise.all([
-        queryClient.invalidateQueries({ queryKey: ["admin-users"] }),
-        queryClient.invalidateQueries({ queryKey: ["admin-user", user.id] }),
+        queryClient.invalidateQueries({ queryKey: ["admin.users"] }),
+        queryClient.invalidateQueries({ queryKey: ["admin.users", user.id] }),
       ])
       router.push(`/dashboard/users/${user.id}`)
     },
     onError: async (error) => {
       const { toast } = await import("sonner")
-      toast.error(error.message)
+      toast.error(getErrorMessage(error, "Failed to update user"))
     },
   })
 

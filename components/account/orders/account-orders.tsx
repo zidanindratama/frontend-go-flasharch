@@ -87,7 +87,7 @@ function OrderCard({ order }: { order: BuyerOrderRow }) {
 export function AccountOrders() {
   const token = useAuthStore((s) => s.access_token)
   const { data, isLoading } = useQuery({
-    queryKey: ["buyer-orders", 1, 10],
+    queryKey: ["account.orders", { page: 1, perPage: 10, sort: "created_at", order: "desc" }],
     queryFn: async () => {
       const response = await getBuyerOrders({
         page: 1,

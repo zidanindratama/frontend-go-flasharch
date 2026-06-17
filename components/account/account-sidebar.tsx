@@ -14,7 +14,7 @@ import {
   type LucideIcon,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
-import { useSignOut } from "@/hooks/use-auth"
+import { useSignOut } from "@/lib/hooks/use-auth"
 
 const ease: [number, number, number, number] = [0.16, 1, 0.3, 1]
 

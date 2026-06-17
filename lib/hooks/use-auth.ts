@@ -21,27 +21,10 @@ import {
   type ChangePasswordInput,
   type ResendVerificationInput,
 } from "@/lib/api/auth"
+import { getErrorMessage } from "@/lib/api/errors"
 import { getMe, updateMe, uploadAvatar, type User } from "@/lib/api/user"
 
 type ApiError = { response?: { data?: { message?: string } } }
-
-function getErrorMessage(error: unknown, fallback: string): string {
-  if (
-    error &&
-    typeof error === "object" &&
-    "response" in error &&
-    error.response &&
-    typeof error.response === "object" &&
-    "data" in error.response &&
-    error.response.data &&
-    typeof error.response.data === "object" &&
-    "message" in error.response.data &&
-    typeof error.response.data.message === "string"
-  ) {
-    return error.response.data.message
-  }
-  return fallback
-}
 
 export function useSignIn() {
   const router = useRouter()
@@ -119,7 +102,7 @@ export function useUser() {
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated)
 
   return useQuery({
-    queryKey: ["user"],
+    queryKey: ["user.me"],
     queryFn: async () => {
       const res = await getMe()
       useAuthStore.getState().setUser(res.data.data)
@@ -225,7 +208,7 @@ export function useUploadAvatar() {
             : { ...currentUser, avatar_url: avatarUrl }
 
         useAuthStore.getState().setUser(nextUser)
-        queryClient.setQueryData(["user"], nextUser)
+        queryClient.setQueryData(["user.me"], nextUser)
       }
       toast.success("Avatar uploaded")
     },

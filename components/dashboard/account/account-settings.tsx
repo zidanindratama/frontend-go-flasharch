@@ -36,7 +36,7 @@ import {
   useUpdateProfile,
   useUploadAvatar,
   useUser,
-} from "@/hooks/use-auth";
+} from "@/lib/hooks/use-auth";
 import { cn } from "@/lib/utils";
 
 const ease = [0.16, 1, 0.3, 1] as const;

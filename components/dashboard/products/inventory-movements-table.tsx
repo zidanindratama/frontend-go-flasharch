@@ -101,7 +101,7 @@ export function InventoryMovementsTable() {
   )
 
   const movementsQuery = useQuery({
-    queryKey: ["admin-inventory-movements", params],
+    queryKey: ["admin.inventory.movements", params],
     queryFn: async () => {
       const response = await listInventoryMovements(params)
       return response.data

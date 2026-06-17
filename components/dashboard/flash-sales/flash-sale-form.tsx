@@ -29,6 +29,7 @@ import {
   type FlashSaleCreateValues,
   type FlashSaleEditValues,
 } from "@/lib/validations/flash-sale"
+import { getErrorMessage } from "@/lib/api/errors"
 
 type FlashSaleFormProps =
   | { mode: "create"; sale?: never }
@@ -79,12 +80,12 @@ function CreateFlashSaleForm() {
     onSuccess: async () => {
       const { toast } = await import("sonner")
       toast.success("Flash sale created")
-      await queryClient.invalidateQueries({ queryKey: ["admin-flash-sales"] })
+      await queryClient.invalidateQueries({ queryKey: ["admin.flashSales"] })
       router.push("/dashboard/flash-sales")
     },
     onError: async (error) => {
       const { toast } = await import("sonner")
-      toast.error(error.message)
+      toast.error(getErrorMessage(error, "Failed to create flash sale"))
     },
   })
 
@@ -208,13 +209,13 @@ function EditFlashSaleForm({ sale }: { sale: FlashSale }) {
     onSuccess: async () => {
       const { toast } = await import("sonner")
       toast.success("Flash sale updated")
-      await queryClient.invalidateQueries({ queryKey: ["admin-flash-sales"] })
-      await queryClient.invalidateQueries({ queryKey: ["admin-flash-sale", sale.id] })
+      await queryClient.invalidateQueries({ queryKey: ["admin.flashSales"] })
+      await queryClient.invalidateQueries({ queryKey: ["admin.flashSales", sale.id] })
       router.push(`/dashboard/flash-sales/${sale.id}`)
     },
     onError: async (error) => {
       const { toast } = await import("sonner")
-      toast.error(error.message)
+      toast.error(getErrorMessage(error, "Failed to update flash sale"))
     },
   })
 

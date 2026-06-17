@@ -27,6 +27,7 @@ import { DataTable, SortHeader, type DataTableFilter } from "@/components/common
 import { FlashSaleStatusBadge } from "./flash-sale-badges"
 import { formatDateTime, shortId, isEditable } from "./flash-sale-utils"
 import { listAdminFlashSales, deleteFlashSale, type FlashSale, type FlashSaleStatus } from "@/lib/api/flash-sale"
+import { getErrorMessage } from "@/lib/api/errors"
 
 const sortableColumns = new Set(["created_at", "updated_at", "name", "starts_at", "status"])
 
@@ -92,7 +93,7 @@ export function FlashSalesTable() {
   )
 
   const salesQuery = useQuery({
-    queryKey: ["admin-flash-sales", params],
+    queryKey: ["admin.flashSales", params],
     queryFn: async () => {
       const response = await listAdminFlashSales(params)
       return response.data
@@ -104,12 +105,12 @@ export function FlashSalesTable() {
     onSuccess: async () => {
       const { toast } = await import("sonner")
       toast.success("Flash sale deleted")
-      await queryClient.invalidateQueries({ queryKey: ["admin-flash-sales"] })
+      await queryClient.invalidateQueries({ queryKey: ["admin.flashSales"] })
       setDeleteTarget(null)
     },
     onError: async (error) => {
       const { toast } = await import("sonner")
-      toast.error(error.message)
+      toast.error(getErrorMessage(error, "Failed to delete flash sale"))
       setDeleteTarget(null)
     },
   })

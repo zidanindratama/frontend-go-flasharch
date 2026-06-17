@@ -14,7 +14,7 @@ export default function EditAddressPage() {
   const token = useAuthStore((s) => s.access_token)
 
   const { data, isLoading, error } = useQuery({
-    queryKey: ["address", params.id],
+    queryKey: ["account.addresses", params.id],
     queryFn: async () => {
       const response = await getAddress(params.id)
       return response.data

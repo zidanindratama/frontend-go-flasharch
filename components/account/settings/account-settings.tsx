@@ -31,7 +31,7 @@ import {
   useUpdateProfile,
   useUploadAvatar,
   useUser,
-} from "@/hooks/use-auth"
+} from "@/lib/hooks/use-auth"
 import {
   accountChangePasswordSchema,
   accountProfileSchema,

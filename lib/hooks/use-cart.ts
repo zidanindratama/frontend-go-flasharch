@@ -13,13 +13,14 @@ import {
   moveSavedItemToCart,
   deleteSavedItem,
 } from "@/lib/api/cart"
+import { getErrorMessage } from "@/lib/api/errors"
 import { useAuthStore } from "@/stores/auth"
 
 export function useCart() {
   const token = useAuthStore((s) => s.access_token)
 
   const cartQuery = useQuery({
-    queryKey: ["cart"],
+    queryKey: ["account.cart"],
     queryFn: async () => {
       const response = await getCart()
       return response.data.data
@@ -53,13 +54,13 @@ export function useAddCartItem() {
     mutationFn: (data: { product_id: string; quantity: number }) =>
       addCartItem(data),
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["cart"] })
+      await queryClient.invalidateQueries({ queryKey: ["account.cart"] })
       const { toast } = await import("sonner")
       toast.success("Added to cart")
     },
     onError: async (error: Error) => {
       const { toast } = await import("sonner")
-      toast.error(error.message || "Failed to add to cart")
+      toast.error(getErrorMessage(error, "Failed to add to cart"))
     },
   })
 }
@@ -71,11 +72,11 @@ export function useUpdateCartItem() {
     mutationFn: ({ itemId, quantity }: { itemId: string; quantity: number }) =>
       updateCartItem(itemId, { quantity }),
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["cart"] })
+      await queryClient.invalidateQueries({ queryKey: ["account.cart"] })
     },
     onError: async (error: Error) => {
       const { toast } = await import("sonner")
-      toast.error(error.message || "Failed to update cart item")
+      toast.error(getErrorMessage(error, "Failed to update cart item"))
     },
   })
 }
@@ -86,13 +87,13 @@ export function useRemoveCartItem() {
   return useMutation({
     mutationFn: (itemId: string) => removeCartItem(itemId),
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["cart"] })
+      await queryClient.invalidateQueries({ queryKey: ["account.cart"] })
       const { toast } = await import("sonner")
       toast.success("Item removed from cart")
     },
     onError: async (error: Error) => {
       const { toast } = await import("sonner")
-      toast.error(error.message || "Failed to remove cart item")
+      toast.error(getErrorMessage(error, "Failed to remove cart item"))
     },
   })
 }
@@ -103,13 +104,13 @@ export function useClearCart() {
   return useMutation({
     mutationFn: () => clearCart(),
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["cart"] })
+      await queryClient.invalidateQueries({ queryKey: ["account.cart"] })
       const { toast } = await import("sonner")
       toast.success("Cart cleared")
     },
     onError: async (error: Error) => {
       const { toast } = await import("sonner")
-      toast.error(error.message || "Failed to clear cart")
+      toast.error(getErrorMessage(error, "Failed to clear cart"))
     },
   })
 }
@@ -118,7 +119,7 @@ export function useSavedItems() {
   const token = useAuthStore((s) => s.access_token)
 
   const savedQuery = useQuery({
-    queryKey: ["saved-items"],
+    queryKey: ["account.cart.savedItems"],
     queryFn: async () => {
       const response = await getSavedItems()
       return response.data.data.items
@@ -137,15 +138,15 @@ export function useSaveForLater() {
     mutationFn: (itemId: string) => saveCartItemForLater(itemId),
     onSuccess: async () => {
       await Promise.all([
-        queryClient.invalidateQueries({ queryKey: ["cart"] }),
-        queryClient.invalidateQueries({ queryKey: ["saved-items"] }),
+        queryClient.invalidateQueries({ queryKey: ["account.cart"] }),
+        queryClient.invalidateQueries({ queryKey: ["account.cart.savedItems"] }),
       ])
       const { toast } = await import("sonner")
       toast.success("Item saved for later")
     },
     onError: async (error: Error) => {
       const { toast } = await import("sonner")
-      toast.error(error.message || "Failed to save item")
+      toast.error(getErrorMessage(error, "Failed to save item"))
     },
   })
 }
@@ -157,15 +158,15 @@ export function useMoveToCart() {
     mutationFn: (savedItemId: string) => moveSavedItemToCart(savedItemId),
     onSuccess: async () => {
       await Promise.all([
-        queryClient.invalidateQueries({ queryKey: ["cart"] }),
-        queryClient.invalidateQueries({ queryKey: ["saved-items"] }),
+        queryClient.invalidateQueries({ queryKey: ["account.cart"] }),
+        queryClient.invalidateQueries({ queryKey: ["account.cart.savedItems"] }),
       ])
       const { toast } = await import("sonner")
       toast.success("Item moved to cart")
     },
     onError: async (error: Error) => {
       const { toast } = await import("sonner")
-      toast.error(error.message || "Failed to move item to cart")
+      toast.error(getErrorMessage(error, "Failed to move item to cart"))
     },
   })
 }
@@ -176,13 +177,13 @@ export function useDeleteSavedItem() {
   return useMutation({
     mutationFn: (savedItemId: string) => deleteSavedItem(savedItemId),
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["saved-items"] })
+      await queryClient.invalidateQueries({ queryKey: ["account.cart.savedItems"] })
       const { toast } = await import("sonner")
       toast.success("Saved item deleted")
     },
     onError: async (error: Error) => {
       const { toast } = await import("sonner")
-      toast.error(error.message || "Failed to delete saved item")
+      toast.error(getErrorMessage(error, "Failed to delete saved item"))
     },
   })
 }

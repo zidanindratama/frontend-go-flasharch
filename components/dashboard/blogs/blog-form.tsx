@@ -63,6 +63,7 @@ import {
   type BlogPostCreateValues,
   type BlogPostEditValues,
 } from "@/lib/validations/blog"
+import { getErrorMessage } from "@/lib/api/errors"
 
 type BlogPostFormProps =
   | { mode: "create"; blog?: never }
@@ -108,7 +109,7 @@ function CreateBlogPostForm() {
   const values = form.watch()
 
   const categoriesQuery = useQuery({
-    queryKey: ["admin-blog-categories-select"],
+    queryKey: ["admin.blogCategories.select"],
     queryFn: async () => {
       const response = await getAllAdminBlogCategories()
       return response.data.data.items
@@ -116,7 +117,7 @@ function CreateBlogPostForm() {
   })
 
   const featuredQuery = useQuery({
-    queryKey: ["admin-blog-featured-check"],
+    queryKey: ["admin.blogs.featuredCheck"],
     queryFn: async () => {
       const response = await listAdminBlogs({ status: "published" })
       return response.data.data.items.filter((p) => p.featured)
@@ -138,12 +139,12 @@ function CreateBlogPostForm() {
     onSuccess: async () => {
       const { toast } = await import("sonner")
       toast.success("Blog post created")
-      await queryClient.invalidateQueries({ queryKey: ["admin-blogs"] })
+      await queryClient.invalidateQueries({ queryKey: ["admin.blogs"] })
       router.push("/dashboard/blogs")
     },
     onError: async (error) => {
       const { toast } = await import("sonner")
-      toast.error(error.message)
+      toast.error(getErrorMessage(error, "Failed to create blog post"))
     },
   })
 
@@ -436,7 +437,7 @@ function EditBlogPostForm({ blog }: { blog: BlogPost }) {
   const values = form.watch()
 
   const categoriesQuery = useQuery({
-    queryKey: ["admin-blog-categories-select"],
+    queryKey: ["admin.blogCategories.select"],
     queryFn: async () => {
       const response = await getAllAdminBlogCategories()
       return response.data.data.items
@@ -444,7 +445,7 @@ function EditBlogPostForm({ blog }: { blog: BlogPost }) {
   })
 
   const featuredQuery = useQuery({
-    queryKey: ["admin-blog-featured-check", blog.id],
+    queryKey: ["admin.blogs.featuredCheck", blog.id],
     queryFn: async () => {
       const response = await listAdminBlogs({ status: "published" })
       return response.data.data.items.filter((p) => p.featured && p.id !== blog.id)
@@ -467,14 +468,14 @@ function EditBlogPostForm({ blog }: { blog: BlogPost }) {
       const { toast } = await import("sonner")
       toast.success("Blog post updated")
       await Promise.all([
-        queryClient.invalidateQueries({ queryKey: ["admin-blogs"] }),
-        queryClient.invalidateQueries({ queryKey: ["admin-blog", blog.id] }),
+        queryClient.invalidateQueries({ queryKey: ["admin.blogs"] }),
+        queryClient.invalidateQueries({ queryKey: ["admin.blogs", blog.id] }),
       ])
       router.push(`/dashboard/blogs/${blog.id}`)
     },
     onError: async (error) => {
       const { toast } = await import("sonner")
-      toast.error(error.message)
+      toast.error(getErrorMessage(error, "Failed to update blog post"))
     },
   })
 

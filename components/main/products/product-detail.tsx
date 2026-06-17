@@ -538,7 +538,7 @@ function ProductNotFound() {
 
 export function ProductDetail({ slug }: { slug: string }) {
   const productQuery = useQuery({
-    queryKey: ["product", slug],
+    queryKey: ["public.products", slug],
     queryFn: () => getProduct(slug),
     select: (res) => res.data.data,
   })
@@ -547,7 +547,7 @@ export function ProductDetail({ slug }: { slug: string }) {
   const categorySlug = product?.categories?.[0]?.slug
 
   const relatedQuery = useQuery({
-    queryKey: ["related-products", categorySlug],
+    queryKey: ["public.products", slug, "related"],
     queryFn: () =>
       categorySlug
         ? listProducts({
@@ -562,7 +562,7 @@ export function ProductDetail({ slug }: { slug: string }) {
   })
 
   const reviewsQuery = useQuery({
-    queryKey: ["product-reviews", slug],
+    queryKey: ["public.products", slug, "reviews"],
     queryFn: () => listProductReviews(slug, { per_page: 5 }),
     select: (res) => res.data.data,
     enabled: !!product,

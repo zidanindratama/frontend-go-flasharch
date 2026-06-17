@@ -82,7 +82,7 @@ export function ProductsCatalog() {
   }, [page, perPage, search, sort, order, category, minPrice, maxPrice])
 
   const productsQuery = useQuery({
-    queryKey: ["public-products", buildParams],
+    queryKey: ["public.products", buildParams],
     queryFn: async () => {
       const response = await listProducts(buildParams)
       return response.data
@@ -91,7 +91,7 @@ export function ProductsCatalog() {
   })
 
   const categoriesQuery = useQuery({
-    queryKey: ["public-categories"],
+    queryKey: ["public.categories"],
     queryFn: async () => {
       const response = await listCategories({ per_page: 100, status: "active" })
       return response.data

@@ -7,6 +7,7 @@ import {
   useQueryClient,
 } from "@tanstack/react-query"
 import { api } from "@/lib/api/axios"
+import { getErrorMessage } from "@/lib/api/errors"
 
 type UploadHookOptions<TData, TContext> = {
   endpoint: string
@@ -39,7 +40,7 @@ export function useUploadData<TData = unknown, TContext = unknown>({
         return response.data
       } catch (error) {
         throw new Error(
-          error instanceof Error ? error.message : errorMessage,
+          getErrorMessage(error, errorMessage),
         )
       }
     },

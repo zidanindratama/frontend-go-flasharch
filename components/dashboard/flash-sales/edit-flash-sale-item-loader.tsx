@@ -12,7 +12,7 @@ export function EditFlashSaleItemLoader() {
   const params = useParams<{ id: string; itemId: string }>()
 
   const saleQuery = useQuery({
-    queryKey: ["admin-flash-sale", params.id],
+    queryKey: ["admin.flashSales", params.id],
     queryFn: async () => {
       const response = await getAdminFlashSale(params.id)
       return response.data.data

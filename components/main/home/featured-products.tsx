@@ -148,7 +148,7 @@ function HomeProductCard({
 
 export function FeaturedProducts() {
   const { data, isLoading, isError } = useQuery({
-    queryKey: ["public-products", "popular"],
+    queryKey: ["public.products", "popular"],
     queryFn: async () => {
       const res = await listProducts({
         sort: "popularity",

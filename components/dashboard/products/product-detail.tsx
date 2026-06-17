@@ -44,7 +44,7 @@ export function ProductDetail() {
   const productId = params.id
 
   const productQuery = useQuery({
-    queryKey: ["admin-product", productId],
+    queryKey: ["admin.products", productId],
     queryFn: async () => {
       const response = await getAdminProduct(productId)
       return response.data.data

@@ -46,7 +46,7 @@ export function FlashSaleItemGrid() {
   const { sort, order } = parseSortOption(sortValue);
 
   const { data, isLoading: isItemsLoading, isError } = useQuery({
-    queryKey: ["public-flash-sale-items", sale?.slug, page, perPage, sort, order],
+    queryKey: ["public.flashSale", sale?.slug, "items", { page, perPage, sort, order }],
     queryFn: async () => {
       if (!sale?.slug) return { items: [] as FlashSaleItem[], page: 1, per_page: perPage, total: 0 };
       const res = await getPublicFlashSaleItems(sale.slug, {

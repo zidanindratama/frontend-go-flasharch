@@ -91,7 +91,7 @@ export function UsersTable() {
   )
 
   const usersQuery = useQuery({
-    queryKey: ["admin-users", params],
+    queryKey: ["admin.users", params],
     queryFn: async () => {
       const response = await listAdminUsers(params)
       return response.data

@@ -18,7 +18,7 @@ export function InventoryTabs() {
   const [selectedProductId, setSelectedProductId] = useState("")
 
   const productsQuery = useQuery({
-    queryKey: ["admin-products-select"],
+    queryKey: ["admin.products", { select: true }],
     queryFn: async () => {
       const response = await listAdminProducts({ per_page: 100, status: "active" })
       return response.data.data.items

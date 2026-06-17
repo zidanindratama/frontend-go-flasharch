@@ -3,7 +3,6 @@
 import Link from "next/link"
 import { useState } from "react"
 import { motion } from "framer-motion"
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import {
   Loader2,
   MapPin,
@@ -34,45 +33,18 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip"
 import {
-  deleteAddress,
-  getBuyerAddresses,
-  setDefaultAddress,
-  type UserAddress,
-} from "@/lib/api/account"
-import { useAuthStore } from "@/stores/auth"
+  useAddresses,
+  useDeleteAddress,
+  useSetDefaultAddress,
+} from "@/lib/hooks/use-addresses"
+import type { UserAddress } from "@/lib/api/account"
 
 const ease: [number, number, number, number] = [0.16, 1, 0.3, 1]
 
 function AddressCard({ address }: { address: UserAddress }) {
-  const queryClient = useQueryClient()
   const [deleteOpen, setDeleteOpen] = useState(false)
-
-  const deleteMut = useMutation({
-    mutationFn: () => deleteAddress(address.id),
-    onSuccess: async () => {
-      const { toast } = await import("sonner")
-      toast.success("Address deleted")
-      setDeleteOpen(false)
-      await queryClient.invalidateQueries({ queryKey: ["buyer-addresses"] })
-    },
-    onError: async (error) => {
-      const { toast } = await import("sonner")
-      toast.error(error instanceof Error ? error.message : "Delete failed")
-    },
-  })
-
-  const defaultMut = useMutation({
-    mutationFn: () => setDefaultAddress(address.id),
-    onSuccess: async () => {
-      const { toast } = await import("sonner")
-      toast.success("Default address updated")
-      await queryClient.invalidateQueries({ queryKey: ["buyer-addresses"] })
-    },
-    onError: async (error) => {
-      const { toast } = await import("sonner")
-      toast.error(error instanceof Error ? error.message : "Failed")
-    },
-  })
+  const deleteMut = useDeleteAddress()
+  const defaultMut = useSetDefaultAddress()
 
   return (
     <motion.div
@@ -138,7 +110,7 @@ function AddressCard({ address }: { address: UserAddress }) {
                   size="icon-sm"
                   className="rounded-lg"
                   disabled={defaultMut.isPending}
-                  onClick={() => defaultMut.mutate()}
+                  onClick={() => defaultMut.mutate(address.id)}
                 >
                   {defaultMut.isPending ? (
                     <Loader2 className="size-4 animate-spin" />
@@ -193,7 +165,9 @@ function AddressCard({ address }: { address: UserAddress }) {
                   disabled={deleteMut.isPending}
                   onClick={(event) => {
                     event.preventDefault()
-                    deleteMut.mutate()
+                    deleteMut.mutate(address.id, {
+                      onSuccess: () => setDeleteOpen(false),
+                    })
                   }}
                 >
                   {deleteMut.isPending ? (
@@ -213,17 +187,9 @@ function AddressCard({ address }: { address: UserAddress }) {
 }
 
 export function AccountAddresses() {
-  const token = useAuthStore((s) => s.access_token)
-  const { data, isLoading } = useQuery({
-    queryKey: ["buyer-addresses"],
-    queryFn: async () => {
-      const response = await getBuyerAddresses()
-      return response.data
-    },
-    enabled: !!token,
-  })
+  const { data, isLoading } = useAddresses()
 
-  const addresses = data?.data.items ?? []
+  const addresses = data ?? []
 
   return (
     <div className="space-y-4">

@@ -31,7 +31,7 @@ export function StockAdjustLoader() {
   const [initialStock, setInitialStock] = useState(0)
 
   const stockQuery = useQuery({
-    queryKey: ["admin-product-stock", productId],
+    queryKey: ["admin.products", productId, "stock"],
     queryFn: async () => {
       const response = await getInventoryProductStock(productId)
       return response.data.data
@@ -39,7 +39,7 @@ export function StockAdjustLoader() {
   })
 
   const productQuery = useQuery({
-    queryKey: ["admin-product-detail", productId],
+    queryKey: ["admin.products", productId],
     queryFn: async () => {
       const response = await getAdminProduct(productId)
       return response.data.data
@@ -55,8 +55,8 @@ export function StockAdjustLoader() {
     onSuccess: async () => {
       const { toast } = await import("sonner")
       toast.success("Stock record created")
-      await queryClient.invalidateQueries({ queryKey: ["admin-product-stock", productId] })
-      await queryClient.invalidateQueries({ queryKey: ["admin-inventory-stocks"] })
+      await queryClient.invalidateQueries({ queryKey: ["admin.products", productId, "stock"] })
+      await queryClient.invalidateQueries({ queryKey: ["admin.inventory.stocks"] })
     },
     onError: async (error) => {
       const { toast } = await import("sonner")

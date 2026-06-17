@@ -68,7 +68,7 @@ export function BlogCards() {
   )
 
   const blogsQuery = useQuery({
-    queryKey: ["admin-blogs", params],
+    queryKey: ["admin.blogs", params],
     queryFn: async () => {
       const response = await listAdminBlogs(params)
       return response.data

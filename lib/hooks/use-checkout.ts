@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { useRouter } from "next/navigation"
 import { createCartCheckout, getCheckout } from "@/lib/api/checkout"
+import { getErrorMessage } from "@/lib/api/errors"
 import { createCheckoutSession } from "@/lib/api/payment"
 
 export function useCartCheckout() {
@@ -16,11 +17,11 @@ export function useCartCheckout() {
         crypto.randomUUID(),
       ),
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["cart"] })
+      await queryClient.invalidateQueries({ queryKey: ["account.cart"] })
     },
     onError: async (error: Error) => {
       const { toast } = await import("sonner")
-      toast.error(error.message || "Failed to start checkout")
+      toast.error(getErrorMessage(error, "Failed to start checkout"))
     },
   })
 }
@@ -32,7 +33,7 @@ export function useCheckoutPolling(checkoutId: string | null, enabled: boolean) 
   const intervalMs = 2000
 
   const checkoutQuery = useQuery({
-    queryKey: ["checkout", checkoutId],
+    queryKey: ["account.checkout", checkoutId],
     queryFn: async () => {
       const response = await getCheckout(checkoutId!)
       return response.data.data
@@ -86,7 +87,7 @@ export function usePaymentCheckout() {
     },
     onError: async (error: Error) => {
       const { toast } = await import("sonner")
-      toast.error(error.message || "Failed to create payment session")
+      toast.error(getErrorMessage(error, "Failed to create payment session"))
     },
   })
 }

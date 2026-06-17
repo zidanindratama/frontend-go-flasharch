@@ -64,7 +64,7 @@ export function BlogIndex() {
   const { sort: sortField, order } = sortMap[sort]
 
   const blogsQuery = useQuery({
-    queryKey: ["public-blogs", debouncedSearch, categoryId, sortField, order, page],
+    queryKey: ["public.blogs", { search: debouncedSearch, categoryId, sort: sortField, order, page }],
     queryFn: async () => {
       const response = await listBlogs({
         page,
@@ -79,7 +79,7 @@ export function BlogIndex() {
   })
 
   const categoriesQuery = useQuery({
-    queryKey: ["public-blog-categories"],
+    queryKey: ["public.blogCategories"],
     queryFn: async () => {
       const response = await listBlogCategories({ per_page: 100, status: "active" })
       return response.data.data.items

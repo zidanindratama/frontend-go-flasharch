@@ -9,7 +9,7 @@ import { useTheme } from "next-themes"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { useAuthStore } from "@/stores/auth"
-import { useUser, useSignOut } from "@/hooks/use-auth"
+import { useUser, useSignOut } from "@/lib/hooks/use-auth"
 import {
   Menu,
   X,

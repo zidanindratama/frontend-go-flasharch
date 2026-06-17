@@ -70,6 +70,7 @@ import {
   type FlashSaleReport,
 } from "@/lib/api/flash-sale"
 import { cn } from "@/lib/utils"
+import { getErrorMessage } from "@/lib/api/errors"
 
 export function FlashSaleDetail() {
   const params = useParams<{ id: string }>()
@@ -77,7 +78,7 @@ export function FlashSaleDetail() {
   const [deleteTarget, setDeleteTarget] = useState<FlashSaleItem | null>(null)
 
   const saleQuery = useQuery({
-    queryKey: ["admin-flash-sale", params.id],
+    queryKey: ["admin.flashSales", params.id],
     queryFn: async () => {
       const response = await getAdminFlashSale(params.id, { include_items: false })
       return response.data.data
@@ -87,7 +88,7 @@ export function FlashSaleDetail() {
 
   const sale = saleQuery.data
   const readinessQuery = useQuery({
-    queryKey: ["admin-flash-sale-readiness", params.id],
+    queryKey: ["admin.flashSales", params.id, "readiness"],
     queryFn: async () => {
       const response = await checkFlashSaleReadiness(params.id)
       return response.data.data
@@ -101,7 +102,7 @@ export function FlashSaleDetail() {
   })
 
   const reportQuery = useQuery({
-    queryKey: ["admin-flash-sale-report", params.id],
+    queryKey: ["admin.flashSales", params.id, "report"],
     queryFn: async () => {
       const response = await getFlashSaleReport(params.id)
       return response.data.data
@@ -110,7 +111,7 @@ export function FlashSaleDetail() {
   })
 
   const itemsMetaQuery = useQuery({
-    queryKey: ["admin-flash-sale-items-meta", params.id],
+    queryKey: ["admin.flashSales", params.id, "items.meta"],
     queryFn: async () => {
       const response = await listAdminFlashSaleItems(params.id, { page: 1, per_page: 1 })
       return response.data.data
@@ -119,7 +120,7 @@ export function FlashSaleDetail() {
   })
 
   const activeItemsMetaQuery = useQuery({
-    queryKey: ["admin-flash-sale-items-meta", params.id, "active"],
+    queryKey: ["admin.flashSales", params.id, "items.meta", "active"],
     queryFn: async () => {
       const response = await listAdminFlashSaleItems(params.id, {
         page: 1,
@@ -138,16 +139,16 @@ export function FlashSaleDetail() {
       toast.success("Item removed")
       setDeleteTarget(null)
       await Promise.all([
-        queryClient.invalidateQueries({ queryKey: ["admin-flash-sale", params.id] }),
-        queryClient.invalidateQueries({ queryKey: ["admin-flash-sale-items", params.id] }),
-        queryClient.invalidateQueries({ queryKey: ["admin-flash-sale-items-meta", params.id] }),
-        queryClient.invalidateQueries({ queryKey: ["admin-flash-sale-report", params.id] }),
-        queryClient.invalidateQueries({ queryKey: ["admin-flash-sale-readiness", params.id] }),
+        queryClient.invalidateQueries({ queryKey: ["admin.flashSales", params.id] }),
+        queryClient.invalidateQueries({ queryKey: ["admin.flashSales", params.id, "items"] }),
+        queryClient.invalidateQueries({ queryKey: ["admin.flashSales", params.id, "items.meta"] }),
+        queryClient.invalidateQueries({ queryKey: ["admin.flashSales", params.id, "report"] }),
+        queryClient.invalidateQueries({ queryKey: ["admin.flashSales", params.id, "readiness"] }),
       ])
     },
     onError: async (error) => {
       const { toast } = await import("sonner")
-      toast.error(error.message)
+      toast.error(getErrorMessage(error, "Failed to remove item"))
       setDeleteTarget(null)
     },
   })
@@ -449,7 +450,7 @@ function ItemsPanel({
   const [page, setPage] = useState(1)
 
   const itemsQuery = useQuery({
-    queryKey: ["admin-flash-sale-items", saleId, page, pageSize, query, statusFilter],
+    queryKey: ["admin.flashSales", saleId, "items", { page, pageSize, query, statusFilter }],
     queryFn: async () => {
       const response = await listAdminFlashSaleItems(saleId, {
         page,

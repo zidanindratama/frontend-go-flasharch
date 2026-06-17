@@ -5,7 +5,7 @@ import { motion } from "framer-motion"
 import { ArrowLeft, Loader2, MapPin, Save } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { useEffect, useState } from "react"
+import { useEffect } from "react"
 import { useForm } from "react-hook-form"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
@@ -20,10 +20,12 @@ import { Textarea } from "@/components/ui/textarea"
 import { RegionCascade } from "@/components/ui/region-cascade"
 import { useRegionalCascade } from "@/hooks/use-regional-cascade"
 import {
-  createAddress,
-  updateAddress,
-  type CreateAddressInput,
-  type UserAddress,
+  useCreateAddress,
+  useUpdateAddress,
+} from "@/lib/hooks/use-addresses"
+import type {
+  CreateAddressInput,
+  UserAddress,
 } from "@/lib/api/account"
 import {
   addressSchema,
@@ -39,7 +41,9 @@ type AddressFormProps = {
 
 export function AddressForm({ mode, initialData }: AddressFormProps) {
   const router = useRouter()
-  const [isBusy, setIsBusy] = useState(false)
+  const createAddress = useCreateAddress()
+  const updateAddress = useUpdateAddress()
+  const isBusy = createAddress.isPending || updateAddress.isPending
 
   const cascade = useRegionalCascade(
     initialData
@@ -105,39 +109,28 @@ export function AddressForm({ mode, initialData }: AddressFormProps) {
   }, [cascade.village, form])
 
   async function handleSubmit(values: AddressValues) {
-    setIsBusy(true)
-    try {
-      const payload: CreateAddressInput = {
-        label: values.label,
-        recipient_name: values.recipient_name,
-        phone: values.phone,
-        province: values.province,
-        city: values.city,
-        district: values.district,
-        postal_code: values.postal_code,
-        address_line: values.address_line,
-        notes: values.notes,
-        is_default: values.is_default,
-      }
+    const payload: CreateAddressInput = {
+      label: values.label,
+      recipient_name: values.recipient_name,
+      phone: values.phone,
+      province: values.province,
+      city: values.city,
+      district: values.district,
+      postal_code: values.postal_code,
+      address_line: values.address_line,
+      notes: values.notes,
+      is_default: values.is_default,
+    }
 
-      if (mode === "create") {
-        await createAddress(payload)
-      } else if (initialData) {
-        await updateAddress(initialData.id, payload)
-      }
-
-      const { toast } = await import("sonner")
-      toast.success(
-        mode === "create" ? "Address created" : "Address updated",
+    if (mode === "create") {
+      createAddress.mutate(payload, {
+        onSuccess: () => router.push("/account/addresses"),
+      })
+    } else if (initialData) {
+      updateAddress.mutate(
+        { id: initialData.id, data: payload },
+        { onSuccess: () => router.push("/account/addresses") },
       )
-      router.push("/account/addresses")
-    } catch (error) {
-      const { toast } = await import("sonner")
-      toast.error(
-        error instanceof Error ? error.message : "Something went wrong",
-      )
-    } finally {
-      setIsBusy(false)
     }
   }
 

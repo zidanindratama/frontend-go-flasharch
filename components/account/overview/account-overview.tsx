@@ -13,7 +13,7 @@ import {
 } from "lucide-react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Skeleton } from "@/components/ui/skeleton"
-import { useUser } from "@/hooks/use-auth"
+import { useUser } from "@/lib/hooks/use-auth"
 import {
   getBuyerDashboard,
   type BuyerOrderRow,
@@ -119,7 +119,7 @@ export function AccountOverview() {
   const { data: user } = useUser()
   const token = useAuthStore((s) => s.access_token)
   const { data: dashboard, isLoading } = useQuery({
-    queryKey: ["buyer-dashboard"],
+    queryKey: ["account.dashboard"],
     queryFn: async () => {
       const response = await getBuyerDashboard()
       return response.data

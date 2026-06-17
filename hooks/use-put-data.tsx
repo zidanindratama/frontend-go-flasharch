@@ -7,6 +7,7 @@ import {
   useQueryClient,
 } from "@tanstack/react-query"
 import { api } from "@/lib/api/axios"
+import { getErrorMessage } from "@/lib/api/errors"
 
 type MutationHookOptions<TData, TVariables, TContext> = {
   endpoint: string
@@ -41,7 +42,7 @@ export function usePutData<
         return response.data
       } catch (error) {
         throw new Error(
-          error instanceof Error ? error.message : errorMessage,
+          getErrorMessage(error, errorMessage),
         )
       }
     },

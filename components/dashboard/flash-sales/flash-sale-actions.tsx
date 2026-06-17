@@ -38,6 +38,7 @@ import {
   canPreload,
   canRelease,
 } from "./flash-sale-utils"
+import { getErrorMessage } from "@/lib/api/errors"
 
 interface FlashSaleActionsProps {
   saleId: string
@@ -62,15 +63,15 @@ export function FlashSaleActions({
     onSuccess: async () => {
       const { toast } = await import("sonner")
       toast.success("Status updated")
-      await queryClient.invalidateQueries({ queryKey: ["admin-flash-sale", saleId] })
-      await queryClient.invalidateQueries({ queryKey: ["admin-flash-sales"] })
-      await queryClient.invalidateQueries({ queryKey: ["admin-flash-sale-readiness", saleId] })
-      await queryClient.invalidateQueries({ queryKey: ["admin-flash-sale-report", saleId] })
+      await queryClient.invalidateQueries({ queryKey: ["admin.flashSales", saleId] })
+      await queryClient.invalidateQueries({ queryKey: ["admin.flashSales"] })
+      await queryClient.invalidateQueries({ queryKey: ["admin.flashSales", saleId, "readiness"] })
+      await queryClient.invalidateQueries({ queryKey: ["admin.flashSales", saleId, "report"] })
       setConfirmAction(null)
     },
     onError: async (error) => {
       const { toast } = await import("sonner")
-      toast.error(error.message)
+      toast.error(getErrorMessage(error, "Failed to update status"))
       setConfirmAction(null)
     },
   })
@@ -80,12 +81,12 @@ export function FlashSaleActions({
     onSuccess: async () => {
       const { toast } = await import("sonner")
       toast.success("Redis stock preloaded")
-      await queryClient.invalidateQueries({ queryKey: ["admin-flash-sale", saleId] })
-      await queryClient.invalidateQueries({ queryKey: ["admin-flash-sale-readiness", saleId] })
+      await queryClient.invalidateQueries({ queryKey: ["admin.flashSales", saleId] })
+      await queryClient.invalidateQueries({ queryKey: ["admin.flashSales", saleId, "readiness"] })
     },
     onError: async (error) => {
       const { toast } = await import("sonner")
-      toast.error(error.message)
+      toast.error(getErrorMessage(error, "Failed to preload Redis"))
     },
   })
 
@@ -95,12 +96,12 @@ export function FlashSaleActions({
       const { toast } = await import("sonner")
       const released = data.data.data.released
       toast.success(released > 0 ? `${released} reservations released` : "No expired reservations")
-      await queryClient.invalidateQueries({ queryKey: ["admin-flash-sale", saleId] })
-      await queryClient.invalidateQueries({ queryKey: ["admin-flash-sale-report", saleId] })
+      await queryClient.invalidateQueries({ queryKey: ["admin.flashSales", saleId] })
+      await queryClient.invalidateQueries({ queryKey: ["admin.flashSales", saleId, "report"] })
     },
     onError: async (error) => {
       const { toast } = await import("sonner")
-      toast.error(error.message)
+      toast.error(getErrorMessage(error, "Failed to release reservations"))
     },
   })
 

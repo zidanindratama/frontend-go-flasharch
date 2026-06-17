@@ -1,7 +1,6 @@
 "use client"
 
 import { useState } from "react"
-import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { Loader2, Pencil, Trash2, TriangleAlert } from "lucide-react"
 import {
   AlertDialog,
@@ -22,7 +21,8 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
-import { deleteCategory, type Category } from "@/lib/api/catalog"
+import { useDeleteCategory } from "@/lib/hooks/use-products"
+import type { Category } from "@/lib/api/catalog"
 
 type CategoryActionsProps = {
   category: Category
@@ -30,20 +30,7 @@ type CategoryActionsProps = {
 
 export function CategoryActions({ category }: CategoryActionsProps) {
   const [open, setOpen] = useState(false)
-  const queryClient = useQueryClient()
-  const deleteMutation = useMutation({
-    mutationFn: () => deleteCategory(category.id),
-    onSuccess: async () => {
-      const { toast } = await import("sonner")
-      toast.success("Category deleted")
-      setOpen(false)
-      await queryClient.invalidateQueries({ queryKey: ["admin-categories"] })
-    },
-    onError: async (error) => {
-      const { toast } = await import("sonner")
-      toast.error(error.message)
-    },
-  })
+  const deleteMutation = useDeleteCategory()
 
   return (
     <TooltipProvider>
@@ -97,7 +84,7 @@ export function CategoryActions({ category }: CategoryActionsProps) {
                 disabled={deleteMutation.isPending}
                 onClick={(event) => {
                   event.preventDefault()
-                  deleteMutation.mutate()
+                  deleteMutation.mutate(category.id)
                 }}
               >
                 {deleteMutation.isPending ? (

@@ -11,7 +11,7 @@ export function EditBlogLoader() {
   const blogId = params.id
 
   const blogQuery = useQuery({
-    queryKey: ["admin-blog", blogId],
+    queryKey: ["admin.blogs", blogId],
     queryFn: async () => {
       const response = await getAdminBlog(blogId)
       return response.data.data

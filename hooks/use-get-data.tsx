@@ -6,6 +6,7 @@ import {
   useQuery,
 } from "@tanstack/react-query"
 import { api } from "@/lib/api/axios"
+import { getErrorMessage } from "@/lib/api/errors"
 
 type UseGetDataOptions<TQueryFnData, TData = TQueryFnData> = {
   queryKey: QueryKey
@@ -33,7 +34,7 @@ export function useGetData<TQueryFnData = unknown, TData = TQueryFnData>({
         return response.data
       } catch (error) {
         throw new Error(
-          error instanceof Error ? error.message : errorMessage,
+          getErrorMessage(error, errorMessage),
         )
       }
     },

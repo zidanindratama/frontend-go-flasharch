@@ -23,6 +23,7 @@ import {
   type FlashSaleItemCreateValues,
   type FlashSaleItemEditValues,
 } from "@/lib/validations/flash-sale"
+import { getErrorMessage } from "@/lib/api/errors"
 
 type FlashSaleItemFormProps =
   | { mode: "create"; saleId: string; item?: never; saleName?: string }
@@ -53,7 +54,7 @@ function CreateItemForm({ saleId, saleName }: { saleId: string; saleName?: strin
   const values = form.watch()
 
   const productsQuery = useQuery({
-    queryKey: ["admin-products-select"],
+    queryKey: ["admin.products", { select: true }],
     queryFn: async () => {
       const response = await listAdminProducts({ per_page: 100, status: "active" })
       return response.data.data.items
@@ -65,12 +66,12 @@ function CreateItemForm({ saleId, saleName }: { saleId: string; saleName?: strin
     onSuccess: async () => {
       const { toast } = await import("sonner")
       toast.success("Item added to flash sale")
-      await queryClient.invalidateQueries({ queryKey: ["admin-flash-sale", saleId] })
+      await queryClient.invalidateQueries({ queryKey: ["admin.flashSales", saleId] })
       router.push(`/dashboard/flash-sales/${saleId}`)
     },
     onError: async (error) => {
       const { toast } = await import("sonner")
-      toast.error(error.message)
+      toast.error(getErrorMessage(error, "Failed to add item to flash sale"))
     },
   })
 
@@ -178,12 +179,12 @@ function EditItemForm({ saleId, item }: { saleId: string; item: FlashSaleItem })
     onSuccess: async () => {
       const { toast } = await import("sonner")
       toast.success("Item updated")
-      await queryClient.invalidateQueries({ queryKey: ["admin-flash-sale", saleId] })
+      await queryClient.invalidateQueries({ queryKey: ["admin.flashSales", saleId] })
       router.push(`/dashboard/flash-sales/${saleId}`)
     },
     onError: async (error) => {
       const { toast } = await import("sonner")
-      toast.error(error.message)
+      toast.error(getErrorMessage(error, "Failed to update flash sale item"))
     },
   })
 

@@ -82,7 +82,7 @@ export function ProductsTable() {
   )
 
   const productsQuery = useQuery({
-    queryKey: ["admin-products", params],
+    queryKey: ["admin.products", params],
     queryFn: async () => {
       const response = await listAdminProducts(params)
       return response.data

@@ -14,7 +14,7 @@ import {
   FieldLabel,
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
-import { useSignIn } from "@/hooks/use-auth"
+import { useSignIn } from "@/lib/hooks/use-auth"
 import { signInSchema, type SignInValues } from "@/lib/validations/auth"
 
 export function SignInForm() {

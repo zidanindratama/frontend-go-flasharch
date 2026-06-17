@@ -28,7 +28,7 @@ export function UserDetail() {
   const params = useParams<{ id: string }>();
   const userId = params.id;
   const userQuery = useQuery({
-    queryKey: ["admin-user", userId],
+    queryKey: ["admin.users", userId],
     queryFn: async () => {
       const response = await getAdminUser(userId);
       return response.data.data;

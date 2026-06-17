@@ -11,7 +11,7 @@ export default function EditCategoryPage() {
   const categoryId = params.id
 
   const categoryQuery = useQuery({
-    queryKey: ["admin-category", categoryId],
+    queryKey: ["admin.categories", categoryId],
     queryFn: async () => {
       const response = await getAdminCategory(categoryId)
       return response.data.data

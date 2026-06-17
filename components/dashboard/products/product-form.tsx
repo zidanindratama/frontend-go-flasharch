@@ -56,6 +56,7 @@ import {
   type ProductCreateValues,
   type ProductEditValues,
 } from "@/lib/validations/catalog";
+import { getErrorMessage } from "@/lib/api/errors";
 
 type ProductFormProps =
   | { mode: "create"; product?: never }
@@ -96,7 +97,7 @@ function CreateProductForm() {
   const values = form.watch();
 
   const categoriesQuery = useQuery({
-    queryKey: ["admin-categories-select"],
+    queryKey: ["admin.categories.select"],
     queryFn: async () => {
       const response = await getAllAdminCategories();
       return response.data.data.items;
@@ -118,12 +119,12 @@ function CreateProductForm() {
     onSuccess: async () => {
       const { toast } = await import("sonner");
       toast.success("Product created");
-      await queryClient.invalidateQueries({ queryKey: ["admin-products"] });
+      await queryClient.invalidateQueries({ queryKey: ["admin.products"] });
       router.push("/dashboard/products");
     },
     onError: async (error) => {
       const { toast } = await import("sonner");
-      toast.error(error.message);
+      toast.error(getErrorMessage(error, "Failed to create product"));
     },
   });
 
@@ -138,7 +139,7 @@ function CreateProductForm() {
     },
     onError: async (error) => {
       const { toast } = await import("sonner");
-      toast.error(error.message);
+      toast.error(getErrorMessage(error, "Failed to upload file"));
     },
   });
 
@@ -407,7 +408,7 @@ function EditProductForm({ product }: { product: Product }) {
   const values = form.watch();
 
   const categoriesQuery = useQuery({
-    queryKey: ["admin-categories-select"],
+    queryKey: ["admin.categories.select"],
     queryFn: async () => {
       const response = await getAllAdminCategories();
       return response.data.data.items;
@@ -432,14 +433,14 @@ function EditProductForm({ product }: { product: Product }) {
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: ["admin-products"] }),
         queryClient.invalidateQueries({
-          queryKey: ["admin-product", product.id],
+          queryKey: ["admin.products", product.id],
         }),
       ]);
       router.push(`/dashboard/products/${product.id}`);
     },
     onError: async (error) => {
       const { toast } = await import("sonner");
-      toast.error(error.message);
+      toast.error(getErrorMessage(error, "Failed to update product"));
     },
   });
 
@@ -454,7 +455,7 @@ function EditProductForm({ product }: { product: Product }) {
     },
     onError: async (error) => {
       const { toast } = await import("sonner");
-      toast.error(error.message);
+      toast.error(getErrorMessage(error, "Failed to upload file"));
     },
   });
 
@@ -474,14 +475,14 @@ function EditProductForm({ product }: { product: Product }) {
         [...current, image].sort((a, b) => a.sort_order - b.sort_order),
       );
       await queryClient.invalidateQueries({
-        queryKey: ["admin-product", product.id],
+        queryKey: ["admin.products", product.id],
       });
       const { toast } = await import("sonner");
       toast.success("Image added");
     },
     onError: async (error) => {
       const { toast } = await import("sonner");
-      toast.error(error.message);
+      toast.error(getErrorMessage(error, "Failed to add image"));
     },
   });
 
@@ -492,14 +493,14 @@ function EditProductForm({ product }: { product: Product }) {
         current.filter((image) => image.id !== imageId),
       );
       await queryClient.invalidateQueries({
-        queryKey: ["admin-product", product.id],
+        queryKey: ["admin.products", product.id],
       });
       const { toast } = await import("sonner");
       toast.success("Image removed");
     },
     onError: async (error) => {
       const { toast } = await import("sonner");
-      toast.error(error.message);
+      toast.error(getErrorMessage(error, "Failed to remove image"));
     },
   });
 

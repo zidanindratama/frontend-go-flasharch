@@ -36,6 +36,7 @@ import {
   type BlogCategoryCreateValues,
   type BlogCategoryEditValues,
 } from "@/lib/validations/blog"
+import { getErrorMessage } from "@/lib/api/errors"
 
 type BlogCategoryFormProps =
   | { mode: "create"; category?: never }
@@ -72,13 +73,13 @@ function CreateBlogCategoryForm() {
       const { toast } = await import("sonner")
       toast.success("Category created")
       await queryClient.invalidateQueries({
-        queryKey: ["admin-blog-categories"],
+        queryKey: ["admin.blogCategories"],
       })
       router.push("/dashboard/blogs/categories")
     },
     onError: async (error) => {
       const { toast } = await import("sonner")
-      toast.error(error.message)
+      toast.error(getErrorMessage(error, "Failed to create blog category"))
     },
   })
 
@@ -212,13 +213,13 @@ function EditBlogCategoryForm({ category }: { category: BlogCategory }) {
       const { toast } = await import("sonner")
       toast.success("Category updated")
       await queryClient.invalidateQueries({
-        queryKey: ["admin-blog-categories"],
+        queryKey: ["admin.blogCategories"],
       })
       router.push("/dashboard/blogs/categories")
     },
     onError: async (error) => {
       const { toast } = await import("sonner")
-      toast.error(error.message)
+      toast.error(getErrorMessage(error, "Failed to update blog category"))
     },
   })
 

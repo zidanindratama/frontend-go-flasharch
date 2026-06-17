@@ -75,7 +75,7 @@ export function BlogCategoryTable() {
   )
 
   const categoriesQuery = useQuery({
-    queryKey: ["admin-blog-categories", params],
+    queryKey: ["admin.blogCategories", params],
     queryFn: async () => {
       const response = await listAdminBlogCategories(params)
       return response.data

@@ -2,7 +2,6 @@
 
 import { useState } from "react"
 import Link from "next/link"
-import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { Eye, Loader2, Pencil, Trash2, TriangleAlert } from "lucide-react"
 import {
   AlertDialog,
@@ -23,7 +22,8 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
-import { deleteAdminUser, type AdminUser } from "@/lib/api/admin-users"
+import { useDeleteAdminUser } from "@/lib/hooks/use-admin-users"
+import type { AdminUser } from "@/lib/api/admin-users"
 
 type UserActionsProps = {
   user: AdminUser
@@ -31,20 +31,7 @@ type UserActionsProps = {
 
 export function UserActions({ user }: UserActionsProps) {
   const [open, setOpen] = useState(false)
-  const queryClient = useQueryClient()
-  const deleteUser = useMutation({
-    mutationFn: () => deleteAdminUser(user.id),
-    onSuccess: async () => {
-      const { toast } = await import("sonner")
-      toast.success("User deleted")
-      setOpen(false)
-      await queryClient.invalidateQueries({ queryKey: ["admin-users"] })
-    },
-    onError: async (error) => {
-      const { toast } = await import("sonner")
-      toast.error(error.message)
-    },
-  })
+  const deleteUser = useDeleteAdminUser()
 
   return (
     <TooltipProvider>
@@ -102,7 +89,7 @@ export function UserActions({ user }: UserActionsProps) {
                 disabled={deleteUser.isPending}
                 onClick={(event) => {
                   event.preventDefault()
-                  deleteUser.mutate()
+                  deleteUser.mutate(user.id)
                 }}
               >
                 {deleteUser.isPending ? (

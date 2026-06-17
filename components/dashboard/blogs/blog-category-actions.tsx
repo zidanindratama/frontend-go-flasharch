@@ -1,7 +1,6 @@
 "use client"
 
 import { useState } from "react"
-import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { Loader2, Pencil, Trash2, TriangleAlert } from "lucide-react"
 import {
   AlertDialog,
@@ -22,7 +21,8 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
-import { deleteBlogCategory, type BlogCategory } from "@/lib/api/blogs"
+import { useDeleteBlogCategory } from "@/lib/hooks/use-blogs"
+import type { BlogCategory } from "@/lib/api/blogs"
 
 type BlogCategoryActionsProps = {
   category: BlogCategory
@@ -30,22 +30,7 @@ type BlogCategoryActionsProps = {
 
 export function BlogCategoryActions({ category }: BlogCategoryActionsProps) {
   const [open, setOpen] = useState(false)
-  const queryClient = useQueryClient()
-  const deleteMutation = useMutation({
-    mutationFn: () => deleteBlogCategory(category.id),
-    onSuccess: async () => {
-      const { toast } = await import("sonner")
-      toast.success("Category deleted")
-      setOpen(false)
-      await queryClient.invalidateQueries({
-        queryKey: ["admin-blog-categories"],
-      })
-    },
-    onError: async (error) => {
-      const { toast } = await import("sonner")
-      toast.error(error.message)
-    },
-  })
+  const deleteMutation = useDeleteBlogCategory()
 
   return (
     <TooltipProvider>
@@ -100,7 +85,7 @@ export function BlogCategoryActions({ category }: BlogCategoryActionsProps) {
                 disabled={deleteMutation.isPending}
                 onClick={(event) => {
                   event.preventDefault()
-                  deleteMutation.mutate()
+                  deleteMutation.mutate(category.id)
                 }}
               >
                 {deleteMutation.isPending ? (

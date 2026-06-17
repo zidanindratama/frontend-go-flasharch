@@ -38,6 +38,7 @@ import {
   type CategoryCreateValues,
   type CategoryEditValues,
 } from "@/lib/validations/catalog"
+import { getErrorMessage } from "@/lib/api/errors"
 
 type CategoryFormProps =
   | { mode: "create"; category?: never }
@@ -69,7 +70,7 @@ function CreateCategoryForm() {
   const values = form.watch()
 
   const categoriesQuery = useQuery({
-    queryKey: ["admin-categories-select"],
+    queryKey: ["admin.categories.select"],
     queryFn: async () => {
       const response = await getAllAdminCategories()
       return response.data.data.items
@@ -81,12 +82,12 @@ function CreateCategoryForm() {
     onSuccess: async () => {
       const { toast } = await import("sonner")
       toast.success("Category created")
-      await queryClient.invalidateQueries({ queryKey: ["admin-categories"] })
+      await queryClient.invalidateQueries({ queryKey: ["admin.categories"] })
       router.push("/dashboard/products/categories")
     },
     onError: async (error) => {
       const { toast } = await import("sonner")
-      toast.error(error.message)
+      toast.error(getErrorMessage(error, "Failed to create category"))
     },
   })
 
@@ -238,7 +239,7 @@ function EditCategoryForm({ category }: { category: Category }) {
   const values = form.watch()
 
   const categoriesQuery = useQuery({
-    queryKey: ["admin-categories-select"],
+    queryKey: ["admin.categories.select"],
     queryFn: async () => {
       const response = await getAllAdminCategories()
       return response.data.data.items
@@ -251,12 +252,12 @@ function EditCategoryForm({ category }: { category: Category }) {
     onSuccess: async () => {
       const { toast } = await import("sonner")
       toast.success("Category updated")
-      await queryClient.invalidateQueries({ queryKey: ["admin-categories"] })
+      await queryClient.invalidateQueries({ queryKey: ["admin.categories"] })
       router.push("/dashboard/products/categories")
     },
     onError: async (error) => {
       const { toast } = await import("sonner")
-      toast.error(error.message)
+      toast.error(getErrorMessage(error, "Failed to update category"))
     },
   })
 
