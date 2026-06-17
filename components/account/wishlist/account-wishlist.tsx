@@ -71,7 +71,6 @@ function WishlistCard({
         href={`/products/${item.product.slug}`}
         className="flex gap-4 rounded-xl bg-card p-4 ring-1 ring-foreground/10 transition-shadow duration-300 hover:shadow-lg hover:shadow-foreground/5 hover:ring-foreground/15"
       >
-        {/* Product image */}
         <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-lg bg-muted sm:h-24 sm:w-24">
           {item.product.thumbnail_url ? (
             <img
@@ -86,7 +85,6 @@ function WishlistCard({
           )}
         </div>
 
-        {/* Info */}
         <div className="flex min-w-0 flex-1 flex-col justify-between">
           <div className="min-w-0">
             <h3 className="line-clamp-2 text-sm font-semibold text-foreground transition-colors group-hover:text-[#FF6600]">
@@ -109,7 +107,6 @@ function WishlistCard({
           </div>
         </div>
 
-        {/* Heart remove button */}
         <div className="flex shrink-0 items-start">
           <motion.button
             type="button"
@@ -252,7 +249,6 @@ export function AccountWishlist() {
 
   return (
     <div className="space-y-5">
-      {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
@@ -274,7 +270,6 @@ export function AccountWishlist() {
         )}
       </motion.div>
 
-      {/* Content */}
       {isLoading ? (
         <WishlistSkeleton />
       ) : itemCount > 0 ? (

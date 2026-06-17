@@ -105,8 +105,6 @@ export type UpdateBlogCategoryInput = {
   status?: BlogCategoryStatus
 }
 
-// ─── Public Blog Posts ──────────────────────────────────────
-
 export const listBlogs = (params: BlogPostListParams) =>
   api.get<PaginatedResponse<BlogPost>>(endpoints.blogs, { params })
 
@@ -117,8 +115,6 @@ export const listBlogCategories = (params: BlogCategoryListParams) =>
   api.get<PaginatedResponse<BlogCategory>>(endpoints.blogCategories, {
     params,
   })
-
-// ─── Admin Blog Posts ───────────────────────────────────────
 
 export const listAdminBlogs = (params: BlogPostListParams) =>
   api.get<PaginatedResponse<BlogPost>>(endpoints.admin.blogs, { params })
@@ -148,8 +144,6 @@ export const deleteBlogPost = (blogId: string) =>
   api.delete<{ message: string; data: null }>(
     `${endpoints.admin.blogs}/${blogId}`,
   )
-
-// ─── Admin Blog Categories ──────────────────────────────────
 
 export const listAdminBlogCategories = (params: BlogCategoryListParams) =>
   api.get<PaginatedResponse<BlogCategory>>(endpoints.admin.blogCategories, {

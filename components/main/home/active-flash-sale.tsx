@@ -83,10 +83,8 @@ function CountdownTimer() {
 export function ActiveFlashSale() {
   return (
     <section className="relative w-full overflow-hidden border-y border-border">
-      {/* Background */}
       <div className="absolute inset-0 bg-gradient-to-br from-[#FF6600]/3 via-transparent to-[#DC143C]/3" />
 
-      {/* Marquee top */}
       <div className="relative border-b border-border/50 py-3">
         <Marquee
           items={[
@@ -103,7 +101,6 @@ export function ActiveFlashSale() {
 
       <div className="relative mx-auto max-w-7xl px-6 py-16 md:py-24">
         <div className="grid gap-12 lg:grid-cols-2 lg:gap-16 items-center">
-          {/* Left: Countdown & info */}
           <motion.div
             initial={{ opacity: 0, x: -40 }}
             whileInView={{ opacity: 1, x: 0 }}
@@ -154,7 +151,6 @@ export function ActiveFlashSale() {
             </div>
           </motion.div>
 
-          {/* Right: Live stats panel */}
           <motion.div
             initial={{ opacity: 0, x: 40 }}
             whileInView={{ opacity: 1, x: 0 }}
@@ -198,7 +194,6 @@ export function ActiveFlashSale() {
                 ))}
               </div>
 
-              {/* Stock progress */}
               <div className="mt-6">
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-muted-foreground">Stock remaining</span>
@@ -216,7 +211,6 @@ export function ActiveFlashSale() {
               </div>
             </div>
 
-            {/* Decorative floating element */}
             <div className="absolute -top-4 -right-4 hidden lg:block">
               <div className="rounded-xl border border-border bg-card px-4 py-3 shadow-lg">
                 <div className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
@@ -231,7 +225,6 @@ export function ActiveFlashSale() {
         </div>
       </div>
 
-      {/* Marquee bottom */}
       <div className="relative border-t border-border/50 py-3">
         <Marquee
           items={[

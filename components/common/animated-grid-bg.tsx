@@ -25,7 +25,6 @@ export function AnimatedGridBackground() {
       time += 0.003;
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      // Grid lines
       const gridSize = 60;
       const offsetX = (time * 10) % gridSize;
       const offsetY = (time * 6) % gridSize;
@@ -47,7 +46,6 @@ export function AnimatedGridBackground() {
         ctx.stroke();
       }
 
-      // Floating nodes
       const nodes = [
         { x: 0.2, y: 0.3, r: 2, speed: 0.5 },
         { x: 0.7, y: 0.2, r: 3, speed: 0.7 },
@@ -66,7 +64,6 @@ export function AnimatedGridBackground() {
         ctx.fillStyle = "rgba(255, 102, 0, 0.4)";
         ctx.fill();
 
-        // Connect nearby nodes
         nodes.forEach((other, j) => {
           if (i >= j) return;
           const ox = other.x * canvas.width + Math.sin(time * other.speed + j) * 30;

@@ -26,13 +26,11 @@ const stats = [
 export function ProductsHero() {
   return (
     <section className="relative w-full overflow-hidden border-b border-border bg-background pt-28 md:pt-32">
-      {/* Background orbs — pushed to corners, lighter on mobile */}
       <div className="absolute -left-40 top-10 size-[28rem] rounded-full bg-[#FF6600]/[0.06] blur-3xl pointer-events-none md:size-[32rem] md:bg-[#FF6600]/8" />
       <div className="absolute -right-40 bottom-32 size-[24rem] rounded-full bg-[#DC143C]/[0.06] blur-3xl pointer-events-none md:size-[28rem] md:bg-[#DC143C]/8" />
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-[#FF6600]/[0.02] via-transparent to-transparent pointer-events-none md:from-[#FF6600]/[0.03]" />
 
       <div className="relative mx-auto max-w-7xl px-6 pb-6 md:pb-10">
-        {/* Centered headline block */}
         <div className="mx-auto max-w-3xl text-center">
           <motion.span
             initial={{ opacity: 0, y: 12 }}
@@ -61,7 +59,6 @@ export function ProductsHero() {
             before you add it to cart.
           </motion.p>
 
-          {/* CTA row */}
           <motion.div
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
@@ -78,7 +75,6 @@ export function ProductsHero() {
           </motion.div>
         </div>
 
-        {/* Stats + Highlights in one centered row */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -107,7 +103,6 @@ export function ProductsHero() {
           ))}
         </motion.div>
 
-        {/* Highlights row */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}

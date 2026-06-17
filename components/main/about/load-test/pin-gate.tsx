@@ -477,7 +477,6 @@ function ResultsPanel() {
       transition={{ duration: 0.6, ease: smoothEase }}
       className="space-y-4"
     >
-      {/* Summary metrics */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <ResultMetric label="Total Requests" value="284,730" trend="up" />
         <ResultMetric label="Requests/sec" value="2,847.3" trend="up" />
@@ -485,13 +484,10 @@ function ResultsPanel() {
         <ResultMetric label="Duration" value="100s" />
       </div>
 
-      {/* Latency */}
       <LatencyTable />
 
-      {/* RPS sparkline */}
       <RpsSparkline />
 
-      {/* Two column: status codes + checks */}
       <div className="grid gap-4 md:grid-cols-2">
         <div className="overflow-hidden rounded-xl border border-border bg-card">
           <div className="flex items-center gap-2 border-b border-border px-5 py-3">
@@ -613,7 +609,6 @@ export function PinGate() {
               transition={{ duration: 0.5, ease: smoothEase }}
               className="space-y-4"
             >
-              {/* Unlocked header */}
               <div className="flex items-center gap-3 rounded-xl border border-emerald-700/20 bg-emerald-700/5 px-5 py-3 dark:border-[#39FF14]/20 dark:bg-[#39FF14]/5">
                 <Unlock className="h-4 w-4 text-emerald-700 dark:text-[#39FF14]" />
                 <span className="text-sm font-medium text-emerald-700 dark:text-[#39FF14]">
@@ -621,7 +616,6 @@ export function PinGate() {
                 </span>
               </div>
 
-              {/* Config toggle */}
               <button
                 onClick={() => setConfigOpen(!configOpen)}
                 className="flex w-full items-center justify-between rounded-xl border border-border bg-card p-4 text-left transition-colors hover:bg-muted/30"
@@ -655,7 +649,6 @@ export function PinGate() {
                 )}
               </AnimatePresence>
 
-              {/* Run button */}
               {!running && !finished && (
                 <motion.button
                   initial={{ opacity: 0 }}
@@ -668,10 +661,8 @@ export function PinGate() {
                 </motion.button>
               )}
 
-              {/* Running state */}
               {running && <LiveMetrics progress={progress} />}
 
-              {/* Finished */}
               {finished && (
                 <motion.div
                   initial={{ opacity: 0, y: 16 }}

@@ -1,15 +1,17 @@
 "use client"
 
 import Link from "next/link"
+import { useState } from "react"
 import { motion } from "framer-motion"
-import { useQuery } from "@tanstack/react-query"
-import { CreditCard, PackageOpen, ShoppingBag } from "lucide-react"
+import { useQuery, useMutation } from "@tanstack/react-query"
+import { CreditCard, Loader2, PackageOpen, ShoppingBag } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
 import {
   getBuyerOrders,
   type BuyerOrderRow,
 } from "@/lib/api/account"
+import { createCheckoutSession } from "@/lib/api/payment"
 import { cn } from "@/lib/utils"
 import { useAuthStore } from "@/stores/auth"
 
@@ -37,6 +39,29 @@ function statusStyle(status: string) {
 }
 
 function OrderCard({ order }: { order: BuyerOrderRow }) {
+  const [isPaying, setIsPaying] = useState(false)
+  const isUnpaid = ["pending", "pending_payment", "waiting_payment"].includes(order.status)
+  const hasPaymentUrl = order.payment?.checkout_url
+
+  const payMutation = useMutation({
+    mutationFn: (paymentId: string) => createCheckoutSession(paymentId),
+    onSuccess: async (response) => {
+      const url = response.data.data.checkout_url
+      if (url) {
+        window.location.href = url
+      }
+    },
+    onError: () => {
+      setIsPaying(false)
+    },
+  })
+
+  function handlePayNow() {
+    if (!order.payment?.id) return
+    setIsPaying(true)
+    payMutation.mutate(order.payment.id)
+  }
+
   return (
     <motion.div
       whileHover={{ y: -2 }}
@@ -72,14 +97,31 @@ function OrderCard({ order }: { order: BuyerOrderRow }) {
           </span>
         </div>
       </div>
-      {order.payment ? (
-        <div className="mt-3 flex items-center gap-2 rounded-lg bg-muted/40 px-3 py-2 text-xs text-muted-foreground">
-          <CreditCard className="h-3.5 w-3.5" />
-          <span className="capitalize">{order.payment.gateway}</span>
-          <span>-</span>
-          <span className="capitalize">{order.payment.status.replaceAll("_", " ")}</span>
-        </div>
-      ) : null}
+      <div className="mt-3 flex flex-wrap items-center gap-2">
+        {order.payment ? (
+          <div className="flex items-center gap-2 rounded-lg bg-muted/40 px-3 py-2 text-xs text-muted-foreground">
+            <CreditCard className="h-3.5 w-3.5" />
+            <span className="capitalize">{order.payment.gateway}</span>
+            <span>-</span>
+            <span className="capitalize">{order.payment.status.replaceAll("_", " ")}</span>
+          </div>
+        ) : null}
+        {isUnpaid && hasPaymentUrl && (
+          <Button
+            size="sm"
+            className="gap-1.5 rounded-lg bg-[#FF6600] text-white hover:bg-[#FF6600]/90"
+            disabled={isPaying}
+            onClick={handlePayNow}
+          >
+            {isPaying ? (
+              <Loader2 className="h-3.5 w-3.5 animate-spin" />
+            ) : (
+              <CreditCard className="h-3.5 w-3.5" />
+            )}
+            Bayar Sekarang
+          </Button>
+        )}
+      </div>
     </motion.div>
   )
 }

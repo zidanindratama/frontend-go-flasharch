@@ -28,7 +28,6 @@ export function Footer() {
     <footer className="w-full border-t border-border bg-background">
       <div className="mx-auto max-w-7xl px-6 py-16 md:py-24">
         <div className="grid gap-12 md:grid-cols-2 lg:grid-cols-5">
-          {/* Brand column */}
           <div className="lg:col-span-2">
             <Link href="/" className="flex items-center gap-2 group">
               <div className="relative flex h-8 w-8 items-center justify-center">
@@ -63,7 +62,6 @@ export function Footer() {
             </div>
           </div>
 
-          {/* Link columns */}
           {Object.entries(footerLinks).map(([category, links]) => (
             <div key={category}>
               <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
@@ -86,7 +84,6 @@ export function Footer() {
           ))}
         </div>
 
-        {/* Bottom bar */}
         <div className="mt-16 flex flex-col items-center justify-between gap-4 border-t border-border pt-8 md:flex-row">
           <p className="text-xs text-muted-foreground">
             &copy; {new Date().getFullYear()} Go FlashArch. Muhamad Zidan

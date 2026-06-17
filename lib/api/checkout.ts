@@ -22,8 +22,10 @@ export type CheckoutOrder = {
   checkout_id: string
   status: string
   subtotal_amount: number
+  shipping_cost: number
   total_amount: number
   currency: string
+  address_id: string | null
   items: CheckoutOrderItem[]
 }
 
@@ -38,8 +40,10 @@ export type Checkout = {
   cart_id: string | null
   flash_sale_id: string | null
   subtotal_amount: number
+  shipping_cost: number
   total_amount: number
   currency: string
+  address_id: string | null
   failure_code: string | null
   failure_message: string | null
   order: CheckoutOrder | null
@@ -67,6 +71,8 @@ export type CheckoutAcceptedResponse = {
 
 export type CartCheckoutInput = {
   cart_id: string
+  address_id?: string
+  shipping_cost?: number
 }
 
 export const createCartCheckout = (data: CartCheckoutInput, idempotencyKey: string) =>

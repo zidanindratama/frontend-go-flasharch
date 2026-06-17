@@ -287,7 +287,6 @@ export function FlashSalesTable() {
 
   return (
     <div className="flex flex-col gap-4">
-      {/* Hero section */}
       <section className="relative overflow-hidden rounded-2xl border border-border bg-card p-4 shadow-sm sm:p-5">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="min-w-0">
@@ -311,7 +310,6 @@ export function FlashSalesTable() {
         </div>
       </section>
 
-      {/* Signal tiles */}
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         <SignalTile label="Total" value={total} />
         <SignalTile label="Draft" value={sales.filter((s) => s.status === "draft").length} />
@@ -319,7 +317,6 @@ export function FlashSalesTable() {
         <SignalTile label="Scheduled" value={sales.filter((s) => s.status === "scheduled").length} />
       </div>
 
-      {/* Data table */}
       <DataTable
         columns={columns}
         data={sales}

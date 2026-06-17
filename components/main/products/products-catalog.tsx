@@ -168,7 +168,6 @@ export function ProductsCatalog() {
     <section className="w-full py-10 md:py-16">
       <div className="mx-auto max-w-7xl px-6">
         <div className="flex flex-col gap-6 lg:flex-row lg:items-start">
-          {/* Desktop Sidebar */}
           <div className="hidden lg:block lg:w-64 lg:shrink-0">
             <div className="sticky top-24">
               <FilterSidebar
@@ -184,16 +183,13 @@ export function ProductsCatalog() {
             </div>
           </div>
 
-          {/* Main content */}
           <div className="min-w-0 flex-1">
-            {/* Toolbar */}
             <motion.div
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, ease: smoothEase, delay: 0.05 }}
               className="mb-6 flex flex-col gap-3"
             >
-              {/* Filter button - mobile only, full width */}
               <div className="flex items-center gap-2 lg:hidden">
                 <FilterDrawer
                   categories={categories}
@@ -210,7 +206,6 @@ export function ProductsCatalog() {
                 </span>
               </div>
 
-              {/* Search + Sort - always full width row */}
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
                 <SearchInput
                   key={search}
@@ -227,7 +222,6 @@ export function ProductsCatalog() {
               </div>
             </motion.div>
 
-            {/* Active filter chips */}
             <FilterChipBar
               search={search}
               selectedCategory={category || null}
@@ -242,7 +236,6 @@ export function ProductsCatalog() {
               className="mb-5"
             />
 
-            {/* Results count */}
             <div className="mb-5 flex items-center justify-between">
               <p className="text-sm text-muted-foreground">
                 {productsQuery.isLoading ? (
@@ -259,7 +252,6 @@ export function ProductsCatalog() {
               </p>
             </div>
 
-            {/* Product grid */}
             <ProductGrid
               products={products}
               isLoading={productsQuery.isLoading}
@@ -267,7 +259,6 @@ export function ProductsCatalog() {
               perPage={perPage}
             />
 
-            {/* Pagination */}
             {total > 0 && (
               <PaginationBar
                 page={page}

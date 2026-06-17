@@ -39,11 +39,9 @@ export function StorefrontHero() {
       ref={containerRef}
       className="relative min-h-screen w-full overflow-hidden flex items-center justify-center"
     >
-      {/* Background layers */}
       <div className="absolute inset-0 bg-gradient-to-b from-background via-background to-transparent" />
       <AnimatedGridBackground />
 
-      {/* Gradient orbs */}
       <div className="absolute top-1/4 left-1/4 h-[500px] w-[500px] rounded-full bg-[#FF6600]/5 blur-[120px] pointer-events-none" />
       <div className="absolute bottom-1/4 right-1/4 h-[400px] w-[400px] rounded-full bg-[#DC143C]/5 blur-[100px] pointer-events-none" />
 
@@ -52,7 +50,6 @@ export function StorefrontHero() {
         className="relative z-10 mx-auto max-w-7xl px-6 py-32 md:py-40"
       >
         <div className="flex flex-col items-center text-center">
-          {/* Live indicator */}
           <motion.div
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
@@ -66,7 +63,6 @@ export function StorefrontHero() {
             <span className="h-px w-8 bg-[#DC143C]" />
           </motion.div>
 
-          {/* Main headline */}
           <h1 className="max-w-5xl">
             <SplitText
               text="Shop fast."
@@ -85,7 +81,6 @@ export function StorefrontHero() {
             </span>
           </h1>
 
-          {/* Subheadline */}
           <motion.p
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
@@ -96,7 +91,6 @@ export function StorefrontHero() {
             frustrating surprises when demand spikes.
           </motion.p>
 
-          {/* CTAs */}
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
@@ -125,7 +119,6 @@ export function StorefrontHero() {
             </Button>
           </motion.div>
 
-          {/* Stats row */}
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
@@ -150,7 +143,6 @@ export function StorefrontHero() {
         </div>
       </motion.div>
 
-      {/* Floating badges with parallax */}
       {floatingBadges.map((badge) => (
         <motion.div
           key={badge.label}
@@ -168,7 +160,6 @@ export function StorefrontHero() {
         </motion.div>
       ))}
 
-      {/* Scroll indicator */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}

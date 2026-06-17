@@ -9,7 +9,6 @@ const smoothEase: [number, number, number, number] = [0.16, 1, 0.3, 1];
 export default function NotFound() {
   return (
     <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-background px-6 py-24 text-foreground">
-      {/* Background */}
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_30%,rgba(255,102,0,0.08),transparent_35%)]" />
       <div
         className="absolute inset-0 opacity-[0.03]"

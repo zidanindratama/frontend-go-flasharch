@@ -87,7 +87,6 @@ function HomeProductCard({
               : "aspect-[4/3] md:aspect-auto md:min-h-full"
           }`}
         >
-          {/* Image or icon placeholder */}
           <div className="absolute inset-0 flex items-center justify-center">
             {product.thumbnail_url ? (
               <img
@@ -103,10 +102,8 @@ function HomeProductCard({
             )}
           </div>
 
-          {/* Gradient overlay for text readability */}
           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent transition-opacity duration-500 md:opacity-0 md:group-hover:opacity-100" />
 
-          {/* Top right badge + wishlist */}
           <div className="absolute top-4 right-4 z-10 flex items-center gap-2">
             <StockBadge stock={stockStatus} count={stockCount} />
             <WishlistToggle
@@ -116,7 +113,6 @@ function HomeProductCard({
             />
           </div>
 
-          {/* Bottom info */}
           <div className="absolute bottom-0 left-0 right-0 p-5 transition-all duration-500 translate-y-0 opacity-100 md:translate-y-4 md:opacity-0 md:group-hover:translate-y-0 md:group-hover:opacity-100">
             <p className="text-xs font-medium uppercase tracking-wider text-white/70 drop-shadow-sm">
               {categoryNames || "Product"}
@@ -134,7 +130,6 @@ function HomeProductCard({
             </div>
           </div>
 
-          {/* Corner arrow */}
           <div className="absolute top-4 left-4 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
             <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#FF6600] text-white">
               <ArrowUpRight className="h-4 w-4" />
@@ -171,7 +166,6 @@ export function FeaturedProducts() {
   return (
     <section className="relative w-full py-24 md:py-32">
       <div className="mx-auto max-w-7xl px-6">
-        {/* Section header */}
         <motion.div
           initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -203,7 +197,6 @@ export function FeaturedProducts() {
           </Button>
         </motion.div>
 
-        {/* Asymmetric grid */}
         {isLoading ? (
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-4 md:grid-rows-[220px_220px] lg:grid-rows-[260px_260px]">
             {Array.from({ length: 4 }).map((_, i) => (

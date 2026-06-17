@@ -37,7 +37,6 @@ export function ProductCard({
     >
       <Link href={`/products/${product.slug}`} className="block">
         <div className="relative overflow-hidden rounded-2xl border border-border bg-card shadow-sm transition-shadow duration-500 group-hover:shadow-xl group-hover:shadow-foreground/5">
-          {/* Image area */}
           <div className="relative aspect-[4/3] overflow-hidden bg-muted">
             {primaryImage ? (
               <motion.img
@@ -51,10 +50,8 @@ export function ProductCard({
               </div>
             )}
 
-            {/* Hover overlay gradient */}
             <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/20 to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
 
-            {/* Top-right: category badge + wishlist */}
             <div className="absolute top-3 right-3 z-10 flex items-center gap-1.5">
               <Badge
                 variant="secondary"
@@ -69,14 +66,12 @@ export function ProductCard({
               />
             </div>
 
-            {/* Top-left arrow */}
             <div className="absolute top-3 left-3 z-10 opacity-0 transition-all duration-500 group-hover:opacity-100">
               <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#FF6600] text-white shadow-lg">
                 <ArrowUpRight className="h-4 w-4" />
               </div>
             </div>
 
-            {/* Quick-add button */}
             <div className="absolute bottom-3 left-3 right-3 z-10 translate-y-4 opacity-0 transition-all duration-500 group-hover:translate-y-0 group-hover:opacity-100">
               <Button
                 type="button"
@@ -89,7 +84,6 @@ export function ProductCard({
             </div>
           </div>
 
-          {/* Info area */}
           <div className="p-5">
             <h3 className="line-clamp-2 min-h-[3rem] text-lg font-bold tracking-tight text-foreground transition-colors group-hover:text-[#FF6600]">
               {product.name}

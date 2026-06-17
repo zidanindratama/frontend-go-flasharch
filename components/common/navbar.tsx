@@ -202,7 +202,6 @@ export function Navbar() {
       >
         <div className="mx-auto max-w-7xl px-6">
           <div className="flex h-16 items-center justify-between md:h-20">
-            {/* Logo */}
             <Link href="/" className="flex items-center gap-2 group">
               <div className="relative flex h-8 w-8 items-center justify-center">
                 <div className="absolute inset-0 rounded-lg bg-[#FF6600]/10 group-hover:bg-[#FF6600]/20 transition-colors" />
@@ -213,7 +212,6 @@ export function Navbar() {
               </span>
             </Link>
 
-            {/* Desktop Nav */}
             <nav className="hidden items-center gap-1 md:flex">
               {navLinks.map((link) => {
                 const active = isActive(link.href)
@@ -244,7 +242,6 @@ export function Navbar() {
               })}
             </nav>
 
-            {/* Right actions */}
             <div className="flex items-center gap-2">
               {mounted && (
                 <Button
@@ -280,7 +277,6 @@ export function Navbar() {
                 </Button>
               )}
 
-              {/* Cart icon */}
               {effectiveAuthenticated && userRoleCode === "buyer" && (
                 <Link href="/account/cart">
                   <motion.button
@@ -307,7 +303,6 @@ export function Navbar() {
                 </Link>
               )}
 
-              {/* User dropdown or Sign In */}
               {effectiveAuthenticated ? (
                 <div className="relative" ref={dropdownRef}>
                   <button
@@ -423,7 +418,6 @@ export function Navbar() {
                 </Button>
               )}
 
-              {/* Mobile menu toggle */}
               <Button
                 variant="ghost"
                 size="icon"
@@ -441,7 +435,6 @@ export function Navbar() {
         </div>
       </motion.header>
 
-      {/* Mobile menu */}
       <AnimatePresence>
         {mobileOpen && (
           <motion.div

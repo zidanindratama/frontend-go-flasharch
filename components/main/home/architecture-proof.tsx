@@ -60,23 +60,19 @@ function ArchitectureCanvas() {
       time += 0.015;
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      // Update node positions with sine wave
       nodes.forEach((node, i) => {
         node.x = node.baseX + Math.sin(time + i * 0.8) * 8;
         node.y = canvas.height / 2 + Math.cos(time * 0.7 + i * 1.2) * 12;
       });
 
-      // Draw connections
       for (let i = 0; i < nodes.length - 1; i++) {
         const start = nodes[i];
         const end = nodes[i + 1];
 
-        // Animated packet
         const progress = (time * 0.5 + i * 0.15) % 1;
         const px = start.x + (end.x - start.x) * progress;
         const py = start.y + (end.y - start.y) * progress;
 
-        // Connection line
         ctx.beginPath();
         ctx.moveTo(start.x, start.y);
         ctx.lineTo(end.x, end.y);
@@ -84,24 +80,20 @@ function ArchitectureCanvas() {
         ctx.lineWidth = 1;
         ctx.stroke();
 
-        // Packet dot
         ctx.beginPath();
         ctx.arc(px, py, 3, 0, Math.PI * 2);
         ctx.fillStyle = "#FF6600";
         ctx.fill();
 
-        // Packet glow
         ctx.beginPath();
         ctx.arc(px, py, 8, 0, Math.PI * 2);
         ctx.fillStyle = "rgba(255, 102, 0, 0.2)";
         ctx.fill();
       }
 
-      // Draw nodes
       nodes.forEach((node, i) => {
         const isCritical = highlightedSteps.includes(flowSteps[i].label);
 
-        // Glow
         ctx.beginPath();
         ctx.arc(node.x, node.y, isCritical ? 20 : 14, 0, Math.PI * 2);
         ctx.fillStyle = isCritical
@@ -109,7 +101,6 @@ function ArchitectureCanvas() {
           : "rgba(255, 255, 255, 0.03)";
         ctx.fill();
 
-        // Core
         ctx.beginPath();
         ctx.arc(node.x, node.y, isCritical ? 6 : 4, 0, Math.PI * 2);
         ctx.fillStyle = isCritical ? "#FF6600" : "rgba(255,255,255,0.3)";
@@ -148,7 +139,6 @@ export function ArchitectureProof() {
       ref={containerRef}
       className="relative w-full overflow-hidden bg-[#0a0a0a] py-24 md:py-32"
     >
-      {/* Grid overlay */}
       <div
         className="absolute inset-0 opacity-[0.03]"
         style={{
@@ -159,7 +149,6 @@ export function ArchitectureProof() {
       />
 
       <div className="relative mx-auto max-w-7xl px-6">
-        {/* Header */}
         <div className="text-center mb-16 md:mb-24">
           <motion.span
             initial={{ opacity: 0 }}
@@ -188,11 +177,9 @@ export function ArchitectureProof() {
           </motion.p>
         </div>
 
-        {/* Animated architecture flow */}
         <div className="relative mb-8 h-[180px] md:mb-16 md:h-[280px]">
           <ArchitectureCanvas />
 
-          {/* Desktop labels below canvas */}
           <div className="absolute bottom-0 left-0 right-0 hidden justify-between px-2 md:flex">
             {flowSteps.map((step, i) => (
               <motion.div
@@ -218,7 +205,6 @@ export function ArchitectureProof() {
           </div>
         </div>
 
-        {/* Mobile request rail keeps the flow readable without falling back to generic cards. */}
         <motion.div
           initial={{ opacity: 0, y: 18 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -283,7 +269,6 @@ export function ArchitectureProof() {
           </div>
         </motion.div>
 
-        {/* Progress line */}
         <div className="relative h-px w-full bg-white/10 mb-16">
           <motion.div
             style={{ width: lineWidth }}
@@ -291,7 +276,6 @@ export function ArchitectureProof() {
           />
         </div>
 
-        {/* Metrics */}
         <motion.div
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
@@ -329,7 +313,6 @@ export function ArchitectureProof() {
           ))}
         </motion.div>
 
-        {/* CTA */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}

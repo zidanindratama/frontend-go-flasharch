@@ -10,7 +10,6 @@ const smoothEase: [number, number, number, number] = [0.16, 1, 0.3, 1];
 export function FinalCTA() {
   return (
     <section className="relative w-full overflow-hidden py-24 md:py-32">
-      {/* Animated background */}
       <div className="absolute inset-0 bg-gradient-to-b from-background via-[#FF6600]/[0.02] to-background" />
       <div className="absolute inset-0">
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-[600px] w-[600px] rounded-full bg-[#FF6600]/5 blur-[150px]" />

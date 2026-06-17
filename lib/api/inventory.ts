@@ -1,8 +1,6 @@
 import { api } from "@/lib/api/axios"
 import { endpoints } from "@/lib/api/endpoints"
 
-// ─── Types ─────────────────────────────────────────────────
-
 export type WarehouseRef = {
   id: string
   code: string
@@ -59,8 +57,6 @@ export type InventoryMovement = {
   created_at: string
 }
 
-// ─── Query Params ──────────────────────────────────────────
-
 export type StockListParams = {
   page?: number
   per_page?: number
@@ -91,8 +87,6 @@ export type StockAdjustInput = {
   quantity_delta: number
   reason: string
 }
-
-// ─── API Calls ─────────────────────────────────────────────
 
 export type PaginatedResponse<T> = {
   message: string

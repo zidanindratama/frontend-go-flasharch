@@ -105,7 +105,6 @@ export function FilterSidebar({
 
       <Separator className="my-4" />
 
-      {/* Categories */}
       <div className="space-y-3">
         <div className="flex items-center gap-2">
           <Tag className="h-4 w-4 text-muted-foreground" />
@@ -114,7 +113,6 @@ export function FilterSidebar({
           </h3>
         </div>
 
-        {/* Category search */}
         <div className="relative">
           <Search className="absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
           <Input
@@ -211,7 +209,6 @@ export function FilterSidebar({
 
       <Separator className="my-4" />
 
-      {/* Price Range */}
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <h3 className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
@@ -222,7 +219,6 @@ export function FilterSidebar({
           </span>
         </div>
 
-        {/* Min / Max inputs */}
         <div className="space-y-2">
           <FormattedPriceInput
             placeholder="Min price"

@@ -1,6 +1,7 @@
 "use client"
 
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { useCallback, useMemo, useState } from "react"
 import { AnimatePresence, motion } from "framer-motion"
 import {
@@ -24,7 +25,6 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip"
 import { useCart, useUpdateCartItem, useRemoveCartItem, useClearCart, useSaveForLater } from "@/lib/hooks/use-cart"
-import { useCheckoutFlow } from "@/lib/hooks/use-checkout"
 import { formatPrice } from "@/components/dashboard/products/product-utils"
 import type { CartItem as CartItemType } from "@/lib/api/cart"
 import { cn } from "@/lib/utils"
@@ -52,6 +52,10 @@ function CartItemRow({
 }) {
   const [confirmRemove, setConfirmRemove] = useState(false)
   const isInactive = item.product.status !== "active"
+  const stock = item.product.available_stock
+  const isOutOfStock = stock <= 0
+  const isLowStock = stock > 0 && stock < item.quantity
+  const hasStockIssue = isInactive || isOutOfStock || isLowStock
 
   const handleRemove = useCallback(() => {
     if (confirmRemove) {
@@ -76,7 +80,11 @@ function CartItemRow({
         "flex gap-4 rounded-xl bg-card p-4 ring-1 ring-foreground/10 transition-shadow duration-300",
         isInactive
           ? "opacity-60 ring-destructive/30"
-          : "hover:shadow-lg hover:shadow-foreground/5 hover:ring-foreground/15",
+          : isOutOfStock
+            ? "opacity-60 ring-destructive/20"
+            : isLowStock
+              ? "ring-yellow-500/30"
+              : "hover:shadow-lg hover:shadow-foreground/5 hover:ring-foreground/15",
       )}>
         <Link
           href={`/products/${item.product.slug}`}
@@ -86,7 +94,7 @@ function CartItemRow({
             <img
               src={thumbnailUrl}
               alt={item.product.name}
-              className="h-full w-full object-cover"
+              className={cn("h-full w-full object-cover", (isInactive || isOutOfStock) && "grayscale")}
             />
           ) : (
             <Package className="absolute inset-0 m-auto h-8 w-8 text-muted-foreground/30" />
@@ -97,7 +105,10 @@ function CartItemRow({
           <div className="min-w-0">
             <Link
               href={`/products/${item.product.slug}`}
-              className="line-clamp-2 text-sm font-semibold text-foreground transition-colors hover:text-[#FF6600]"
+              className={cn(
+                "line-clamp-2 text-sm font-semibold transition-colors hover:text-[#FF6600]",
+                isInactive || isOutOfStock ? "text-muted-foreground" : "text-foreground",
+              )}
             >
               {item.product.name}
             </Link>
@@ -105,9 +116,9 @@ function CartItemRow({
               {item.product.sku}
             </p>
             <p className="mt-0.5 text-[11px] text-muted-foreground">
-              {item.product.weight} kg
+              {item.product.weight * item.quantity} kg
             </p>
-            {isInactive && (
+            {isInactive ? (
               <motion.p
                 initial={{ opacity: 0, y: -4 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -116,6 +127,28 @@ function CartItemRow({
                 <AlertTriangle className="h-3 w-3" />
                 No longer available
               </motion.p>
+            ) : isOutOfStock ? (
+              <motion.p
+                initial={{ opacity: 0, y: -4 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="mt-1 flex items-center gap-1 text-[11px] font-medium text-destructive"
+              >
+                <AlertTriangle className="h-3 w-3" />
+                Out of stock
+              </motion.p>
+            ) : isLowStock ? (
+              <motion.p
+                initial={{ opacity: 0, y: -4 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="mt-1 flex items-center gap-1 text-[11px] font-medium text-yellow-600 dark:text-yellow-400"
+              >
+                <AlertTriangle className="h-3 w-3" />
+                Only {stock} left — you requested {item.quantity}
+              </motion.p>
+            ) : (
+              <p className="mt-1 text-[11px] text-emerald-600 dark:text-emerald-400">
+                In stock ({stock})
+              </p>
             )}
           </div>
 
@@ -129,7 +162,7 @@ function CartItemRow({
                 type="button"
                 whileTap={{ scale: 0.85 }}
                 onClick={() => onUpdate(item.id, Math.max(1, item.quantity - 1))}
-                disabled={isUpdating || item.quantity <= 1 || isInactive}
+                disabled={isUpdating || item.quantity <= 1 || hasStockIssue}
                 className="flex h-7 w-7 items-center justify-center rounded-md border border-border text-muted-foreground transition-colors hover:bg-muted hover:text-foreground disabled:opacity-40"
               >
                 <Minus className="h-3 w-3" />
@@ -149,7 +182,7 @@ function CartItemRow({
                 type="button"
                 whileTap={{ scale: 0.85 }}
                 onClick={() => onUpdate(item.id, item.quantity + 1)}
-                disabled={isUpdating || isInactive}
+                disabled={isUpdating || isOutOfStock || (isLowStock && item.quantity >= stock)}
                 className="flex h-7 w-7 items-center justify-center rounded-md border border-border text-muted-foreground transition-colors hover:bg-muted hover:text-foreground disabled:opacity-40"
               >
                 <Plus className="h-3 w-3" />
@@ -171,7 +204,7 @@ function CartItemRow({
                     type="button"
                     whileTap={{ scale: 0.85 }}
                     onClick={() => onSaveForLater(item.id)}
-                    disabled={isUpdating || isInactive}
+                    disabled={isUpdating}
                     className="flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-[#FF6600]/10 hover:text-[#FF6600]"
                   >
                     <Save className="h-3.5 w-3.5" />
@@ -290,12 +323,19 @@ export function CartPage() {
   const saveForLaterMutation = useSaveForLater()
   const deleteSavedMutation = useDeleteSavedItem()
   const moveToCartMutation = useMoveToCart()
-  const { phase, startCheckout, isStarting } = useCheckoutFlow(cart?.id ?? null)
+  const router = useRouter()
 
   const hasInactiveItems = useMemo(
     () => (cart?.items ?? []).some((item) => item.product.status !== "active"),
     [cart?.items],
   )
+
+  const hasOutOfStockItems = useMemo(
+    () => (cart?.items ?? []).some((item) => item.product.available_stock <= 0),
+    [cart?.items],
+  )
+
+  const hasStockIssues = hasInactiveItems || hasOutOfStockItems
 
   const [confirmClear, setConfirmClear] = useState(false)
 
@@ -427,32 +467,25 @@ export function CartPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3, duration: 0.4, ease: smoothEase }}
           >
-            {hasInactiveItems && (
+            {hasStockIssues && (
               <motion.p
                 initial={{ opacity: 0, height: 0 }}
                 animate={{ opacity: 1, height: "auto" }}
                 className="mb-3 flex items-center gap-2 rounded-lg bg-destructive/5 px-3 py-2 text-xs text-destructive"
               >
                 <AlertTriangle className="h-3.5 w-3.5 shrink-0" />
-                Remove unavailable items before checkout
+                {hasOutOfStockItems
+                  ? "Some items are out of stock. Remove them before checkout."
+                  : "Remove unavailable items before checkout"}
               </motion.p>
             )}
             <Button
-              onClick={startCheckout}
-              disabled={isStarting || phase !== "idle" || hasInactiveItems}
+              onClick={() => router.push("/checkout")}
+              disabled={hasStockIssues}
               className="h-11 w-full rounded-full text-sm font-semibold"
             >
-              {isStarting || phase === "checkout" ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Processing...
-                </>
-              ) : (
-                <>
-                  <ShoppingCart className="mr-2 h-4 w-4" />
-                  Checkout
-                </>
-              )}
+              <ShoppingCart className="mr-2 h-4 w-4" />
+              Checkout
             </Button>
           </motion.div>
         </div>

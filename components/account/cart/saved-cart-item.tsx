@@ -80,7 +80,7 @@ export function SavedCartItem({
               {item.product.sku}
             </p>
             <p className="mt-0.5 text-[11px] text-muted-foreground">
-              {item.product.weight} kg
+              {item.product.weight * item.quantity} kg
             </p>
           </div>
           <span className="mt-1 text-sm font-bold tabular-nums text-foreground">

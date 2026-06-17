@@ -11,6 +11,7 @@ export type CartProduct = {
   status: string
   weight: number
   thumbnail_url: string | null
+  available_stock: number
 }
 
 export type CartItem = {

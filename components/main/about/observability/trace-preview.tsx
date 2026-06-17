@@ -292,7 +292,6 @@ export function TracePreview() {
           transition={{ duration: 0.5, ease: smoothEase }}
           className="overflow-hidden rounded-xl border border-border bg-card"
         >
-          {/* Toolbar */}
           <div className="flex flex-col gap-4 border-b border-border px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex items-center gap-3">
               <button
@@ -370,7 +369,6 @@ export function TracePreview() {
             )}
           </div>
 
-          {/* Content */}
           <AnimatePresence mode="wait">
             {mode === "real" && error ? (
               <motion.div

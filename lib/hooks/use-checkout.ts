@@ -11,9 +11,21 @@ export function useCartCheckout() {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: (cartId: string) =>
+    mutationFn: ({
+      cartId,
+      addressId,
+      shippingCost,
+    }: {
+      cartId: string
+      addressId?: string
+      shippingCost?: number
+    }) =>
       createCartCheckout(
-        { cart_id: cartId },
+        {
+          cart_id: cartId,
+          address_id: addressId,
+          shipping_cost: shippingCost,
+        },
         crypto.randomUUID(),
       ),
     onSuccess: async () => {
@@ -108,19 +120,26 @@ export function useCheckoutFlow(cartId: string | null) {
   )
   const paymentCheckoutMutation = usePaymentCheckout()
 
-  const startCheckout = useCallback(async () => {
-    if (!cartId) return
-    setPhase("checkout")
-    processedRef.current = false
+  const startCheckout = useCallback(
+    async (addressId?: string, shippingCost?: number) => {
+      if (!cartId) return
+      setPhase("checkout")
+      processedRef.current = false
 
-    try {
-      const response = await cartCheckoutMutation.mutateAsync(cartId)
-      setCheckoutId(response.data.data.checkout_id)
-      setPhase("polling")
-    } catch {
-      setPhase("error")
-    }
-  }, [cartId, cartCheckoutMutation])
+      try {
+        const response = await cartCheckoutMutation.mutateAsync({
+          cartId,
+          addressId,
+          shippingCost,
+        })
+        setCheckoutId(response.data.data.checkout_id)
+        setPhase("polling")
+      } catch {
+        setPhase("error")
+      }
+    },
+    [cartId, cartCheckoutMutation],
+  )
 
   useEffect(() => {
     if (

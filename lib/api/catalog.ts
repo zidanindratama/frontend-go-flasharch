@@ -166,8 +166,6 @@ export type UploadFileResponse = {
   url: string
 }
 
-// ─── Public Products ────────────────────────────────────────
-
 export const listProducts = (params: ProductListParams) =>
   api.get<PaginatedResponse<Product>>(endpoints.products, { params })
 
@@ -179,8 +177,6 @@ export const listProductReviews = (slug: string, params?: ProductReviewListParam
 
 export const listCategories = (params?: CategoryListParams) =>
   api.get<PaginatedResponse<Category>>(endpoints.categories, { params })
-
-// ─── Products ───────────────────────────────────────────────
 
 export const listAdminProducts = (params: ProductListParams) =>
   api.get<PaginatedResponse<Product>>(endpoints.admin.products, { params })
@@ -222,8 +218,6 @@ export const deleteProductImage = (productId: string, imageId: string) =>
     `${endpoints.admin.products}/${productId}/images/${imageId}`,
   )
 
-// ─── Categories ─────────────────────────────────────────────
-
 export const listAdminCategories = (params: CategoryListParams) =>
   api.get<PaginatedResponse<Category>>(endpoints.admin.categories, { params })
 
@@ -250,8 +244,6 @@ export const deleteCategory = (categoryId: string) =>
   api.delete<{ message: string; data: null }>(
     `${endpoints.admin.categories}/${categoryId}`,
   )
-
-// ─── File Upload ────────────────────────────────────────────
 
 export const uploadFile = (file: File) => {
   const formData = new FormData()
