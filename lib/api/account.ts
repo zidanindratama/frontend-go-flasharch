@@ -72,6 +72,7 @@ export type UserAddress = {
   province: string
   city: string
   district: string
+  village_code: string
   postal_code: string
   address_line: string
   notes: string
@@ -128,6 +129,7 @@ export type CreateAddressInput = {
   province: string
   city: string
   district: string
+  village_code: string
   postal_code: string
   address_line: string
   notes?: string

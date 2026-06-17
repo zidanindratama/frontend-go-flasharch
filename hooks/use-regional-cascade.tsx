@@ -27,11 +27,36 @@ function findCodeByName(items: RegionItem[], name: string) {
   return items.find((i) => i.name === name)?.code ?? ""
 }
 
+function extractPostalCode(value: unknown): string {
+  if (!value || typeof value !== "object") return ""
+  if (Array.isArray(value)) {
+    for (const item of value) {
+      const postalCode = extractPostalCode(item)
+      if (postalCode) return postalCode
+    }
+    return ""
+  }
+
+  const record = value as Record<string, unknown>
+  for (const key of ["postal_code", "postalCode", "postcode", "zip_code"]) {
+    const candidate = record[key]
+    if (typeof candidate === "string" && candidate.trim()) {
+      return candidate.trim()
+    }
+    if (typeof candidate === "number") {
+      return String(candidate)
+    }
+  }
+
+  return extractPostalCode(record.data)
+}
+
 export function useRegionalCascade(initial?: RegionCascadeInitial) {
   const [province, setProvince] = useState("")
   const [regency, setRegency] = useState("")
   const [district, setDistrict] = useState("")
   const [village, setVillage] = useState("")
+  const [postalCode, setPostalCode] = useState("")
 
   const [provinces, setProvinces] = useState<RegionItem[]>([])
   const [regencies, setRegencies] = useState<RegionItem[]>([])
@@ -44,6 +69,29 @@ export function useRegionalCascade(initial?: RegionCascadeInitial) {
   const [loadingVillages, setLoadingVillages] = useState(false)
 
   const initialRef = useRef(initial)
+
+  const fetchVillagePostalCode = useCallback(async (villageCode: string) => {
+    if (!villageCode) { setPostalCode(""); return }
+    const requests = [
+      () => getRegionalData<unknown>(endpoints.regional.village(villageCode)),
+      () => getRegionalData<unknown>(endpoints.regional.postalCodes, { village_code: villageCode }),
+      () => getRegionalData<unknown>(endpoints.regional.villages, { village_code: villageCode }),
+    ]
+
+    for (const request of requests) {
+      try {
+        const res = await request()
+        const postalCode = extractPostalCode(res.data)
+        if (postalCode) {
+          setPostalCode(postalCode)
+          return
+        }
+      } catch {
+        // Try the next regional endpoint shape before giving up.
+      }
+    }
+    setPostalCode("")
+  }, [])
 
   useEffect(() => {
     let cancelled = false
@@ -92,9 +140,13 @@ export function useRegionalCascade(initial?: RegionCascadeInitial) {
 
                           if (init.villageCode) {
                             setVillage(init.villageCode)
+                            fetchVillagePostalCode(init.villageCode)
                           } else if (init.villageName) {
                             const vCode = findCodeByName(villageList, init.villageName)
-                            if (vCode) setVillage(vCode)
+                            if (vCode) {
+                              setVillage(vCode)
+                              fetchVillagePostalCode(vCode)
+                            }
                           }
                         }).finally(() => {
                           if (!cancelled) setLoadingVillages(false)
@@ -114,9 +166,9 @@ export function useRegionalCascade(initial?: RegionCascadeInitial) {
       })
       .finally(() => {
         if (!cancelled) setLoadingProvinces(false)
-      })
+    })
     return () => { cancelled = true }
-  }, [])
+  }, [fetchVillagePostalCode])
 
   const fetchRegencies = useCallback(async (provinceCode: string) => {
     if (!provinceCode) { setRegencies([]); return }
@@ -163,6 +215,7 @@ export function useRegionalCascade(initial?: RegionCascadeInitial) {
       setRegency("")
       setDistrict("")
       setVillage("")
+      setPostalCode("")
       setRegencies([])
       setDistricts([])
       setVillages([])
@@ -176,6 +229,7 @@ export function useRegionalCascade(initial?: RegionCascadeInitial) {
       setRegency(code)
       setDistrict("")
       setVillage("")
+      setPostalCode("")
       setDistricts([])
       setVillages([])
       if (code) fetchDistricts(code)
@@ -187,6 +241,7 @@ export function useRegionalCascade(initial?: RegionCascadeInitial) {
     (code: string) => {
       setDistrict(code)
       setVillage("")
+      setPostalCode("")
       setVillages([])
       if (code) fetchVillages(code)
     },
@@ -195,7 +250,8 @@ export function useRegionalCascade(initial?: RegionCascadeInitial) {
 
   const onVillageChange = useCallback((code: string) => {
     setVillage(code)
-  }, [])
+    fetchVillagePostalCode(code)
+  }, [fetchVillagePostalCode])
 
   const findName = (items: RegionItem[], code: string) =>
     findByCode(items, code)?.name ?? ""
@@ -205,6 +261,7 @@ export function useRegionalCascade(initial?: RegionCascadeInitial) {
     regency,
     district,
     village,
+    postalCode,
     provinces,
     regencies,
     districts,

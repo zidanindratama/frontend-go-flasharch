@@ -4,6 +4,26 @@ import { endpoints } from "@/lib/api/endpoints"
 export type AdminUserRoleCode = "admin" | "buyer"
 export type AdminUserStatus = "active" | "suspended"
 
+export type AdminUserAddress = {
+  id: string
+  user_id: string
+  label: string
+  recipient_name: string
+  phone: string
+  province: string
+  city: string
+  district: string
+  village_code: string
+  postal_code: string
+  address_line: string
+  notes: string
+  latitude: number | null
+  longitude: number | null
+  is_default: boolean
+  created_at: string
+  updated_at: string
+}
+
 export type AdminUser = {
   id: string
   email: string
@@ -19,6 +39,7 @@ export type AdminUser = {
   last_sign_in_at: string | null
   created_at: string
   updated_at: string
+  addresses?: AdminUserAddress[]
 }
 
 export type AdminUsersListParams = {

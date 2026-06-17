@@ -6,7 +6,7 @@ import { ArrowLeft, Loader2, MapPin, Save } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useEffect } from "react"
-import { useForm } from "react-hook-form"
+import { useForm, useWatch } from "react-hook-form"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import {
@@ -51,7 +51,7 @@ export function AddressForm({ mode, initialData }: AddressFormProps) {
           province: initialData.province,
           regency: initialData.city,
           district: initialData.district,
-          villageCode: initialData.postal_code,
+          villageCode: initialData.village_code,
         }
       : undefined,
   )
@@ -65,6 +65,7 @@ export function AddressForm({ mode, initialData }: AddressFormProps) {
       province: "",
       city: "",
       district: "",
+      village_code: "",
       postal_code: "",
       address_line: "",
       notes: "",
@@ -81,6 +82,7 @@ export function AddressForm({ mode, initialData }: AddressFormProps) {
       province: initialData.province,
       city: initialData.city,
       district: initialData.district,
+      village_code: initialData.village_code,
       postal_code: initialData.postal_code,
       address_line: initialData.address_line,
       notes: initialData.notes ?? "",
@@ -90,23 +92,44 @@ export function AddressForm({ mode, initialData }: AddressFormProps) {
 
   useEffect(() => {
     if (!cascade.province) return
-    form.setValue("province", cascade.provinceName)
+    form.setValue("province", cascade.provinceName, {
+      shouldDirty: true,
+      shouldValidate: true,
+    })
   }, [cascade.province, cascade.provinceName, form])
 
   useEffect(() => {
     if (!cascade.regency) return
-    form.setValue("city", cascade.regencyName)
+    form.setValue("city", cascade.regencyName, {
+      shouldDirty: true,
+      shouldValidate: true,
+    })
   }, [cascade.regency, cascade.regencyName, form])
 
   useEffect(() => {
     if (!cascade.district) return
-    form.setValue("district", cascade.districtName)
+    form.setValue("district", cascade.districtName, {
+      shouldDirty: true,
+      shouldValidate: true,
+    })
   }, [cascade.district, cascade.districtName, form])
 
   useEffect(() => {
     if (!cascade.village) return
-    form.setValue("postal_code", cascade.village)
+    form.setValue("village_code", cascade.village, {
+      shouldDirty: true,
+      shouldValidate: true,
+    })
   }, [cascade.village, form])
+
+  useEffect(() => {
+    if (!cascade.postalCode) return
+    if (form.getValues("postal_code")) return
+    form.setValue("postal_code", cascade.postalCode, {
+      shouldDirty: true,
+      shouldValidate: true,
+    })
+  }, [cascade.postalCode, form])
 
   async function handleSubmit(values: AddressValues) {
     const payload: CreateAddressInput = {
@@ -116,6 +139,7 @@ export function AddressForm({ mode, initialData }: AddressFormProps) {
       province: values.province,
       city: values.city,
       district: values.district,
+      village_code: values.village_code,
       postal_code: values.postal_code,
       address_line: values.address_line,
       notes: values.notes,
@@ -134,7 +158,10 @@ export function AddressForm({ mode, initialData }: AddressFormProps) {
     }
   }
 
-  const isDefault = form.watch("is_default")
+  const isDefault = useWatch({
+    control: form.control,
+    name: "is_default",
+  })
 
   return (
     <div className="space-y-5">
@@ -241,6 +268,12 @@ export function AddressForm({ mode, initialData }: AddressFormProps) {
                 value: cascade.village,
                 onChange: cascade.onVillageChange,
               }}
+              postalCode={{
+                value: form.watch("postal_code"),
+                onChange: (v) => form.setValue("postal_code", v),
+                error: !!form.formState.errors.postal_code,
+                readOnly: !!cascade.postalCode,
+              }}
               provinceOptions={cascade.provinces}
               regencyOptions={cascade.regencies}
               districtOptions={cascade.districts}
@@ -251,11 +284,14 @@ export function AddressForm({ mode, initialData }: AddressFormProps) {
               loadingVillage={cascade.loadingVillages}
               disabled={isBusy}
             />
-            <div className="mt-4 grid gap-4 sm:grid-cols-2">
+            <div className="mt-4">
               <FieldError
                 errors={[
                   form.formState.errors.province,
                   form.formState.errors.city,
+                  form.formState.errors.district,
+                  form.formState.errors.village_code,
+                  form.formState.errors.postal_code,
                 ]}
               />
             </div>

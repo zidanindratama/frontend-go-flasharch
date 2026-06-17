@@ -17,6 +17,7 @@ export const addressSchema = z.object({
   province: z.string().min(1, "Province is required"),
   city: z.string().min(1, "City is required"),
   district: z.string().min(1, "District is required"),
+  village_code: z.string().min(1, "Village is required"),
   postal_code: z.string().min(1, "Postal code is required"),
   address_line: z.string().min(1, "Address line is required"),
   notes: z.string().optional(),

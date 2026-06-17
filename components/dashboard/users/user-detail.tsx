@@ -164,6 +164,56 @@ export function UserDetail() {
           />
         </div>
       </section>
+
+      <section className="rounded-2xl border border-border bg-card">
+        <div className="border-b border-border px-6 py-4 sm:px-8">
+          <h2 className="text-sm font-semibold text-foreground">
+            Saved addresses
+          </h2>
+          <p className="mt-1 text-xs text-muted-foreground">
+            {user.addresses && user.addresses.length > 0
+              ? `${user.addresses.length} address${user.addresses.length > 1 ? "es" : ""} saved`
+              : "No addresses saved yet"}
+          </p>
+        </div>
+        {user.addresses && user.addresses.length > 0 ? (
+          <div className="divide-y divide-border">
+            {user.addresses.map((addr) => (
+              <div key={addr.id} className="px-6 py-4 sm:px-8">
+                <div className="flex items-start justify-between gap-4">
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-medium text-foreground">
+                        {addr.label}
+                      </span>
+                      {addr.is_default && (
+                        <span className="inline-flex items-center rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] font-medium text-emerald-600">
+                          Default
+                        </span>
+                      )}
+                    </div>
+                    <p className="mt-1 text-sm text-muted-foreground">
+                      {addr.recipient_name} &middot; {addr.phone}
+                    </p>
+                    <p className="mt-1 text-sm text-muted-foreground">
+                      {addr.address_line}
+                    </p>
+                    <p className="mt-0.5 text-xs text-muted-foreground">
+                      {addr.district}, {addr.city}, {addr.province} {addr.postal_code}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="px-6 py-8 text-center sm:px-8">
+            <p className="text-sm text-muted-foreground">
+              This user has not saved any addresses.
+            </p>
+          </div>
+        )}
+      </section>
     </div>
   );
 }
