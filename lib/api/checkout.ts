@@ -156,6 +156,7 @@ export type AdminOrderDetail = AdminOrderRow & {
     sku: string
     quantity: number
     unit_price_amount: number
+    original_price_amount: number
     line_total_amount: number
     currency: string
     created_at: string

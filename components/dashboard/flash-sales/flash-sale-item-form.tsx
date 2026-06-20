@@ -191,9 +191,9 @@ function CreateItemForm({ saleId, saleName }: { saleId: string; saleName?: strin
                 {productDetailQuery.data && (
                   <p className="mt-1.5 text-xs text-muted-foreground">
                     Normal price: {formatCurrency(productDetailQuery.data.base_price_amount)}
-                    {values.sale_price_amount > 0 && productDetailQuery.data.base_price_amount > 0 && (
+                    {(values.sale_price_amount ?? 0) > 0 && productDetailQuery.data.base_price_amount > 0 && (
                       <span className="ml-2 font-medium text-[#1a8a0a] dark:text-emerald-400">
-                        ({Math.round((1 - values.sale_price_amount / productDetailQuery.data.base_price_amount) * 100)}% off)
+                        ({Math.round((1 - (values.sale_price_amount ?? 0) / productDetailQuery.data.base_price_amount) * 100)}% off)
                       </span>
                     )}
                   </p>
