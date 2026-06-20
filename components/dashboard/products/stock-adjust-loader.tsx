@@ -22,6 +22,7 @@ import { Input } from "@/components/ui/input"
 import { StockAdjustForm } from "@/components/dashboard/products/stock-adjust-form"
 import { getInventoryProductStock, adjustProductStock } from "@/lib/api/inventory"
 import { getAdminProduct } from "@/lib/api/catalog"
+import { getErrorMessage } from "@/lib/api/errors"
 import { cn } from "@/lib/utils"
 
 export function StockAdjustLoader() {
@@ -60,7 +61,7 @@ export function StockAdjustLoader() {
     },
     onError: async (error) => {
       const { toast } = await import("sonner")
-      toast.error(error.message)
+      toast.error(getErrorMessage(error, "Failed to create stock"))
     },
   })
 

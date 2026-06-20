@@ -7,6 +7,7 @@ import { FlashSaleLiveStats } from "@/components/main/flash-sale/flash-sale-live
 import { FlashSaleHowItWorks } from "@/components/main/flash-sale/flash-sale-how-it-works";
 import { FlashSaleTrustBar } from "@/components/main/flash-sale/flash-sale-trust-bar";
 import { FlashSaleCTA } from "@/components/main/flash-sale/flash-sale-cta";
+import { FlashSaleCheckoutBanner } from "@/components/main/flash-sale/flash-sale-checkout-banner";
 import { createPageMetadata } from "@/lib/seo";
 
 export const metadata: Metadata = createPageMetadata({
@@ -20,6 +21,7 @@ export const metadata: Metadata = createPageMetadata({
 export default function FlashSalePage() {
   return (
     <>
+      <FlashSaleCheckoutBanner />
       <FlashSaleTicker />
       <FlashSaleHero />
       <FlashSaleProgressBar />

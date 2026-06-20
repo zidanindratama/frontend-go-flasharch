@@ -5,8 +5,8 @@ import { cn } from "@/lib/utils"
 const statusStyles: Record<FlashSaleStatus, string> = {
   draft: "border border-white/15 bg-white/10 text-white/80",
   scheduled: "border border-blue-400/30 bg-blue-500/15 text-blue-300",
-  running: "border border-[#39FF14]/30 bg-[#39FF14]/15 text-[#39FF14]",
-  ended: "border border-white/10 bg-white/5 text-white/50",
+  running: "border border-emerald-500/30 bg-emerald-500/15 text-emerald-400",
+  ended: "border border-gray-400/30 bg-gray-500/10 text-gray-500 dark:border-white/10 dark:bg-white/5 dark:text-white/50",
   cancelled: "border border-[#DC143C]/30 bg-[#DC143C]/15 text-[#DC143C]",
 }
 

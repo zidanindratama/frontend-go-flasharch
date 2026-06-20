@@ -16,16 +16,42 @@ export type PaymentSummary = {
   updated_at?: string
 }
 
+export type ShipmentSummary = {
+  id: string
+  order_id: string
+  carrier: string
+  tracking_number: string
+  status: "shipped" | "delivered"
+  shipped_at: string
+  delivered_at: string | null
+  created_at: string
+  updated_at: string
+}
+
 export type BuyerOrderRow = {
   id: string
   order_code: string
   checkout_id: string
   status: string
   subtotal_amount: number
+  shipping_cost: number
+  carrier: string
   total_amount: number
   currency: string
   item_count: number
+  thumbnail_url: string | null
   payment: PaymentSummary | null
+  shipment: ShipmentSummary | null
+  address: {
+    recipient_name: string
+    phone: string
+    province: string
+    city: string
+    district: string
+    village_code: string
+    postal_code: string
+    address_line: string
+  } | null
   created_at: string
   updated_at: string
 }
@@ -109,7 +135,12 @@ export type WishlistItem = {
 
 export type WishlistResponse = {
   message: string
-  data: { items: WishlistItem[] }
+  data: { items: WishlistItem[]; page: number; per_page: number; total: number }
+}
+
+export type WishlistParams = {
+  page?: number
+  per_page?: number
 }
 
 export const getBuyerDashboard = () =>
@@ -164,8 +195,8 @@ export type WishlistSingleResponse = {
   data: WishlistItem
 }
 
-export const getBuyerWishlist = () =>
-  api.get<WishlistResponse>(endpoints.user.wishlist)
+export const getBuyerWishlist = (params?: WishlistParams) =>
+  api.get<WishlistResponse>(endpoints.user.wishlist, { params })
 
 export const addToWishlist = (data: AddWishlistInput) =>
   api.post<WishlistSingleResponse>(endpoints.user.wishlist + "/items", data)
@@ -174,3 +205,69 @@ export const removeFromWishlist = (productId: string) =>
   api.delete<{ message: string }>(
     `${endpoints.user.wishlist}/items/${productId}`,
   )
+
+export type OrderTimelineStep = {
+  status: string
+  label: string
+  occurred_at: string | null
+  state: "completed" | "current" | "pending" | "failed"
+}
+
+export type OrderItem = {
+  id: string
+  product_id: string | null
+  flash_sale_item_id: string | null
+  reservation_id: string | null
+  product_name: string
+  sku: string
+  quantity: number
+  unit_price_amount: number
+  original_price_amount: number
+  line_total_amount: number
+  currency: string
+  thumbnail_url: string | null
+  created_at: string
+}
+
+export type OrderDetail = {
+  id: string
+  order_code: string
+  checkout_id: string
+  status: string
+  subtotal_amount: number
+  shipping_cost: number
+  carrier: string
+  total_amount: number
+  currency: string
+  checkout: {
+    id: string
+    checkout_code: string
+    status: string
+    source: string
+  } | null
+  payment: PaymentSummary | null
+  shipment: ShipmentSummary | null
+  address: {
+    recipient_name: string
+    phone: string
+    province: string
+    city: string
+    district: string
+    village_code: string
+    postal_code: string
+    address_line: string
+  } | null
+  items: OrderItem[]
+  reservations: unknown[]
+  timeline: OrderTimelineStep[]
+  created_at: string
+  updated_at: string
+}
+
+export type OrderDetailResponse = {
+  message: string
+  data: OrderDetail
+}
+
+export const getOrderDetail = (orderId: string) =>
+  api.get<OrderDetailResponse>(`${endpoints.orders.list}/${orderId}`)

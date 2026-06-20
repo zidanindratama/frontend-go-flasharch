@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -12,6 +13,7 @@ const smoothEase: [number, number, number, number] = [0.16, 1, 0.3, 1];
 const iconRotation = [HardDrive];
 
 export function FlashSaleItemCard({ item, index }: { item: FlashSaleItem; index: number }) {
+  const router = useRouter();
   const Icon = iconRotation[index % iconRotation.length];
   const remaining = item.remaining_quantity ?? Math.max(0, item.sale_stock_quantity - item.reserved_quantity - item.sold_quantity);
   const claimedPercent = item.sale_stock_quantity > 0
@@ -31,6 +33,11 @@ export function FlashSaleItemCard({ item, index }: { item: FlashSaleItem; index:
     badgeVariant = "outline";
   }
 
+  function handleClaim() {
+    if (remaining <= 0) return;
+    router.push(`/checkout?source=flash_sale&item_id=${item.id}`);
+  }
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 28 }}
@@ -42,12 +49,20 @@ export function FlashSaleItemCard({ item, index }: { item: FlashSaleItem; index:
     >
       <Link href={`/products/${item.product.slug}`} className="block">
         <div className="relative aspect-[4/3] overflow-hidden bg-muted">
-          <div className="absolute inset-0 flex items-center justify-center">
-            <div className="relative">
-              <div className="absolute inset-0 rounded-full bg-[#FF6600]/5 blur-3xl scale-150 group-hover:scale-200 transition-transform duration-700" />
-              <Icon className="relative h-16 w-16 text-muted-foreground/30 transition-colors duration-500 group-hover:text-[#FF6600]/40" />
+          {item.product.thumbnail_url ? (
+            <img
+              src={item.product.thumbnail_url}
+              alt={item.product.name}
+              className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+            />
+          ) : (
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="relative">
+                <div className="absolute inset-0 rounded-full bg-[#FF6600]/5 blur-3xl scale-150 group-hover:scale-200 transition-transform duration-700" />
+                <Icon className="relative h-16 w-16 text-muted-foreground/30 transition-colors duration-500 group-hover:text-[#FF6600]/40" />
+              </div>
             </div>
-          </div>
+          )}
           <div className="absolute top-3 right-3">
             <Badge variant={badgeVariant} className="rounded-full text-xs">
               {stockLabel}
@@ -67,6 +82,11 @@ export function FlashSaleItemCard({ item, index }: { item: FlashSaleItem; index:
           <h3 className="mt-1 text-lg font-semibold leading-tight">{item.product.name}</h3>
 
           <div className="mt-3 flex items-baseline gap-2">
+            {item.product.price_amount > item.sale_price_amount && (
+              <span className="text-sm text-muted-foreground line-through">
+                {item.product.price_amount.toLocaleString()}
+              </span>
+            )}
             <span className="text-2xl font-bold text-[#FF6600]">
               {item.sale_price_amount.toLocaleString()}
             </span>
@@ -93,11 +113,15 @@ export function FlashSaleItemCard({ item, index }: { item: FlashSaleItem; index:
 
       <div className="px-5 pb-5">
         <Button
-          asChild
           disabled={remaining <= 0}
+          onClick={handleClaim}
           className="w-full rounded-full bg-[#FF6600] text-white hover:bg-[#e65c00] disabled:opacity-50"
         >
-          <Link href={`/products/${item.product.slug}`}>{remaining <= 0 ? "Sold out" : "Claim now"}</Link>
+          {remaining <= 0 ? (
+            "Sold out"
+          ) : (
+            "Claim now"
+          )}
         </Button>
       </div>
     </motion.div>

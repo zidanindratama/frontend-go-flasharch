@@ -23,6 +23,8 @@ const statusStyles: Record<string, string> = {
   expired: "bg-muted text-muted-foreground",
   shipped: "bg-blue-500/10 text-blue-600 dark:bg-blue-500/15 dark:text-blue-400",
   completed: "bg-emerald-500/10 text-emerald-600 dark:bg-emerald-500/15 dark:text-emerald-400",
+  fulfilled: "bg-emerald-500/10 text-emerald-600 dark:bg-emerald-500/15 dark:text-emerald-400",
+  pending_payment: "bg-amber-500/10 text-amber-600 dark:bg-amber-500/15 dark:text-amber-400",
 }
 
 function formatCurrency(amount: number) {

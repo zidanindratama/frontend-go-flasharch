@@ -6,6 +6,11 @@ export const metadata: Metadata = {
   description: "Selesaikan pesanan Anda",
 }
 
-export default function Checkout() {
-  return <CheckoutPage />
+export default async function Checkout({
+  searchParams,
+}: {
+  searchParams: Promise<{ source?: string; item_id?: string }>
+}) {
+  const params = await searchParams
+  return <CheckoutPage source={params.source} itemId={params.item_id} />
 }

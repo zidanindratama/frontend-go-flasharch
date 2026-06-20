@@ -44,6 +44,7 @@ import {
 } from "@/components/ui/alert-dialog"
 import { FlashSaleStatusBadge } from "./flash-sale-badges"
 import { FlashSaleActions } from "./flash-sale-actions"
+import { ReconciliationPanel } from "./reconciliation-panel"
 import {
   canCancel,
   canEnd,
@@ -174,14 +175,16 @@ export function FlashSaleDetail() {
   const report = reportQuery.data
   const totalItems = itemsMetaQuery.data?.total ?? 0
   const activeItems = activeItemsMetaQuery.data?.total ?? 0
+  const draftWithoutActiveItems = sale.status === "draft" && activeItems === 0
   const hasActions =
-    canSchedule(sale.status) ||
+    (canSchedule(sale.status) && activeItems > 0) ||
     canRevertDraft(sale.status) ||
     canPreload(sale.status) ||
     canRun(sale.status) ||
     canRelease(sale.status) ||
     canEnd(sale.status) ||
-    canCancel(sale.status)
+    canCancel(sale.status) ||
+    draftWithoutActiveItems
 
   return (
     <div className="flex min-w-0 flex-col gap-4">
@@ -203,10 +206,17 @@ export function FlashSaleDetail() {
 
       {hasActions && (
         <div className="rounded-xl border border-border bg-card p-3 shadow-sm sm:p-4">
+          {draftWithoutActiveItems && (
+            <div className="mb-3 flex items-start gap-2 rounded-lg bg-muted/45 px-3 py-2.5 text-sm text-muted-foreground">
+              <CircleAlert className="mt-0.5 size-4 shrink-0 text-[#FF6600]" />
+              <span>Add at least one active item before scheduling automatic launch.</span>
+            </div>
+          )}
           <FlashSaleActions
             saleId={sale.id}
             status={sale.status}
             redisPreloadedAt={sale.redis_preloaded_at}
+            activeItems={activeItems}
             readinessReady={readiness?.ready}
             readinessLoading={readinessQuery.isLoading}
           />
@@ -230,6 +240,8 @@ export function FlashSaleDetail() {
         </div>
         <ReportPanel report={report} isLoading={reportQuery.isLoading} isError={reportQuery.isError} />
       </div>
+
+      <ReconciliationPanel saleId={sale.id} />
 
       <AlertDialog open={!!deleteTarget} onOpenChange={() => setDeleteTarget(null)}>
         <AlertDialogContent>
@@ -665,8 +677,13 @@ function ItemRow({
       <td className="px-3 py-3">
         <ItemStatusBadge status={item.status} />
       </td>
-      <td className="px-3 py-3 text-right font-medium text-[#d65300]">
-        {formatPrice(item.sale_price_amount)}
+      <td className="px-3 py-3 text-right">
+        <span className="text-[#d65300] font-medium">{formatPrice(item.sale_price_amount)}</span>
+        {item.product.price_amount > item.sale_price_amount && (
+          <span className="ml-1.5 text-xs text-muted-foreground line-through">
+            {formatPrice(item.product.price_amount)}
+          </span>
+        )}
       </td>
       <td className="px-3 py-3 text-right tabular-nums">{item.sale_stock_quantity}</td>
       <td className="px-3 py-3 text-right tabular-nums text-amber-600 dark:text-amber-400">
@@ -734,7 +751,17 @@ function MobileItemCard({
       </div>
 
       <div className="mt-3 grid grid-cols-2 gap-2 text-xs">
-        <MobileStat label="Price" value={formatPrice(item.sale_price_amount)} tone="price" />
+        <div>
+          <span className="text-xs text-muted-foreground">Price</span>
+          <div className="mt-0.5">
+            <span className="font-medium text-[#d65300]">{formatPrice(item.sale_price_amount)}</span>
+            {item.product.price_amount > item.sale_price_amount && (
+              <span className="ml-1 text-xs text-muted-foreground line-through">
+                {formatPrice(item.product.price_amount)}
+              </span>
+            )}
+          </div>
+        </div>
         <MobileStat label="Remaining" value={String(item.remaining_quantity)} strong />
         <MobileStat label="Stock" value={String(item.sale_stock_quantity)} />
         <MobileStat label="Reserved" value={String(item.reserved_quantity)} tone="warn" />
@@ -936,11 +963,11 @@ function ItemStatusBadge({ status }: { status: FlashSaleItemStatus }) {
 }
 
 function getBlockingReason(sale: FlashSale, readiness?: FlashSaleReadiness, activeItems = 0) {
-  if (sale.status === "draft") return "Schedule sale first"
-  if (!sale.redis_preloaded_at) return "Preload Redis"
   if (activeItems === 0) {
     return "Add active item"
   }
+  if (sale.status === "draft") return "Schedule sale first"
+  if (!sale.redis_preloaded_at) return "Preload Redis"
   if (readiness && !readiness.ready) return "Missing Redis keys"
   return ""
 }

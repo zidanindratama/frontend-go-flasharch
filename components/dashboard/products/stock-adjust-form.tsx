@@ -29,6 +29,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { adjustProductStock, type StockSnapshot } from "@/lib/api/inventory"
+import { getErrorMessage } from "@/lib/api/errors"
 import { cn } from "@/lib/utils"
 
 const adjustSchema = z.object({
@@ -84,7 +85,7 @@ export function StockAdjustForm({ stock }: StockAdjustFormProps) {
     },
     onError: (error: Error) => {
       form.setError("root", {
-        message: error.message || "Failed to adjust stock",
+        message: getErrorMessage(error, "Failed to adjust stock"),
       })
     },
   })

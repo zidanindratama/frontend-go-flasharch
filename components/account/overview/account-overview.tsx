@@ -13,13 +13,13 @@ import {
 } from "lucide-react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Skeleton } from "@/components/ui/skeleton"
+import { OrderStatusBadge } from "@/components/common/order-status-badge"
 import { useUser } from "@/lib/hooks/use-auth"
 import {
   getBuyerDashboard,
   type BuyerOrderRow,
 } from "@/lib/api/account"
 import { useAuthStore } from "@/stores/auth"
-import { cn } from "@/lib/utils"
 
 const ease: [number, number, number, number] = [0.16, 1, 0.3, 1]
 
@@ -67,19 +67,6 @@ function formatCurrency(amount: number) {
   }).format(amount)
 }
 
-function statusStyle(status: string) {
-  if (["paid", "completed", "confirmed"].includes(status)) {
-    return "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
-  }
-  if (["pending", "pending_payment", "waiting_payment"].includes(status)) {
-    return "bg-amber-500/10 text-amber-600 dark:text-amber-400"
-  }
-  if (["cancelled", "failed", "expired"].includes(status)) {
-    return "bg-red-500/10 text-red-600 dark:text-red-400"
-  }
-  return "bg-muted text-muted-foreground"
-}
-
 function OrderRow({ order }: { order: BuyerOrderRow }) {
   return (
     <Link
@@ -102,14 +89,7 @@ function OrderRow({ order }: { order: BuyerOrderRow }) {
         <p className="text-sm font-semibold tabular-nums text-foreground">
           {formatCurrency(order.total_amount)}
         </p>
-        <span
-          className={cn(
-            "mt-1 inline-flex rounded-full px-2 py-0.5 text-[11px] font-medium capitalize",
-            statusStyle(order.status),
-          )}
-        >
-          {order.status.replaceAll("_", " ")}
-        </span>
+        <OrderStatusBadge status={order.status} className="mt-1" />
       </div>
     </Link>
   )

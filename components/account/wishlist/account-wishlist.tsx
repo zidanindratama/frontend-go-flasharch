@@ -20,6 +20,7 @@ import {
 } from "@/lib/api/account"
 import { useAuthStore } from "@/stores/auth"
 import { cn } from "@/lib/utils"
+import { PaginationBar } from "@/components/main/products/pagination-bar"
 
 const smoothEase: [number, number, number, number] = [0.16, 1, 0.3, 1]
 
@@ -203,24 +204,29 @@ function EmptyState() {
 export function AccountWishlist() {
   const token = useAuthStore((s) => s.access_token)
   const queryClient = useQueryClient()
+  const [page, setPage] = useState(1)
+  const perPage = 20
 
-  const { data: items = [], isLoading } = useQuery<WishlistItem[]>({
-    queryKey: ["account.wishlist"],
+  const { data, isLoading } = useQuery({
+    queryKey: ["account.wishlist", { page, perPage }],
     queryFn: async () => {
-      const response = await getBuyerWishlist()
-      return response.data.data.items
+      const response = await getBuyerWishlist({ page, per_page: perPage })
+      return response.data
     },
     enabled: !!token,
   })
 
+  const items = data?.data.items ?? []
+  const total = data?.data.total ?? 0
+
   const removeMutation = useMutation({
     mutationFn: (productId: string) => removeFromWishlist(productId),
     onMutate: async (productId) => {
-      await queryClient.cancelQueries({ queryKey: ["account.wishlist"] })
-      const previous = queryClient.getQueryData<WishlistItem[]>(["account.wishlist"])
-      queryClient.setQueryData<WishlistItem[]>(["account.wishlist"], (old) => {
+      await queryClient.cancelQueries({ queryKey: ["account.wishlist", { page, perPage }] })
+      const previous = queryClient.getQueryData(["account.wishlist", { page, perPage }])
+      queryClient.setQueryData(["account.wishlist", { page, perPage }], (old: { data: { items: WishlistItem[] } } | undefined) => {
         if (!old) return old
-        return old.filter((item) => item.product.id !== productId)
+        return { ...old, data: { ...old.data, items: old.data.items.filter((item) => item.product.id !== productId) } }
       })
       const { toast } = await import("sonner")
       toast.success("Removed from wishlist")
@@ -228,7 +234,7 @@ export function AccountWishlist() {
     },
     onError: async (_err, _productId, context) => {
       if (context?.previous) {
-        queryClient.setQueryData(["account.wishlist"], context.previous)
+        queryClient.setQueryData(["account.wishlist", { page, perPage }], context.previous)
       }
       const { toast } = await import("sonner")
       toast.error("Failed to remove item")
@@ -237,8 +243,6 @@ export function AccountWishlist() {
       queryClient.invalidateQueries({ queryKey: ["account.wishlist"] })
     },
   })
-
-  const itemCount = items.length
 
   const handleRemove = useCallback(
     (productId: string) => {
@@ -258,44 +262,52 @@ export function AccountWishlist() {
         <h1 className="text-lg font-bold tracking-tight lg:text-xl">
           My Wishlist
         </h1>
-        {!isLoading && itemCount > 0 && (
+        {!isLoading && total > 0 && (
           <motion.span
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.15, duration: 0.3, ease: smoothEase }}
             className="inline-flex h-6 min-w-[1.5rem] items-center justify-center rounded-full bg-[#FF6600]/10 px-2 text-xs font-semibold tabular-nums text-[#FF6600]"
           >
-            {itemCount}
+            {total}
           </motion.span>
         )}
       </motion.div>
 
       {isLoading ? (
         <WishlistSkeleton />
-      ) : itemCount > 0 ? (
-        <div className="space-y-3">
-          <AnimatePresence mode="popLayout">
-            {items.map((item, index) => (
-              <motion.div
-                key={item.id}
-                layout
-                initial={{ opacity: 0, y: 16 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{
-                  layout: { duration: 0.3, ease: smoothEase },
-                  opacity: { duration: 0.3 },
-                  y: { duration: 0.35, delay: index * 0.04, ease: smoothEase },
-                }}
-              >
-                <WishlistCard
-                  item={item}
-                  onRemove={handleRemove}
-                  isRemoving={removeMutation.isPending && removeMutation.variables === item.product.id}
-                />
-              </motion.div>
-            ))}
-          </AnimatePresence>
-        </div>
+      ) : items.length > 0 ? (
+        <>
+          <div className="space-y-3">
+            <AnimatePresence mode="popLayout">
+              {items.map((item, index) => (
+                <motion.div
+                  key={item.id}
+                  layout
+                  initial={{ opacity: 0, y: 16 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{
+                    layout: { duration: 0.3, ease: smoothEase },
+                    opacity: { duration: 0.3 },
+                    y: { duration: 0.35, delay: index * 0.04, ease: smoothEase },
+                  }}
+                >
+                  <WishlistCard
+                    item={item}
+                    onRemove={handleRemove}
+                    isRemoving={removeMutation.isPending && removeMutation.variables === item.product.id}
+                  />
+                </motion.div>
+              ))}
+            </AnimatePresence>
+          </div>
+          <PaginationBar
+            page={page}
+            perPage={perPage}
+            total={total}
+            onPageChange={setPage}
+          />
+        </>
       ) : (
         <EmptyState />
       )}

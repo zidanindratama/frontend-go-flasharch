@@ -22,6 +22,7 @@ export const endpoints = {
   },
   orders: {
     list: "/orders",
+    detail: (id: string) => `/orders/${id}` as const,
   },
   products: "/products",
   categories: "/categories",

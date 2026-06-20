@@ -21,7 +21,9 @@ export type FlashSaleItem = {
     sku: string
     slug: string
     name: string
+    price_amount: number
     weight: number
+    thumbnail_url: string | null
   }
   sale_price_amount: number
   currency: string
@@ -145,6 +147,49 @@ export type FlashSaleReport = {
   generated_at: string
 }
 
+export type ReconciliationItem = {
+  item_id: string
+  product_id: string
+  product_name: string
+  product_sku: string
+  initial_stock: number
+  redis_remaining: number | null
+  redis_reserved: number | null
+  redis_keys_available: boolean
+  postgresql_sold: number
+  postgresql_reserved: number
+  expected_remaining: number
+  difference: number | null
+}
+
+export type ReconciliationSummary = {
+  total_items: number
+  mismatched_items: number
+  total_initial_stock: number
+  total_postgresql_sold: number
+  has_mismatch: boolean
+}
+
+export type ReconciliationReport = {
+  sale_id: string
+  sale_name: string
+  status: FlashSaleStatus
+  reconciled_at: string
+  summary: ReconciliationSummary
+  items: ReconciliationItem[]
+  page: number
+  per_page: number
+  total: number
+}
+
+export type ReconciliationFilter = {
+  page?: number
+  per_page?: number
+  sort?: string
+  order?: "asc" | "desc"
+  filter?: "mismatch"
+}
+
 export function getActiveFlashSale() {
   return api.get<{ message: string; data: FlashSale }>(`${endpoints.flashSales}/active`)
 }
@@ -225,4 +270,11 @@ export function deleteFlashSaleItem(saleId: string, itemId: string) {
 
 export function deleteFlashSale(saleId: string) {
   return api.delete(`${endpoints.admin.flashSales}/${saleId}`)
+}
+
+export function getFlashSaleReconciliation(saleId: string, params?: ReconciliationFilter) {
+  return api.get<{ message: string; data: ReconciliationReport }>(
+    `${endpoints.admin.flashSales}/${saleId}/reconciliation`,
+    { params },
+  )
 }

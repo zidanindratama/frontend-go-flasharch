@@ -44,6 +44,7 @@ interface FlashSaleActionsProps {
   saleId: string
   status: FlashSaleStatus
   redisPreloadedAt: string | null
+  activeItems?: number
   readinessReady?: boolean
   readinessLoading?: boolean
 }
@@ -52,6 +53,7 @@ export function FlashSaleActions({
   saleId,
   status,
   redisPreloadedAt,
+  activeItems = 0,
   readinessReady,
   readinessLoading,
 }: FlashSaleActionsProps) {
@@ -132,8 +134,9 @@ export function FlashSaleActions({
 
   const isLoading = statusMutation.isPending || preloadMutation.isPending || releaseMutation.isPending
   const canStart = canRun(status) && !!redisPreloadedAt && readinessReady === true
+  const canScheduleWithItems = canSchedule(status) && activeItems > 0
 
-  if (!canSchedule(status) && !canRevertDraft(status) && !canRun(status) && !canEnd(status) && !canCancel(status) && !canPreload(status) && !canRelease(status)) {
+  if (!canScheduleWithItems && !canRevertDraft(status) && !canRun(status) && !canEnd(status) && !canCancel(status) && !canPreload(status) && !canRelease(status)) {
     return null
   }
 
@@ -179,7 +182,7 @@ export function FlashSaleActions({
           </Button>
         )}
 
-        {canSchedule(status) && (
+        {canScheduleWithItems && (
           <Button
             variant="outline"
             size="sm"
@@ -188,7 +191,7 @@ export function FlashSaleActions({
             disabled={isLoading}
           >
             <ChevronRight className="size-4" />
-            Schedule
+            Schedule for automatic launch
           </Button>
         )}
 
@@ -248,6 +251,8 @@ export function FlashSaleActions({
                 ? "This will start the flash sale. Make sure Redis is preloaded first."
                 : confirmAction === "draft"
                 ? "This will move the scheduled sale back to draft so timing and items can be revised."
+                : confirmAction === "schedule"
+                ? "This hands the sale to the scheduler. Redis will be preloaded automatically, the sale will start at or after the scheduled start time, and it will end after the scheduled end time."
                 : `Change status to ${confirmAction}?`}
             </AlertDialogDescription>
           </AlertDialogHeader>

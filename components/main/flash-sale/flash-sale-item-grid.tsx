@@ -58,7 +58,8 @@ export function FlashSaleItemGrid() {
       return res.data.data;
     },
     enabled: !!sale?.slug,
-    staleTime: 30_000,
+    staleTime: sale?.status === "running" ? 5_000 : 30_000,
+    refetchInterval: sale?.status === "running" ? 10_000 : false,
   });
 
   useEffect(() => {

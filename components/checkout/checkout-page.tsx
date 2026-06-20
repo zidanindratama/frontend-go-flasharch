@@ -7,8 +7,10 @@ import Link from "next/link"
 import { motion, AnimatePresence } from "framer-motion"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
+import { useQuery } from "@tanstack/react-query"
 import { useCart } from "@/lib/hooks/use-cart"
-import { useCheckoutFlow } from "@/lib/hooks/use-checkout"
+import { useCheckoutFlow, useFlashSaleCheckoutFlow } from "@/lib/hooks/use-checkout"
+import { getActiveFlashSale, type FlashSaleItem } from "@/lib/api/flash-sale"
 import { formatPrice } from "@/components/dashboard/products/product-utils"
 import type { UserAddress } from "@/lib/api/account"
 import type { ShippingOption } from "@/lib/hooks/use-shipping"
@@ -58,68 +60,102 @@ function StepIndicator({
   )
 }
 
-export function CheckoutPage() {
+export function CheckoutPage({ source, itemId }: { source?: string; itemId?: string }) {
   const router = useRouter()
+  const isFlashSale = !!(source === "flash_sale" && itemId)
+
   const { cart, isLoading: cartLoading } = useCart()
-  const { phase, startCheckout, isStarting } = useCheckoutFlow(cart?.id ?? null)
+  const { phase: cartPhase, startCheckout: cartStartCheckout, isStarting: cartIsStarting } = useCheckoutFlow(cart?.id ?? null)
+
+  const { data: flashSaleData, isLoading: saleLoading } = useQuery({
+    queryKey: ["flashSale.active"],
+    queryFn: () => getActiveFlashSale(),
+    enabled: isFlashSale,
+  })
+
+  const flashSaleItem = useMemo(() => {
+    if (!isFlashSale || !flashSaleData?.data?.data?.items || !itemId) return null
+    return flashSaleData.data.data.items.find((i: FlashSaleItem) => i.id === itemId) ?? null
+  }, [flashSaleData, itemId, isFlashSale])
+
+  const { phase: flashPhase, startCheckout: flashStartCheckout, isStarting: flashIsStarting } = useFlashSaleCheckoutFlow()
+
+  const phase = isFlashSale ? flashPhase : cartPhase
+  const isStarting = isFlashSale ? flashIsStarting : cartIsStarting
 
   const [selectedAddress, setSelectedAddress] = useState<UserAddress | null>(null)
   const [selectedShipping, setSelectedShipping] = useState<ShippingOption | null>(null)
 
   const totalQuantity = useMemo(() => {
+    if (isFlashSale) return 1
     if (!cart) return 0
     return cart.items.reduce((sum, item) => sum + item.quantity, 0)
-  }, [cart])
+  }, [cart, isFlashSale])
 
   const totalWeight = useMemo(() => {
+    if (isFlashSale) return flashSaleItem?.product?.weight ?? 0
     if (!cart) return 0
     return cart.items.reduce(
       (sum, item) => sum + (item.product.weight || 0) * item.quantity,
       0,
     )
-  }, [cart])
+  }, [cart, isFlashSale, flashSaleItem])
 
   const subtotal = useMemo(() => {
+    if (isFlashSale) return flashSaleItem?.sale_price_amount ?? 0
     if (!cart) return 0
     return cart.items.reduce(
       (sum, item) => sum + item.unit_price_amount * item.quantity,
       0,
     )
-  }, [cart])
+  }, [cart, isFlashSale, flashSaleItem])
 
   const total = subtotal + (selectedShipping?.price ?? 0)
 
   const outOfStockItems = useMemo(() => {
+    if (isFlashSale) return []
     if (!cart) return []
     return cart.items.filter((item) => item.product.available_stock <= 0)
-  }, [cart])
+  }, [cart, isFlashSale])
 
   const insufficientStockItems = useMemo(() => {
+    if (isFlashSale) return []
     if (!cart) return []
     return cart.items.filter(
       (item) => item.product.available_stock > 0 && item.product.available_stock < item.quantity,
     )
-  }, [cart])
+  }, [cart, isFlashSale])
 
   const hasStockIssues = outOfStockItems.length > 0 || insufficientStockItems.length > 0
 
+  const isLoading = isFlashSale ? saleLoading : cartLoading
+
   useEffect(() => {
-    if (!cartLoading && (!cart || cart.items.length === 0)) {
+    if (phase !== "idle") return
+    if (isLoading) return
+    if (isFlashSale && !flashSaleItem) {
+      router.push("/flash-sale")
+    } else if (!isFlashSale && (!cart || cart.items.length === 0)) {
       router.push("/account/cart")
     }
-  }, [cart, cartLoading, router])
+  }, [cart, isLoading, router, phase, isFlashSale, flashSaleItem])
 
   useEffect(() => {
     if (phase === "error") {
-      router.push("/account/orders")
+      router.push(isFlashSale ? "/flash-sale" : "/account/orders")
     }
-  }, [phase, router])
+  }, [phase, router, isFlashSale])
 
   const handlePay = () => {
-    startCheckout(selectedAddress?.id, selectedShipping?.price)
+    if (isFlashSale) {
+      if (!flashSaleItem) return
+      flashStartCheckout(flashSaleItem.id, selectedAddress?.id, selectedShipping?.price, selectedShipping?.courier_name)
+    } else {
+      cartStartCheckout(selectedAddress?.id, selectedShipping?.price, selectedShipping?.courier_name)
+    }
   }
 
-  if (cartLoading) {
+  if (isLoading) {
     return (
       <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 md:px-8 md:py-12">
         <Skeleton className="mb-8 h-6 w-32" />
@@ -136,16 +172,20 @@ export function CheckoutPage() {
     )
   }
 
-  if (!cart || cart.items.length === 0) return null
+  if (isFlashSale && !flashSaleItem) return null
+  if (!isFlashSale && (!cart || cart.items.length === 0)) return null
+
+  const backHref = isFlashSale ? "/flash-sale" : "/account/cart"
+  const backLabel = isFlashSale ? "Back to flash sale" : "Back to cart"
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-6 sm:px-6 md:px-8 md:py-10 lg:py-12">
       <Link
-        href="/account/cart"
+        href={backHref}
         className="mb-6 inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground sm:mb-8 lg:mb-10"
       >
         <ArrowLeft className="h-3.5 w-3.5" />
-        Back to cart
+        {backLabel}
       </Link>
 
       <div className="grid gap-8 lg:grid-cols-[1fr_400px] lg:gap-12">
@@ -223,79 +263,119 @@ export function CheckoutPage() {
             <div className="mb-5 flex items-center justify-between">
               <h3 className="text-sm font-semibold">Order summary</h3>
               <span className="inline-flex items-center rounded-full bg-[#FF6600]/10 px-2.5 py-0.5 text-[11px] font-semibold text-[#FF6600]">
-                {totalQuantity} item{totalQuantity !== 1 ? "s" : ""}
+                {isFlashSale ? "Flash sale" : `${totalQuantity} item${totalQuantity !== 1 ? "s" : ""}`}
               </span>
             </div>
 
             <div className="mb-5 max-h-[360px] space-y-3 overflow-y-auto pr-1">
-              {cart.items.map((item) => {
-                const itemWeight = (item.product.weight || 0) * item.quantity
-                const stock = item.product.available_stock
-                const isOutOfStock = stock <= 0
-                const isLowStock = stock > 0 && stock < item.quantity
-                return (
-                  <div
-                    key={item.id}
-                    className={`flex gap-3 rounded-xl p-3 transition-colors ${
-                      isOutOfStock
-                        ? "bg-destructive/5 opacity-60"
-                        : isLowStock
-                          ? "bg-yellow-500/5 dark:bg-yellow-500/10"
-                          : "bg-muted/50"
-                    }`}
-                  >
-                    <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-lg bg-background shadow-sm sm:h-16 sm:w-16">
-                      {item.product.thumbnail_url ? (
-                        <img
-                          src={item.product.thumbnail_url}
-                          alt={item.product.name}
-                          className={`h-full w-full object-cover ${isOutOfStock ? " grayscale" : ""}`}
-                        />
-                      ) : (
-                        <Package className="absolute inset-0 m-auto h-5 w-5 text-muted-foreground/30" />
+              {isFlashSale && flashSaleItem ? (
+                <div className="flex gap-3 rounded-xl bg-muted/50 p-3">
+                  <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-lg bg-background shadow-sm sm:h-16 sm:w-16">
+                    {flashSaleItem.product.thumbnail_url ? (
+                      <img
+                        src={flashSaleItem.product.thumbnail_url}
+                        alt={flashSaleItem.product.name}
+                        className="h-full w-full object-cover"
+                      />
+                    ) : (
+                      <Package className="absolute inset-0 m-auto h-5 w-5 text-muted-foreground/30" />
+                    )}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="line-clamp-2 text-xs font-medium leading-tight sm:text-sm">
+                      {flashSaleItem.product.name}
+                    </p>
+                    <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[11px] text-muted-foreground">
+                      <span>Qty: 1</span>
+                      {totalWeight > 0 && (
+                        <>
+                          <span className="text-muted-foreground/30">·</span>
+                          <span>{totalWeight} kg</span>
+                        </>
                       )}
-                      {item.quantity > 1 && (
-                        <span className="absolute -bottom-0.5 -right-0.5 flex h-4.5 min-w-[1.125rem] items-center justify-center rounded-full bg-[#FF6600] px-1 text-[9px] font-bold text-white shadow-sm">
-                          {item.quantity}
+                    </div>
+                    <div className="mt-1 flex items-baseline gap-2">
+                      {flashSaleItem.product.price_amount > flashSaleItem.sale_price_amount && (
+                        <span className="text-[11px] text-muted-foreground line-through">
+                          {formatPrice(flashSaleItem.product.price_amount)}
                         </span>
                       )}
-                    </div>
-
-                    <div className="min-w-0 flex-1">
-                      <p className={`line-clamp-2 text-xs font-medium leading-tight sm:text-sm ${isOutOfStock ? "text-muted-foreground line-through" : ""}`}>
-                        {item.product.name}
-                      </p>
-                      <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[11px] text-muted-foreground">
-                        <span>Qty: {item.quantity}</span>
-                        {item.product.weight > 0 && (
-                          <>
-                            <span className="text-muted-foreground/30">·</span>
-                            <span>{itemWeight} kg</span>
-                          </>
-                        )}
-                      </div>
-                      <div className="mt-1.5">
-                        {isOutOfStock ? (
-                          <span className="inline-flex items-center gap-1 rounded-full bg-destructive/10 px-2 py-0.5 text-[10px] font-semibold text-destructive">
-                            Out of stock
-                          </span>
-                        ) : isLowStock ? (
-                          <span className="inline-flex items-center gap-1 rounded-full bg-yellow-500/10 px-2 py-0.5 text-[10px] font-semibold text-yellow-600 dark:text-yellow-400">
-                            Only {stock} left
-                          </span>
-                        ) : (
-                          <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] font-semibold text-emerald-600 dark:text-emerald-400">
-                            In stock ({stock})
-                          </span>
-                        )}
-                      </div>
-                      <p className="mt-1 text-xs font-semibold tabular-nums">
-                        {formatPrice(item.unit_price_amount * item.quantity)}
-                      </p>
+                      <span className="text-xs font-semibold tabular-nums">
+                        {formatPrice(subtotal)}
+                      </span>
                     </div>
                   </div>
-                )
-              })}
+                </div>
+              ) : cart ? (
+                cart.items.map((item) => {
+                  const itemWeight = (item.product.weight || 0) * item.quantity
+                  const stock = item.product.available_stock
+                  const isOutOfStock = stock <= 0
+                  const isLowStock = stock > 0 && stock < item.quantity
+                  return (
+                    <div
+                      key={item.id}
+                      className={`flex gap-3 rounded-xl p-3 transition-colors ${
+                        isOutOfStock
+                          ? "bg-destructive/5 opacity-60"
+                          : isLowStock
+                            ? "bg-yellow-500/5 dark:bg-yellow-500/10"
+                            : "bg-muted/50"
+                      }`}
+                    >
+                      <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-lg bg-background shadow-sm sm:h-16 sm:w-16">
+                        {item.product.thumbnail_url ? (
+                          <img
+                            src={item.product.thumbnail_url}
+                            alt={item.product.name}
+                            className={`h-full w-full object-cover ${isOutOfStock ? " grayscale" : ""}`}
+                          />
+                        ) : (
+                          <Package className="absolute inset-0 m-auto h-5 w-5 text-muted-foreground/30" />
+                        )}
+                        {item.quantity > 1 && (
+                          <span className="absolute -bottom-0.5 -right-0.5 flex h-4.5 min-w-[1.125rem] items-center justify-center rounded-full bg-[#FF6600] px-1 text-[9px] font-bold text-white shadow-sm">
+                            {item.quantity}
+                          </span>
+                        )}
+                      </div>
+
+                      <div className="min-w-0 flex-1">
+                        <p className={`line-clamp-2 text-xs font-medium leading-tight sm:text-sm ${isOutOfStock ? "text-muted-foreground line-through" : ""}`}>
+                          {item.product.name}
+                        </p>
+                        <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[11px] text-muted-foreground">
+                          <span>Qty: {item.quantity}</span>
+                          {item.product.weight > 0 && (
+                            <>
+                              <span className="text-muted-foreground/30">·</span>
+                              <span>{itemWeight} kg</span>
+                            </>
+                          )}
+                        </div>
+                        <div className="mt-1.5">
+                          {isOutOfStock ? (
+                            <span className="inline-flex items-center gap-1 rounded-full bg-destructive/10 px-2 py-0.5 text-[10px] font-semibold text-destructive">
+                              Out of stock
+                            </span>
+                          ) : isLowStock ? (
+                            <span className="inline-flex items-center gap-1 rounded-full bg-yellow-500/10 px-2 py-0.5 text-[10px] font-semibold text-yellow-600 dark:text-yellow-400">
+                              Only {stock} left
+                            </span>
+                          ) : (
+                            <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] font-semibold text-emerald-600 dark:text-emerald-400">
+                              In stock ({stock})
+                            </span>
+                          )}
+                        </div>
+                        <p className="mt-1 text-xs font-semibold tabular-nums">
+                          {formatPrice(item.unit_price_amount * item.quantity)}
+                        </p>
+                      </div>
+                    </div>
+                  )
+                })
+              ) : null}
             </div>
 
             <div className="space-y-2 border-t border-border pt-4">
@@ -322,7 +402,7 @@ export function CheckoutPage() {
               </div>
             </div>
 
-            {hasStockIssues && (
+            {!isFlashSale && hasStockIssues && (
               <div className="mt-4 flex items-start gap-2 rounded-xl bg-yellow-500/10 p-3 text-xs text-yellow-600 dark:text-yellow-400">
                 <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0" />
                 <span>
@@ -344,8 +424,8 @@ export function CheckoutPage() {
 
             <Button
               onClick={handlePay}
-              disabled={isStarting || !selectedShipping || hasStockIssues}
-              className="mt-5 h-12 w-full rounded-xl bg-[#FF6600] text-sm font-semibold text-white shadow-lg shadow-[#FF6600]/20 transition-all hover:bg-[#E55C00] hover:shadow-xl hover:shadow-[#FF6600]/25 active:scale-[0.98] disabled:opacity-40 disabled:shadow-none sm:mt-6"
+              disabled={isStarting || !selectedShipping || (!isFlashSale && hasStockIssues)}
+              className="mt-5 h-12 w-full rounded-xl bg-[#FF6600] text-sm font-semibold text-white transition-all hover:bg-[#E55C00] active:scale-[0.98] disabled:opacity-40 sm:mt-6"
             >
               {isStarting ? (
                 <span className="flex items-center gap-2">
