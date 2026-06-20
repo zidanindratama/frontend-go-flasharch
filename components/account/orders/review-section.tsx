@@ -48,7 +48,7 @@ function ReviewItem({
   userId: string | undefined
 }) {
   const slugQuery = useProductSlug(item.product_id, item.product_name)
-  const productSlug = slugQuery.data
+  const productSlug = slugQuery.data ?? null
   const myReview = useMyReviewForProduct(productSlug, userId)
 
   return (

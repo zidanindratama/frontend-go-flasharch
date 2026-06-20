@@ -9,6 +9,7 @@ import {
   ShoppingCart,
   MapPin,
   Heart,
+  Bell,
   Settings,
   LogOut,
   type LucideIcon,
@@ -24,6 +25,7 @@ const accountNavItems: { label: string; href: string; icon: LucideIcon }[] = [
   { label: "Orders", href: "/account/orders", icon: ShoppingBag },
   { label: "Addresses", href: "/account/addresses", icon: MapPin },
   { label: "Wishlist", href: "/account/wishlist", icon: Heart },
+  { label: "Flash Sale Alerts", href: "/account/stock-alerts", icon: Bell },
   { label: "Settings", href: "/account/settings", icon: Settings },
 ]
 

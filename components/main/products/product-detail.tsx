@@ -47,6 +47,7 @@ import type { Product } from "@/lib/api/catalog";
 import { ProductReviews } from "./product-reviews";
 import { RelatedProducts } from "./related-products";
 import { WishlistToggle } from "./wishlist-button";
+import { StockAlertToggle } from "./stock-alert-button";
 import { useAddCartItem } from "@/lib/hooks/use-cart"
 import { useRelatedProducts } from "@/lib/hooks/use-products";
 
@@ -365,6 +366,12 @@ function ProductCommandPanel({ product }: { product: Product }) {
             </Button>
             <WishlistToggle
               productId={product.id}
+              size="lg"
+              variant="command"
+              className="h-11 w-11 shrink-0"
+            />
+            <StockAlertToggle
+              productSlug={product.slug}
               size="lg"
               variant="command"
               className="h-11 w-11 shrink-0"

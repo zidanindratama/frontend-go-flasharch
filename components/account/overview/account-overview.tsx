@@ -4,6 +4,7 @@ import Link from "next/link"
 import { motion } from "framer-motion"
 import { useQuery } from "@tanstack/react-query"
 import {
+  Bell,
   ChevronRight,
   Heart,
   MapPin,
@@ -43,10 +44,10 @@ const navCards = [
     desc: "Manage shipping addresses",
   },
   {
-    label: "Settings",
-    href: "/account/settings",
-    icon: Settings,
-    desc: "Account & preferences",
+    label: "Flash Sale Alerts",
+    href: "/account/stock-alerts",
+    icon: Bell,
+    desc: "Flash sale notifications",
   },
 ]
 
@@ -242,6 +243,27 @@ export function AccountOverview() {
             </motion.div>
           ))}
         </div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5, duration: 0.35, ease }}
+          className="mt-2.5"
+        >
+          <Link
+            href="/account/settings"
+            className="group flex items-center gap-4 rounded-xl bg-card p-4 ring-1 ring-foreground/10 transition-shadow hover:shadow-md hover:ring-[#FF6600]/20"
+          >
+            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#FF6600]/10">
+              <Settings className="h-4 w-4 text-[#FF6600]" />
+            </div>
+            <div className="flex-1">
+              <p className="text-sm font-semibold">Settings</p>
+              <p className="text-xs text-muted-foreground">Account & preferences</p>
+            </div>
+            <ChevronRight className="h-4 w-4 text-muted-foreground/40 transition-transform group-hover:translate-x-0.5" />
+          </Link>
+        </motion.div>
       </div>
     </div>
   )

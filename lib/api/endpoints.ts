@@ -16,6 +16,7 @@ export const endpoints = {
     dashboard: "/users/me/dashboard",
     addresses: "/users/me/addresses",
     wishlist: "/users/me/wishlist",
+    stockAlerts: "/users/me/stock-alerts",
   },
   upload: {
     file: "/files/upload",
@@ -65,6 +66,7 @@ export const endpoints = {
   productReviews: (slug: string) => `/products/${slug}/reviews` as const,
   relatedProducts: (slug: string) => `/products/${slug}/related` as const,
   myProductReview: (slug: string) => `/products/${slug}/reviews/me` as const,
+  productStockAlert: (slug: string) => `/products/${slug}/stock-alerts` as const,
   flashSales: "/flash-sales",
   checkouts: {
     cart: "/checkouts/cart",
