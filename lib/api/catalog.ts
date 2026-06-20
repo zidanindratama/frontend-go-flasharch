@@ -152,6 +152,16 @@ export type ProductReviewListParams = {
   per_page?: number
 }
 
+export type ReviewInput = {
+  rating: number
+  title: string
+  body: string
+}
+
+export type RelatedProductsParams = {
+  limit?: number
+}
+
 export type AddProductImageInput = {
   file_id: string
   alt_text?: string
@@ -174,6 +184,18 @@ export const getProduct = (slug: string) =>
 
 export const listProductReviews = (slug: string, params?: ProductReviewListParams) =>
   api.get<PaginatedResponse<ProductReview>>(endpoints.productReviews(slug), { params })
+
+export const createProductReview = (slug: string, data: ReviewInput) =>
+  api.post<SingleResponse<ProductReview>>(endpoints.productReviews(slug), data)
+
+export const updateMyProductReview = (slug: string, data: ReviewInput) =>
+  api.patch<SingleResponse<ProductReview>>(endpoints.myProductReview(slug), data)
+
+export const deleteMyProductReview = (slug: string) =>
+  api.delete<{ message: string; data: null }>(endpoints.myProductReview(slug))
+
+export const listRelatedProducts = (slug: string, params?: RelatedProductsParams) =>
+  api.get<{ message: string; data: { items: Product[]; limit: number } }>(endpoints.relatedProducts(slug), { params })
 
 export const listCategories = (params?: CategoryListParams) =>
   api.get<PaginatedResponse<Category>>(endpoints.categories, { params })

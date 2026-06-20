@@ -17,6 +17,7 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { getOrderDetail, type OrderDetail as OrderDetailType } from "@/lib/api/account"
 import { useAuthStore } from "@/stores/auth"
 import { cn } from "@/lib/utils"
+import { ReviewSection } from "./review-section"
 
 function formatCurrency(amount: number) {
   return new Intl.NumberFormat("id-ID", {
@@ -343,6 +344,10 @@ export function OrderDetail() {
           )}
         </div>
       </div>
+
+      {order.status === "fulfilled" && (
+        <ReviewSection items={order.items} />
+      )}
     </div>
   )
 }

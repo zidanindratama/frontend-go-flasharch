@@ -16,6 +16,10 @@ import {
   createCategory,
   updateCategory,
   deleteCategory,
+  listRelatedProducts,
+  createProductReview,
+  updateMyProductReview,
+  deleteMyProductReview,
   type ProductListParams,
   type CategoryListParams,
   type CreateProductInput,
@@ -23,6 +27,7 @@ import {
   type CreateCategoryInput,
   type UpdateCategoryInput,
   type ProductStatus,
+  type ReviewInput,
 } from "@/lib/api/catalog"
 import { getErrorMessage } from "@/lib/api/errors"
 
@@ -233,6 +238,71 @@ export function useDeleteCategory() {
     onError: async (error: unknown) => {
       const { toast } = await import("sonner")
       toast.error(getErrorMessage(error, "Failed to delete category"))
+    },
+  })
+}
+
+export function useRelatedProducts(slug: string) {
+  return useQuery({
+    queryKey: ["public.products", slug, "related"],
+    queryFn: async () => {
+      const response = await listRelatedProducts(slug, { limit: 8 })
+      return response.data.data.items
+    },
+    enabled: !!slug,
+  })
+}
+
+export function useCreateProductReview(slug: string) {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (input: ReviewInput) => createProductReview(slug, input),
+    onSuccess: async () => {
+      const { toast } = await import("sonner")
+      toast.success("Review submitted")
+      await queryClient.invalidateQueries({ queryKey: ["public.products", slug, "reviews"] })
+      await queryClient.invalidateQueries({ queryKey: ["public.products", slug] })
+    },
+    onError: async (error: unknown) => {
+      const { toast } = await import("sonner")
+      toast.error(getErrorMessage(error, "Failed to submit review"))
+    },
+  })
+}
+
+export function useUpdateProductReview(slug: string) {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (input: ReviewInput) => updateMyProductReview(slug, input),
+    onSuccess: async () => {
+      const { toast } = await import("sonner")
+      toast.success("Review updated")
+      await queryClient.invalidateQueries({ queryKey: ["public.products", slug, "reviews"] })
+      await queryClient.invalidateQueries({ queryKey: ["public.products", slug] })
+    },
+    onError: async (error: unknown) => {
+      const { toast } = await import("sonner")
+      toast.error(getErrorMessage(error, "Failed to update review"))
+    },
+  })
+}
+
+export function useDeleteProductReview(slug: string) {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: () => deleteMyProductReview(slug),
+    onSuccess: async () => {
+      const { toast } = await import("sonner")
+      toast.success("Review deleted")
+      await queryClient.invalidateQueries({ queryKey: ["public.products", slug, "reviews"] })
+      await queryClient.invalidateQueries({ queryKey: ["public.products", slug] })
+    },
+    onError: async (error: unknown) => {
+      const { toast } = await import("sonner")
+      toast.error(getErrorMessage(error, "Failed to delete review"))
     },
   })
 }

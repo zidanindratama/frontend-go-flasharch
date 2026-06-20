@@ -1,7 +1,9 @@
 "use client"
 
+import { useState } from "react"
 import { motion } from "framer-motion"
 import { Star, User } from "lucide-react"
+import { PaginationBar } from "@/components/main/products/pagination-bar"
 import { cn } from "@/lib/utils"
 import type { ProductReview } from "@/lib/api/catalog"
 
@@ -66,6 +68,8 @@ function ReviewCard({ review, index }: { review: ProductReview; index: number })
   )
 }
 
+const REVIEWS_PER_PAGE = 6
+
 export function ProductReviews({
   reviews,
   total,
@@ -77,6 +81,12 @@ export function ProductReviews({
   ratingAverage: number
   ratingCount: number
 }) {
+  const [page, setPage] = useState(1)
+  const totalPages = Math.ceil(total / REVIEWS_PER_PAGE)
+
+  const start = (page - 1) * REVIEWS_PER_PAGE
+  const visibleReviews = reviews.slice(start, start + REVIEWS_PER_PAGE)
+
   return (
     <div className="space-y-6">
       <div className="flex items-end justify-between">
@@ -116,16 +126,19 @@ export function ProductReviews({
         </div>
       ) : (
         <div className="grid gap-3 sm:grid-cols-2">
-          {reviews.map((review, i) => (
+          {visibleReviews.map((review, i) => (
             <ReviewCard key={review.id} review={review} index={i} />
           ))}
         </div>
       )}
 
-      {total > reviews.length && (
-        <p className="text-center text-sm text-muted-foreground">
-          +{total - reviews.length} more reviews
-        </p>
+      {totalPages > 1 && (
+        <PaginationBar
+          page={page}
+          perPage={REVIEWS_PER_PAGE}
+          total={total}
+          onPageChange={setPage}
+        />
       )}
     </div>
   )

@@ -40,7 +40,6 @@ import { Skeleton } from "@/components/ui/skeleton";
 import {
   getProduct,
   listProductReviews,
-  listProducts,
 } from "@/lib/api/catalog";
 import { cn } from "@/lib/utils";
 import { formatPrice } from "@/components/dashboard/products/product-utils";
@@ -48,7 +47,8 @@ import type { Product } from "@/lib/api/catalog";
 import { ProductReviews } from "./product-reviews";
 import { RelatedProducts } from "./related-products";
 import { WishlistToggle } from "./wishlist-button";
-import { useAddCartItem } from "@/lib/hooks/use-cart";
+import { useAddCartItem } from "@/lib/hooks/use-cart"
+import { useRelatedProducts } from "@/lib/hooks/use-products";
 
 const smoothEase: [number, number, number, number] = [0.16, 1, 0.3, 1];
 
@@ -564,26 +564,12 @@ export function ProductDetail({ slug }: { slug: string }) {
   });
 
   const product = productQuery.data;
-  const categorySlug = product?.categories?.[0]?.slug;
 
-  const relatedQuery = useQuery({
-    queryKey: ["public.products", slug, "related"],
-    queryFn: () =>
-      categorySlug
-        ? listProducts({
-            category: categorySlug,
-            per_page: 8,
-            status: "active",
-          })
-        : Promise.resolve(null),
-    enabled: !!categorySlug,
-    select: (res) =>
-      res?.data?.data?.items?.filter((p) => p.slug !== slug).slice(0, 6) ?? [],
-  });
+  const relatedQuery = useRelatedProducts(slug);
 
   const reviewsQuery = useQuery({
     queryKey: ["public.products", slug, "reviews"],
-    queryFn: () => listProductReviews(slug, { per_page: 5 }),
+    queryFn: () => listProductReviews(slug, { per_page: 30 }),
     select: (res) => res.data.data,
     enabled: !!product,
   });

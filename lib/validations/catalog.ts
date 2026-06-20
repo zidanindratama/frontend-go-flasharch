@@ -102,3 +102,17 @@ export type ProductCreateValues = z.infer<typeof productCreateSchema>
 export type ProductEditValues = z.infer<typeof productEditSchema>
 export type CategoryCreateValues = z.infer<typeof categoryCreateSchema>
 export type CategoryEditValues = z.infer<typeof categoryEditSchema>
+
+export const reviewSchema = z.object({
+  rating: z
+    .number()
+    .min(1, "Rating is required")
+    .max(5, "Rating must be between 1 and 5"),
+  title: z
+    .string()
+    .trim()
+    .max(180, "Title must be 180 characters or fewer"),
+  body: z.string(),
+})
+
+export type ReviewValues = z.infer<typeof reviewSchema>

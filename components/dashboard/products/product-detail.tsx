@@ -32,7 +32,8 @@ import {
   formatPrice,
   shortId,
 } from "@/components/dashboard/products/product-utils"
-import { getAdminProduct, type Product, type ProductImage } from "@/lib/api/catalog"
+import { getAdminProduct, listProductReviews, type Product, type ProductImage } from "@/lib/api/catalog"
+import { PaginationBar } from "@/components/main/products/pagination-bar"
 import { cn } from "@/lib/utils"
 
 type GalleryImage = Pick<ProductImage, "id" | "url" | "alt_text" | "sort_order"> & {
@@ -273,6 +274,8 @@ function ProductDetailView({ product }: { product: Product }) {
           </div>
         </div>
       </section>
+
+      <DashboardReviews productId={product.id} productSlug={product.slug} />
     </div>
   )
 }
@@ -347,6 +350,107 @@ function ProductDetailSkeleton() {
         <Skeleton className="h-56 rounded-2xl" />
         <Skeleton className="h-56 rounded-2xl" />
       </div>
+    </div>
+  )
+}
+
+function DashboardReviews({
+  productId,
+  productSlug,
+}: {
+  productId: string
+  productSlug: string
+}) {
+  const [page, setPage] = useState(1)
+  const perPage = 10
+
+  const reviewsQuery = useQuery({
+    queryKey: ["admin.products", productId, "reviews", page],
+    queryFn: async () => {
+      const response = await listProductReviews(productSlug, { page, per_page: perPage })
+      return response.data.data
+    },
+    enabled: !!productSlug,
+  })
+
+  if (reviewsQuery.isLoading) {
+    return (
+      <div className="rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6">
+        <Skeleton className="h-5 w-32" />
+        <Skeleton className="mt-4 h-32 rounded-xl" />
+      </div>
+    )
+  }
+
+  if (!reviewsQuery.data || reviewsQuery.data.items.length === 0) {
+    return null
+  }
+
+  const { items: reviews, total } = reviewsQuery.data
+
+  return (
+    <div className="rounded-2xl border border-border bg-card p-5 shadow-sm sm:p-6">
+      <div className="flex items-center justify-between">
+        <h2 className="text-base font-semibold text-foreground">
+          Customer Reviews
+        </h2>
+        <span className="text-sm text-muted-foreground">
+          {total} {total === 1 ? "review" : "reviews"}
+        </span>
+      </div>
+      <div className="mt-4 space-y-3">
+        {reviews.map((review) => (
+          <div
+            key={review.id}
+            className="rounded-xl border border-border bg-background p-4"
+          >
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <div className="flex items-center gap-0.5">
+                  {Array.from({ length: 5 }).map((_, i) => (
+                    <Star
+                      key={i}
+                      className={cn(
+                        "size-3.5",
+                        i < review.rating
+                          ? "fill-[#FF6600] text-[#FF6600]"
+                          : "text-muted-foreground/45",
+                      )}
+                    />
+                  ))}
+                </div>
+                <span className="text-xs text-muted-foreground">
+                  {new Date(review.created_at).toLocaleDateString("id-ID", {
+                    year: "numeric",
+                    month: "short",
+                    day: "numeric",
+                  })}
+                </span>
+              </div>
+            </div>
+            {review.title && (
+              <p className="mt-2 text-sm font-semibold text-foreground">
+                {review.title}
+              </p>
+            )}
+            {review.body && (
+              <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
+                {review.body}
+              </p>
+            )}
+          </div>
+        ))}
+      </div>
+      {total > perPage && (
+        <div className="mt-4">
+          <PaginationBar
+            page={page}
+            perPage={perPage}
+            total={total}
+            onPageChange={setPage}
+          />
+        </div>
+      )}
     </div>
   )
 }

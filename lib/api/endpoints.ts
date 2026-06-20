@@ -63,6 +63,8 @@ export const endpoints = {
       `/cart/saved-items/${savedItemId}/move-to-cart` as const,
   },
   productReviews: (slug: string) => `/products/${slug}/reviews` as const,
+  relatedProducts: (slug: string) => `/products/${slug}/related` as const,
+  myProductReview: (slug: string) => `/products/${slug}/reviews/me` as const,
   flashSales: "/flash-sales",
   checkouts: {
     cart: "/checkouts/cart",
