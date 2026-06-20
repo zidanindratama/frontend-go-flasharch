@@ -261,7 +261,6 @@ export function OrderDetail() {
         All orders
       </Link>
 
-      {/* Header */}
       <div className="rounded-2xl border border-border bg-card p-4 sm:p-5">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div className="min-w-0">
@@ -293,11 +292,8 @@ export function OrderDetail() {
         </div>
       </div>
 
-      {/* Content */}
       <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_320px]">
-        {/* Left: Items + Timeline */}
         <div className="space-y-4">
-          {/* Items */}
           <div className="rounded-2xl border border-border bg-card p-4">
             <div className="mb-3 flex items-center gap-2">
               <Package className="h-4 w-4 text-muted-foreground" />
@@ -333,7 +329,6 @@ export function OrderDetail() {
             </div>
           </div>
 
-          {/* Timeline */}
           <div className="rounded-2xl border border-border bg-card p-4">
             <div className="mb-3 flex items-center gap-2">
               <CheckCircle2 className="h-4 w-4 text-muted-foreground" />
@@ -343,9 +338,7 @@ export function OrderDetail() {
           </div>
         </div>
 
-        {/* Right: Payment + Shipment + Actions */}
         <div className="space-y-4">
-          {/* Payment */}
           {order.payment && (
             <div className="rounded-2xl border border-border bg-card p-4">
               <div className="mb-3 flex items-center gap-2">
@@ -386,7 +379,6 @@ export function OrderDetail() {
             </div>
           )}
 
-          {/* Shipping Address */}
           {order.address && (
             <div className="rounded-2xl border border-border bg-card p-4">
               <div className="mb-3 flex items-center gap-2">
@@ -406,7 +398,6 @@ export function OrderDetail() {
             </div>
           )}
 
-          {/* Shipment */}
           {order.shipment && (
             <div className="rounded-2xl border border-border bg-card p-4">
               <div className="mb-3 flex items-center gap-2">
@@ -458,7 +449,6 @@ export function OrderDetail() {
             </div>
           )}
 
-          {/* Actions */}
           {(canShip || canDeliver) && (
             <div className="rounded-2xl border border-border bg-card p-4">
               <div className="mb-3 flex items-center gap-2">

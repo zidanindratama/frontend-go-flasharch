@@ -112,7 +112,6 @@ export function PaymentCancelView() {
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_40%,rgba(136,136,136,0.04),transparent_50%)]" />
 
       <div className="relative z-10 flex max-w-2xl flex-col items-center text-center">
-        {/* Icon */}
         <motion.div
           initial={{ opacity: 0, scale: 0.6 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -136,7 +135,6 @@ export function PaymentCancelView() {
           </div>
         </motion.div>
 
-        {/* Mono label */}
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
@@ -151,7 +149,6 @@ export function PaymentCancelView() {
           </span>
         </motion.div>
 
-        {/* Headline */}
         <motion.h1
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
@@ -165,7 +162,6 @@ export function PaymentCancelView() {
               : "No worries!"}
         </motion.h1>
 
-        {/* Description */}
         <motion.p
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
@@ -179,7 +175,6 @@ export function PaymentCancelView() {
               : "You cancelled the payment. Your cart is saved and ready when you are."}
         </motion.p>
 
-        {/* Buttons */}
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
@@ -203,7 +198,6 @@ export function PaymentCancelView() {
           </Link>
         </motion.div>
 
-        {/* Trace ID */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}

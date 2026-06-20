@@ -162,7 +162,7 @@ function CartItemRow({
                 type="button"
                 whileTap={{ scale: 0.85 }}
                 onClick={() => onUpdate(item.id, Math.max(1, item.quantity - 1))}
-                disabled={isUpdating || item.quantity <= 1 || hasStockIssue}
+                disabled={isUpdating || item.quantity <= 1}
                 className="flex h-7 w-7 items-center justify-center rounded-md border border-border text-muted-foreground transition-colors hover:bg-muted hover:text-foreground disabled:opacity-40"
               >
                 <Minus className="h-3 w-3" />
@@ -182,7 +182,7 @@ function CartItemRow({
                 type="button"
                 whileTap={{ scale: 0.85 }}
                 onClick={() => onUpdate(item.id, item.quantity + 1)}
-                disabled={isUpdating || isOutOfStock || (isLowStock && item.quantity >= stock)}
+                disabled={isUpdating || isOutOfStock || item.quantity >= stock}
                 className="flex h-7 w-7 items-center justify-center rounded-md border border-border text-muted-foreground transition-colors hover:bg-muted hover:text-foreground disabled:opacity-40"
               >
                 <Plus className="h-3 w-3" />
@@ -335,7 +335,12 @@ export function CartPage() {
     [cart?.items],
   )
 
-  const hasStockIssues = hasInactiveItems || hasOutOfStockItems
+  const hasLowStockItems = useMemo(
+    () => (cart?.items ?? []).some((item) => item.product.available_stock > 0 && item.quantity > item.product.available_stock),
+    [cart?.items],
+  )
+
+  const hasStockIssues = hasInactiveItems || hasOutOfStockItems || hasLowStockItems
 
   const [confirmClear, setConfirmClear] = useState(false)
 
@@ -476,7 +481,9 @@ export function CartPage() {
                 <AlertTriangle className="h-3.5 w-3.5 shrink-0" />
                 {hasOutOfStockItems
                   ? "Some items are out of stock. Remove them before checkout."
-                  : "Remove unavailable items before checkout"}
+                  : hasLowStockItems
+                    ? "Some items exceed available stock. Reduce quantities before checkout."
+                    : "Remove unavailable items before checkout"}
               </motion.p>
             )}
             <Button

@@ -89,7 +89,6 @@ export function PaymentSuccessView() {
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_40%,rgba(255,102,0,0.06),transparent_50%)]" />
 
       <div className="relative z-10 flex max-w-2xl flex-col items-center text-center">
-        {/* Icon */}
         <motion.div
           initial={{ opacity: 0, scale: 0.6 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -120,7 +119,6 @@ export function PaymentSuccessView() {
           </div>
         </motion.div>
 
-        {/* Mono label */}
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
@@ -137,7 +135,6 @@ export function PaymentSuccessView() {
           </span>
         </motion.div>
 
-        {/* Headline */}
         <motion.h1
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
@@ -153,7 +150,6 @@ export function PaymentSuccessView() {
                 : "You are all set!"}
         </motion.h1>
 
-        {/* Description */}
         <motion.p
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
@@ -169,7 +165,6 @@ export function PaymentSuccessView() {
                 : "Your payment has been confirmed. Check your orders for details."}
         </motion.p>
 
-        {/* Auto-refresh indicator */}
         {isPending && (
           <motion.div
             initial={{ opacity: 0 }}
@@ -188,7 +183,6 @@ export function PaymentSuccessView() {
           </motion.div>
         )}
 
-        {/* Buttons */}
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
@@ -211,7 +205,6 @@ export function PaymentSuccessView() {
           </Link>
         </motion.div>
 
-        {/* Trace ID */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}

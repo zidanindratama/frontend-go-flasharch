@@ -75,7 +75,7 @@
   --ops-foreground: oklch(0.96 0.006 78);
   --ops-muted: oklch(0.78 0.018 78);
   --ops-grid: oklch(0.42 0.025 45 / 32%);
-  --health: oklch(0.82 0.26 139);
+  --health: oklch(0.78 0.16 162);
   --warning: oklch(0.77 0.18 72);
   --radius: 0.5rem;
 
@@ -123,7 +123,7 @@
   --ops-foreground: oklch(0.96 0.006 78);
   --ops-muted: oklch(0.78 0.018 78);
   --ops-grid: oklch(0.42 0.025 45 / 34%);
-  --health: oklch(0.86 0.29 139);
+  --health: oklch(0.85 0.15 162);
   --warning: oklch(0.76 0.18 72);
   --radius: 0.5rem;
 

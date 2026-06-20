@@ -235,7 +235,6 @@ export function TracePreview() {
     setError(null);
     setActiveTrace(null);
 
-    // Simulated API delay — replace with real trace backend later
     await new Promise((r) => setTimeout(r, 800));
 
     if (orderId.trim() === "91024") {

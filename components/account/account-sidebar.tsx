@@ -72,7 +72,6 @@ export function AccountSidebar() {
 
   return (
     <>
-      {/* Desktop: vertical sidebar */}
       <aside className="hidden w-56 shrink-0 lg:block">
         <div className="sticky top-24 space-y-1">
           {accountNavItems.map((item, i) => (

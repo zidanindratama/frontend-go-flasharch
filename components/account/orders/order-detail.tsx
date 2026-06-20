@@ -169,7 +169,6 @@ export function OrderDetail() {
       </div>
 
       <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_320px]">
-        {/* Left: Items + Timeline */}
         <div className="space-y-4">
           <div className="rounded-xl bg-card p-4 ring-1 ring-foreground/10">
             <div className="mb-3 flex items-center gap-2">
@@ -223,9 +222,7 @@ export function OrderDetail() {
           </div>
         </div>
 
-        {/* Right: Payment + Address + Shipment */}
         <div className="space-y-4">
-          {/* Payment */}
           {order.payment && (
             <div className="rounded-xl bg-card p-4 ring-1 ring-foreground/10">
               <div className="mb-3 flex items-center gap-2">
@@ -277,7 +274,6 @@ export function OrderDetail() {
             </div>
           )}
 
-          {/* Shipping Address */}
           {order.address && (
             <div className="rounded-xl bg-card p-4 ring-1 ring-foreground/10">
               <div className="mb-3 flex items-center gap-2">
@@ -297,7 +293,6 @@ export function OrderDetail() {
             </div>
           )}
 
-          {/* Shipment */}
           {order.shipment && (
             <div className="rounded-xl bg-card p-4 ring-1 ring-foreground/10">
               <div className="mb-3 flex items-center gap-2">
