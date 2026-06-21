@@ -45,14 +45,14 @@ export function LoadTestHero() {
           className="mt-8 grid gap-8 lg:grid-cols-[0.7fr_0.3fr] lg:items-end"
         >
           <p className="max-w-3xl text-base leading-relaxed text-muted-foreground md:text-xl">
-            Simulate flash sale traffic with configurable virtual users,
-            ramp-up curves, and target endpoints. Validate that Redis stock
-            gates and RabbitMQ buffers hold under real pressure.
+            Run the real PRD 09 k6 scenarios through the backend orchestrator.
+            Validate that Redis stock gates, RabbitMQ buffers, and checkout
+            workers hold under real pressure.
           </p>
 
           <div className="flex items-center gap-2 text-sm text-muted-foreground lg:justify-end">
             <Gauge className="h-4 w-4 text-[#FF6600]" />
-            <span className="font-mono">K6-compatible execution model</span>
+            <span className="font-mono">Real k6 execution via backend</span>
           </div>
         </motion.div>
 
@@ -64,15 +64,15 @@ export function LoadTestHero() {
         >
           <div className="flex items-start gap-3">
             <Users className="mt-0.5 h-4 w-4 shrink-0 text-[#FF6600]" />
-            <p>Configure virtual users, ramp-up time, and hold duration.</p>
+            <p>Select smoke, baseline, spike, stress, soak, or edge scenarios.</p>
           </div>
           <div className="flex items-start gap-3">
             <Activity className="mt-0.5 h-4 w-4 shrink-0 text-[#FF6600]" />
-            <p>Target specific endpoints: checkout, product list, or auth.</p>
+            <p>Backend prepares isolated flash sale data per run.</p>
           </div>
           <div className="flex items-start gap-3">
             <Timer className="mt-0.5 h-4 w-4 shrink-0 text-[#FF6600]" />
-            <p>Real-time metrics streamed during test execution.</p>
+            <p>Run status and verdict are polled from backend result files.</p>
           </div>
           <div className="flex items-start gap-3">
             <Gauge className="mt-0.5 h-4 w-4 shrink-0 text-[#FF6600]" />

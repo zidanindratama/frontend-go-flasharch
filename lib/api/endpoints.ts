@@ -78,6 +78,14 @@ export const endpoints = {
     checkoutSession: (id: string) =>
       `/payments/${id}/checkout-session` as const,
   },
+  loadTests: {
+    session: "/load-tests/session",
+    scenarios: "/load-tests/scenarios",
+    runs: "/load-tests/runs",
+    run: (id: string) => `/load-tests/runs/${id}` as const,
+    cancel: (id: string) => `/load-tests/runs/${id}/cancel` as const,
+    results: (id: string) => `/load-tests/runs/${id}/results` as const,
+  },
   admin: {
     dashboard: "/admin/reports/dashboard",
     summary: "/admin/reports/summary",
