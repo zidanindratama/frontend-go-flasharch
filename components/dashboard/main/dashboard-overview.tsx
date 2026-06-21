@@ -26,6 +26,8 @@ import {
 } from "@/components/ui/chart"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Button } from "@/components/ui/button"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { ProductPerformanceTable } from "@/components/dashboard/main/product-performance"
 import { useGetData } from "@/hooks/use-get-data"
 import { endpoints } from "@/lib/api/endpoints"
 import { cn } from "@/lib/utils"
@@ -116,10 +118,8 @@ const orderConfig = {
 const paymentStatusOrder = [
   "paid",
   "pending",
-  "requires_action",
-  "failed",
   "expired",
-  "refunded",
+  "failed",
   "cancelled",
 ]
 
@@ -221,6 +221,11 @@ export function DashboardOverview() {
     }))
   }, [dashboard])
 
+  const dateRangeIso = useMemo(() => ({
+    from: dateRange.from?.toISOString(),
+    to: dateRange.to?.toISOString(),
+  }), [dateRange.from, dateRange.to])
+
   if (isLoading) return <DashboardSkeleton />
 
   if (isError || !dashboard || !summary) {
@@ -273,7 +278,14 @@ export function DashboardOverview() {
         onRefresh={() => refetch()}
       />
 
-      <MetricStrip>
+      <Tabs defaultValue="overview" className="flex flex-col gap-4 lg:gap-5">
+        <TabsList variant="line" className="w-fit">
+          <TabsTrigger value="overview">Overview</TabsTrigger>
+          <TabsTrigger value="products">Products</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="overview" className="flex flex-col gap-4 lg:gap-5 mt-0">
+          <MetricStrip>
         <MetricTile
           icon={ReceiptText}
           label="Gross revenue"
@@ -300,7 +312,7 @@ export function DashboardOverview() {
           icon={Clock3}
           label="Expired"
           value={formatNumber(summary.expired_checkouts)}
-          detail="Missed payment"
+          detail="Checkout expired"
           tone="warning"
         />
         <MetricTile
@@ -426,8 +438,8 @@ export function DashboardOverview() {
         </CompactPanel>
 
         <CompactPanel
-          eyebrow="Payment status"
-          title="All payment states"
+          eyebrow="Payments"
+          title="Payment status breakdown"
           action={<PanelLink href="/dashboard/orders" />}
         >
           <StatusSummary statuses={paymentStatuses} />
@@ -450,25 +462,52 @@ export function DashboardOverview() {
       >
         {activeFlashSales.length > 0 ? (
           <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-            {activeFlashSales.map((sale) => (
+            {activeFlashSales.map((sale, i) => (
               <motion.div
                 key={sale.id}
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: i * 0.06, duration: 0.4, ease }}
                 whileHover={{ y: -2 }}
-                transition={{ duration: 0.18, ease }}
-                className="rounded-xl border border-border bg-background p-3.5"
+                className="group rounded-xl border border-border bg-background p-4 transition-shadow hover:shadow-md hover:shadow-foreground/5"
               >
                 <div className="flex items-start justify-between gap-3">
-                  <div className="min-w-0">
-                    <p className="truncate text-sm font-semibold text-foreground">
+                  <div className="min-w-0 flex-1">
+                    <Link
+                      href={`/dashboard/flash-sales/${sale.id}`}
+                      className="text-sm font-semibold text-foreground transition-colors group-hover:text-[#FF6600]"
+                    >
                       {sale.name}
-                    </p>
-                    <p className="mt-1 text-xs text-muted-foreground">
-                      Ends {dateLabel(sale.ends_at)}
-                    </p>
+                    </Link>
                   </div>
-                  <span className="shrink-0 rounded-full bg-emerald-500/10 px-2 py-1 text-xs font-medium text-emerald-600 dark:text-emerald-400">
-                    Running
+                  <span className={cn(
+                    "shrink-0 rounded-full px-2 py-1 text-xs font-medium capitalize",
+                    sale.status === "running" && "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400",
+                    sale.status === "scheduled" && "bg-blue-500/10 text-blue-600 dark:text-blue-400",
+                    sale.status === "ended" && "bg-muted text-muted-foreground",
+                    sale.status === "cancelled" && "bg-red-500/10 text-red-600 dark:text-red-400",
+                  )}>
+                    {sale.status}
                   </span>
+                </div>
+                <div className="mt-3 flex items-center gap-2 text-xs text-muted-foreground">
+                  <Clock3 className="size-3.5" />
+                  <span>
+                    {dateLabel(sale.starts_at)} → {dateLabel(sale.ends_at)}
+                  </span>
+                </div>
+                <div className="mt-3 flex items-center justify-between border-t border-border/50 pt-3">
+                  <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                    <Flame className="size-3.5 text-[#FF6600]" />
+                    <span>{sale.status}</span>
+                  </div>
+                  <Link
+                    href={`/dashboard/flash-sales/${sale.id}`}
+                    className="inline-flex items-center gap-1 text-xs font-medium text-[#FF6600] transition-colors hover:text-[#e65c00]"
+                  >
+                    View
+                    <ArrowUpRight className="size-3" />
+                  </Link>
                 </div>
               </motion.div>
             ))}
@@ -480,7 +519,13 @@ export function DashboardOverview() {
             copy="Launch a campaign when stock is preloaded and ready."
           />
         )}
-      </CompactPanel>
+        </CompactPanel>
+        </TabsContent>
+
+        <TabsContent value="products" className="mt-0">
+          <ProductPerformanceTable dateRange={dateRangeIso} />
+        </TabsContent>
+      </Tabs>
     </div>
   )
 }
@@ -565,9 +610,9 @@ function MetricTile({
   const toneClass = {
     success: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400",
     warning: "bg-amber-500/10 text-amber-600 dark:text-amber-400",
-    orange: "bg-orange-500/10 text-orange-600 dark:text-orange-400",
+    orange: "bg-[#FF6600]/10 text-[#FF6600]",
     neutral: "bg-muted text-muted-foreground",
-    revenue: "bg-foreground text-background",
+    revenue: "bg-blue-500/10 text-blue-600 dark:text-blue-400",
   }[tone]
 
   return (
@@ -746,51 +791,83 @@ function StatusSummary({
 }: {
   statuses: { status: string; count: number }[]
 }) {
+  const total = statuses.reduce((sum, s) => sum + s.count, 0)
+
   return (
-    <div className="grid gap-2.5 min-[560px]:grid-cols-4">
-      {statuses.map((status) => (
-        <StatusBlock
-          key={status.status}
-          label={status.status}
-          value={status.count}
-          tone={statusTone(status.status)}
-        />
-      ))}
+    <div className="space-y-3">
+      <div className="flex h-2 overflow-hidden rounded-full bg-muted">
+        {statuses.map((status) => {
+          const pct = total > 0 ? (status.count / total) * 100 : 0
+          if (pct === 0) return null
+          return (
+            <div
+              key={status.status}
+              className={cn("transition-all duration-500", statusBarColor(status.status))}
+              style={{ width: `${pct}%` }}
+            />
+          )
+        })}
+      </div>
+      <div className="grid grid-cols-5 gap-2">
+        {statuses.map((status) => (
+          <StatusBlock
+            key={status.status}
+            label={status.status}
+            value={status.count}
+            total={total}
+            tone={statusTone(status.status)}
+          />
+        ))}
+      </div>
     </div>
   )
+}
+
+function statusBarColor(status: string) {
+  if (["paid", "confirmed", "completed"].includes(status)) return "bg-emerald-500"
+  if (["pending", "pending_payment", "waiting_payment"].includes(status)) return "bg-amber-500"
+  if (["expired"].includes(status)) return "bg-orange-500"
+  if (["cancelled", "failed"].includes(status)) return "bg-red-500"
+  return "bg-muted-foreground/40"
 }
 
 function StatusBlock({
   label,
   value,
+  total,
   tone,
 }: {
   label: string
   value: number
+  total: number
   tone: "success" | "warning" | "danger" | "neutral"
 }) {
-  const toneClass = {
-    success: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400",
-    warning: "bg-amber-500/10 text-amber-600 dark:text-amber-400",
-    danger: "bg-red-500/10 text-red-600 dark:text-red-400",
-    neutral: "bg-muted text-muted-foreground",
+  const dotColor = {
+    success: "bg-emerald-500",
+    warning: "bg-amber-500",
+    danger: "bg-red-500",
+    neutral: "bg-muted-foreground/40",
   }[tone]
 
+  const pct = total > 0 ? Math.round((value / total) * 100) : 0
+
   return (
-    <motion.div
-      whileHover={{ y: -2 }}
-      transition={{ duration: 0.18, ease }}
-      className="rounded-xl border border-border bg-background p-3"
-    >
-      <div className="flex items-center justify-between gap-3">
-        <span className={cn("truncate rounded-full px-2 py-1 text-[11px] font-medium capitalize", toneClass)}>
+    <div className="rounded-lg bg-muted/40 p-2.5">
+      <div className="flex items-center gap-2">
+        <span className={cn("size-2 shrink-0 rounded-full", dotColor)} />
+        <span className="truncate text-xs font-medium text-foreground capitalize">
           {statusLabel(label)}
         </span>
-        <span className="text-lg font-semibold tabular-nums text-foreground">
+      </div>
+      <div className="mt-1.5 flex items-baseline gap-1.5">
+        <span className="text-lg font-bold tabular-nums text-foreground">
           {formatNumber(value)}
         </span>
+        {total > 0 && (
+          <span className="text-[10px] text-muted-foreground">{pct}%</span>
+        )}
       </div>
-    </motion.div>
+    </div>
   )
 }
 
