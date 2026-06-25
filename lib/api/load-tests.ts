@@ -1,4 +1,4 @@
-import { api } from "@/lib/api/axios"
+import { loadTestApi } from "@/lib/api/load-test-axios"
 import { endpoints } from "@/lib/api/endpoints"
 
 type Envelope<T> = {
@@ -90,15 +90,14 @@ function tokenHeader(token: string) {
 }
 
 export async function createLoadTestSession(pin: string) {
-  const response = await api.post<Envelope<{ token: string; expires_at: string }>>(
-    endpoints.loadTests.session,
-    { pin },
-  )
+  const response = await loadTestApi.post<
+    Envelope<{ token: string; expires_at: string }>
+  >(endpoints.loadTests.session, { pin })
   return response.data.data
 }
 
 export async function listLoadTestScenarios(token: string) {
-  const response = await api.get<Envelope<{ items: LoadTestScenario[] }>>(
+  const response = await loadTestApi.get<Envelope<{ items: LoadTestScenario[] }>>(
     endpoints.loadTests.scenarios,
     { headers: tokenHeader(token) },
   )
@@ -109,7 +108,7 @@ export async function startLoadTestRun(
   token: string,
   payload: { scenario_id: string; config: ScenarioConfig },
 ) {
-  const response = await api.post<Envelope<LoadTestRun>>(
+  const response = await loadTestApi.post<Envelope<LoadTestRun>>(
     endpoints.loadTests.runs,
     payload,
     { headers: tokenHeader(token) },
@@ -118,7 +117,7 @@ export async function startLoadTestRun(
 }
 
 export async function listLoadTestRuns(token: string) {
-  const response = await api.get<Envelope<{ items: LoadTestRun[] }>>(
+  const response = await loadTestApi.get<Envelope<{ items: LoadTestRun[] }>>(
     endpoints.loadTests.runs,
     { headers: tokenHeader(token) },
   )
@@ -126,7 +125,7 @@ export async function listLoadTestRuns(token: string) {
 }
 
 export async function getLoadTestRun(token: string, id: string) {
-  const response = await api.get<Envelope<LoadTestRun>>(
+  const response = await loadTestApi.get<Envelope<LoadTestRun>>(
     endpoints.loadTests.run(id),
     { headers: tokenHeader(token) },
   )
@@ -134,11 +133,10 @@ export async function getLoadTestRun(token: string, id: string) {
 }
 
 export async function cancelLoadTestRun(token: string, id: string) {
-  const response = await api.post<Envelope<LoadTestRun>>(
+  const response = await loadTestApi.post<Envelope<LoadTestRun>>(
     endpoints.loadTests.cancel(id),
     {},
     { headers: tokenHeader(token) },
   )
   return response.data.data
 }
-
