@@ -4,9 +4,7 @@ import {
   Tag,
   ShoppingCart,
   Zap,
-  Activity,
   Gauge,
-  Cpu,
   Users,
   Warehouse,
   Newspaper,
@@ -73,18 +71,8 @@ export const dashboardNav: NavItem[] = [
     ],
   },
   {
-    label: "Observability",
-    href: "/dashboard/observability",
-    icon: Activity,
-  },
-  {
     label: "Load Test",
-    href: "/dashboard/load-test",
+    href: "/about/load-test",
     icon: Gauge,
-  },
-  {
-    label: "Architecture",
-    href: "/dashboard/architecture",
-    icon: Cpu,
   },
 ];
